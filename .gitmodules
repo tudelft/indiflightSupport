@@ -1,0 +1,9 @@
+[submodule "external/indiflight-configurator"]
+	path = external/indiflight-configurator
+	url = https://github.com/tblaha/indiflight-configurator/
+[submodule "external/blackbox-log-viewer"]
+	path = external/blackbox-log-viewer
+	url = https://github.com/tblaha/blackbox-log-viewer/
+[submodule "Groundstation/oldMocapClient/relay/ext/pi-protocol"]
+	path = Groundstation/oldMocapClient/relay/ext/pi-protocol
+	url = https://github.com/tblaha/pi-protocol
