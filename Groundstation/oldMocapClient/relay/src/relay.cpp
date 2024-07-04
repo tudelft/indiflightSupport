@@ -184,8 +184,8 @@ int main(int argc, char** argv) {
     uint8_t setpointBuffer[PI_MSG_POS_SETPOINT_PAYLOAD_LEN];
 
     // create imu log file and write to header
-    FILE* imuLogFile = createImuLogFile();
-    writeImuToCsvHeader(imuLogFile);
+    //FILE* imuLogFile = createImuLogFile();
+    //writeImuToCsvHeader(imuLogFile);
 
     while (true) {
         // Q1: doesnt this add a lot of delay? Because the buffer is only filled once
@@ -195,16 +195,17 @@ int main(int argc, char** argv) {
         // answer, seems like the PL011 buffer is 32byte deep. termios wraps it
         // in a PAGE_SIZE deep buffer (4096bytes), so this is fine at least
         ssize_t numBytes = read(serialPortFd, buffer, PI_MAX_PACKET_LEN);
-        uint8_t res;
+        //uint8_t res;
         if (numBytes) {
             for (int i=0; i < numBytes; i++){
-                res = piParse(buffer[i]);
+                //res = piParse(buffer[i]);
+                piParse(buffer[i]);
 
-                if (res == PI_MSG_IMU_ID) {
-                    // write to csv
-                    // if message parse successful then write to csv
-                    writeImuToCsv(piMsgImuRx, imuLogFile);
-                }
+                //if (res == PI_MSG_IMU_ID) {
+                //    // write to csv
+                //    // if message parse successful then write to csv
+                //    writeImuToCsv(piMsgImuRx, imuLogFile);
+                //}
             }
         }
 
@@ -305,7 +306,7 @@ int main(int argc, char** argv) {
     close(serialPortFd);
     close(optitrackFd);
     close(setpointFd);
-    fclose(imuLogFile);
+    //fclose(imuLogFile);
 
     return 0;
 }
