@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
 
-from logTools import IndiflightLog, imuOffsetCorrection
 from glob import glob
 from os import path
 import pandas as pd
 import numpy as np
 import pickle
+from matplotlib import pyplot as plt
+
+from LogAnalysis.indiflightLogTools import IndiflightLog, imuOffsetCorrection, Signal
+
+from os import path, makedirs
+outputPath = path.join(path.dirname(__file__), "output")
+makedirs(outputPath, exist_ok=True)
 
 # G1/G2
 rowNames = ['x', 'y', 'z', 'p', 'q', 'r']
 
 def analyseLogs(logPath, calcInitConds = False):
     files = glob(path.join(logPath, "*.BFL"));
-
-    parameters = []
-    initialConditions = []
 
     #%% go through logs and get G1 and G2 parameters
     logs = []
@@ -65,8 +68,7 @@ def analyseLogs(logPath, calcInitConds = False):
 
     return df
 
-#dataPath = "/mnt/data/WorkData/BlackboxLogs/2024-02-27/ExperimentsForReal";
-dataPath = "/mnt/data/WorkData/BlackboxLogs/2024-03-05/Cyberzoo"
+dataPath = "Documentation/Papers/Data/IROS2024_ExperimentData"
 
 df = analyseLogs(dataPath, calcInitConds=True)
 
@@ -117,8 +119,6 @@ print((np.array([[1.,1.,1.,1000.]]).T *motordf).to_latex(float_format="%.3f"))
 
 #%% Initial condition scatter
 
-from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D 
 plt.close('all')
 
 plt.rcParams.update({
@@ -167,14 +167,13 @@ ax.set_zlim(bottom=-700)
 ax.view_init(elev=17, azim=-137)
 #plt.title("Initial rotation before excitation")
 
-fig.savefig('InitialRotation.pdf', format='pdf')
+fig.savefig(path.join(outputPath, 'InitialRotation.pdf'), format='pdf')
 #fig.show()
 
 
 #%% Simulation results
 
-#dataPathSim = "/mnt/data/WorkData/BlackboxLogs/2024-03-05/HIL_Randomisation"
-dataPathSim = "/mnt/data/WorkData/BlackboxLogs/2024-03-06"
+dataPathSim = "Documentation/Papers/Data/IROS2024_SimData"
 dfSim = analyseLogs(dataPathSim, calcInitConds=False)
 
 pkls = glob(path.join(dataPathSim, "*.pkl"))
@@ -255,8 +254,7 @@ plt.rcParams.update({
     'lines.linewidth': 1,
 })
 
-#log = IndiflightLog("/mnt/data/WorkData/BlackboxLogs/2024-02-27/Experiments500HzLoggingAndThrows/LOG00228.BFL")
-log = IndiflightLog("/mnt/data/WorkData/BlackboxLogs/2024-03-05/Cyberzoo/LOG00271.BFL")
+log = IndiflightLog("Documentation/Papers/Data/IROS2024_ExperimentData/LOG00271.BFL")
 timeMs = log.data['timeMs'] - 1435
 boolarr = (timeMs > 0) & (timeMs < 457)
 timeMs = timeMs[boolarr]
@@ -288,7 +286,7 @@ axs[0].set_ylim(top=1.)
 axs[0].legend( ncol=4 )
 #axs[1].legend( ncol=2 )
 
-f.savefig('Excitation.pdf', format='pdf')
+f.savefig(path.join(outputPath, 'Excitation.pdf'), format='pdf')
 
 #%% regressors
 
@@ -314,7 +312,6 @@ boolarr = (timeMs > 0) & (timeMs < 500)
 timeMs = timeMs[boolarr]
 crop = log.data[boolarr]
 
-from logTools import Signal
 order = 2
 fc = 20 # Hz
 r = np.array([-0.01, -0.01, 0.015])
@@ -353,7 +350,7 @@ for axi, ax in enumerate(['x', 'y', 'z']):
 
     frls.suptitle(f"Online Estimation for {ax}-Axis Force Effectiveness")
 
-    frls.savefig(f"Fx_estimation_{ax}.pdf", format='pdf')
+    frls.savefig(path.join(outputPath, f"Fx_estimation_{ax}.pdf"), format='pdf')
 
 axis_names = ['Roll', 'Pitch', 'Yaw']
 for axi, ax in enumerate(['p', 'q', 'r']):
@@ -387,7 +384,7 @@ for axi, ax in enumerate(['p', 'q', 'r']):
 
     frls.suptitle(f"Online Estimation for {axis_names[axi]} Effectiveness")
 
-    frls.savefig(f"Fx_estimation_{ax}.pdf", format='pdf')
+    frls.savefig(path.join(outputPath, f"Fx_estimation_{ax}.pdf"), format='pdf')
 
 plt.rcParams.update({
     'figure.subplot.bottom': 0.15,
@@ -422,7 +419,7 @@ axs[1].plot(timeMsRec, rec[[f'motor[{i}]' for i in range(4)]])
 axs[1].set_xlabel("Time [ms]")
 axs[1].set_ylabel("Motor command $\delta$ [-]")
 axs[1].legend([f"Motor {i+1}" for i in range(4)], loc="lower right", ncols=2)
-frec.savefig("Recovery.pdf", format='pdf')
+frec.savefig(path.join(outputPath, "Recovery.pdf"), format='pdf')
 
 plt.rcParams.update({
     'figure.subplot.left': 0.05,
@@ -491,16 +488,16 @@ for motor in range(4):
 
     frls.suptitle(f"Online Estimation for Motor Model {motor+1}")
 
-    frls.savefig(f"Motor_estimation_{motor+1}.pdf", format='pdf')
+    frls.savefig(path.join(outputPath, f"Motor_estimation_{motor+1}.pdf"), format='pdf')
 
 # %% Plot trajectories
 
 ft = plt.figure(figsize=(6.7, 5))
 ax = ft.add_subplot(111, projection='3d')
 
-throwFiles = ["/mnt/data/WorkData/BlackboxLogs/2024-02-27/Experiments500HzLoggingAndThrows/LOG00230.BFL",
-    "/mnt/data/WorkData/BlackboxLogs/2024-02-27/Experiments500HzLoggingAndThrows/LOG00231.BFL",
-    "/mnt/data/WorkData/BlackboxLogs/2024-02-27/Experiments500HzLoggingAndThrows/LOG00232.BFL",
+throwFiles = ["Documentation/Papers/Data/IROS2024_ExperimentData/LOG00230.BFL",
+              "Documentation/Papers/Data/IROS2024_ExperimentData/LOG00231.BFL",
+              "Documentation/Papers/Data/IROS2024_ExperimentData/LOG00232.BFL",
     ]
 times = [7629, 5377, 5063]
 throwLogs = []
@@ -538,6 +535,6 @@ ax.set_xlabel("East [m]")
 ax.set_ylabel("North [m]")
 ax.set_zlabel("Up [m]")
 ax.view_init(elev=16, azim=-14)
-ft.savefig('Trajectories.pdf', format='pdf')
+ft.savefig(path.join(outputPath, 'Trajectories.pdf'), format='pdf')
 
 

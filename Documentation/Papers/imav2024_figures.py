@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 
-from logTools import IndiflightLog, Signal, imuOffsetCorrection
-from glob import glob
-from os import path
-import pandas as pd
 import numpy as np
-import pickle
+import quaternion
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
+from cycler import cycler
+
+from LogAnalysis.indiflightLogTools import IndiflightLog, Signal, imuOffsetCorrection
+
+from os import path, makedirs
+outputPath = path.join(path.dirname(__file__), "output")
+makedirs(outputPath, exist_ok=True)
 
 plt.rcParams.update({
     "xtick.labelsize": 10,
@@ -27,17 +30,14 @@ plt.rcParams.update({
     "axes.formatter.limits": [-2, 3]
 })
 
-from cycler import cycler
 backupCycle = plt.rcParams['axes.prop_cycle']
 plt.rcParams['axes.prop_cycle'] = cycler('linestyle', ['-', '--', ':', '-.'])
 
-log = IndiflightLog("/mnt/data/WorkData/BlackboxLogs/2024-06-12/LOG00472_video.BFL", (1368, 1820))
+log = IndiflightLog("Documentation/Papers/Data/IMAV2024_ExperimentData/LOG00472.BFL", (1368, 1820))
 log.resetTime()
 crop = log.data
 timeMs = log.data['timeMs']
 
-
-import quaternion
 qTrue = np.quaternion(0.837, -0.491, 0.242, 0.).normalized()
 r = 1e-3 * np.array([-10., -12., 8.]) # onbaord precision is 1mm
 rq = np.quaternion(0, r[0], r[1], r[2])
@@ -115,7 +115,7 @@ axs[5].legend([
 
 axs[-1].set_xlabel("Time [ms]")
 
-f.savefig("hoverAttitude.pdf", format="pdf")
+f.savefig(path.join(outputPath, "hoverAttitude.pdf"), format="pdf")
 #plt.show()
 
 
@@ -134,7 +134,7 @@ plt.rcParams.update({
     "axes.formatter.limits": [-2, 4]
 })
 
-log = IndiflightLog("/mnt/data/WorkData/BlackboxLogs/2024-06-12/LOG00472_video.BFL", (1100, 1900))
+log = IndiflightLog("Documentation/Papers/Data/IMAV2024_ExperimentData/LOG00472.BFL", (1100, 1900))
 log.resetTime()
 crop = log.data
 timeMs = log.data['timeMs'] + 1100 - 1368
@@ -179,7 +179,7 @@ ax.set_ylabel( "Execution Time [$\mu$s]" )
 ax.set_xlabel( "Time [ms]" )
 ax.legend( handles[::-1], legendNames[::-1], loc="upper left")
 
-fex.savefig("learnerTimings.pdf", format='pdf')
-fex.savefig("learnerTimings.png", format='png', dpi=300)
-fex.savefig("learnerTimings.eps", format='eps')
+fex.savefig(path.join(outputPath, "learnerTimings.pdf"), format='pdf')
+fex.savefig(path.join(outputPath, "learnerTimings.png"), format='png', dpi=300)
+fex.savefig(path.join(outputPath, "learnerTimings.eps"), format='eps')
 
