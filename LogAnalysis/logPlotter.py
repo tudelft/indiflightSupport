@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-from argparse import ArgumentParser, ArgumentError
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from matplotlib import pyplot as plt
+import numpy as np
 import logging
 import sys
 
-from indiflightLogTools import IndiflightLog
+from indiflightLogTools import IndiflightLog, imuOffsetCorrection, Signal
 
 if __name__=="__main__":
     # script to demonstrate how to use it
-    parser = ArgumentParser()
+    parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("datafile", help="single indiflight bfl logfile")
     parser.add_argument("--range","-r", required=False, nargs=2, type=int, help="integer time range to consider in ms since start of datafile")
     parser.add_argument("-c", "--compare", required=False, help="supply a second file for comparison")
@@ -34,9 +35,6 @@ if __name__=="__main__":
 
     # import data
     log = IndiflightLog(args.datafile, args.range, not args.no_cache)
-
-    from logTools.estimators import imuOffsetCorrection, Signal
-    import numpy as np
 
     a = log.data[[f"accUnfiltered[{i}]" for i in range(3)]].to_numpy()
     w = log.data[[f"gyroADCafterRpm[{i}]" for i in range(3)]].to_numpy()

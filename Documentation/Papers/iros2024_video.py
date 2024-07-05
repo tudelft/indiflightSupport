@@ -1,8 +1,15 @@
 import numpy as np
-from matplotlib import animation
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+from matplotlib import animation
 from cycler import cycler
+
+from LogAnalysis.indiflightLogTools import IndiflightLog, Signal, imuOffsetCorrection
+
+from os import path, makedirs
+outputPath = path.join(path.dirname(__file__), "output")
+makedirs(outputPath, exist_ok=True)
 
 plt.rcParams.update({
     "xtick.labelsize": 10,
@@ -23,13 +30,7 @@ plt.rcParams.update({
 
 plt.rcParams['axes.prop_cycle'] = cycler('linestyle', ['-', '--', ':', '-.'])
 
-from logTools import IndiflightLog, Signal, imuOffsetCorrection
-
-#log = IndiflightLog("/mnt/data/WorkData/BlackboxLogs/2024-03-05/Cyberzoo/LOG00271.BFL")
-#crop, timeS = log.crop(1.435, 1.435+0.475)   # ident
-#crop, timeS = log.crop(1.435+0.475, 1.435+2.000)    # recover
-log = IndiflightLog("/mnt/data/WorkData/BlackboxLogs/2024-03-18_IROSVideoShoot/LOG00342.BFL")
-#crop, timeS = log.crop(1.285, 1.285+0.475)   # ident
+log = IndiflightLog("Documentation/Papers/Data/IROS2024_VideoShoot/LOG00342.BFL")
 crop, timeS = log.crop(1.285+0.475, 1.285+2.000)    # recover
 timeMs = timeS * 1e3
 
@@ -218,7 +219,6 @@ def func(frame):
     for im in allIms:
         im.remove()
 
-    import matplotlib as mpl
     cmapname = 'coolwarm'
     limF = 1e-6
     limR = 5e-5
@@ -281,5 +281,5 @@ ani = animation.FuncAnimation(fig, func, data_gen, init_func=init,
                               save_count=len(crop))
 FFwriter = animation.FFMpegWriter(fps=500/slowDown, bitrate=10000)
 #ani.save('identData.mp4', writer=FFwriter)
-ani.save('recoveryData.mp4', writer=FFwriter)
+ani.save(path.join(outputPath, 'recoveryData.mp4'), writer=FFwriter)
 #plt.show()
