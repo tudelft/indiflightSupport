@@ -1,0 +1,14 @@
+# Dockerfile.cross.custom
+FROM pi-cross-base:latest
+
+RUN apt-get --no-install-recommends install -y \
+    python3-pip \
+    # more-packages \
+    && \
+  apt-get clean
+
+RUN pip install PyYAML semver Jinja2 && \
+  pip cache purge
+
+
+

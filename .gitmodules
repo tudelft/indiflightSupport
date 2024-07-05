@@ -7,3 +7,6 @@
 [submodule "Groundstation/oldMocapClient/relay/ext/pi-protocol"]
 	path = Groundstation/oldMocapClient/relay/ext/pi-protocol
 	url = https://github.com/tblaha/pi-protocol
+[submodule "external/racebian"]
+	path = external/racebian
+	url = https://github.com/tblaha/racebian
