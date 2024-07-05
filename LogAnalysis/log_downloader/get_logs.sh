@@ -1,8 +1,8 @@
 #!/bin/bash
 
 function help_and_exit {
-    echo "$0 {--no-reset} [device_on_remote] [local_path]"
-    echo "One-way sync from device to local path. Deletes local files that are not on the remote anymore!"
+    echo "$0 [--no-reset] device_on_remote local_path"
+    echo "One-way sync from device to local path. !! This script deletes local files that are not on the remote anymore !!"
     exit 1
 }
 

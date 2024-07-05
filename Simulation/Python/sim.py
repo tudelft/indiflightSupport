@@ -72,6 +72,8 @@ if __name__=="__main__":
         except ValueError:
             print("PORT must be integer")
 
+
     simThread = threading.Thread(target=runSim, daemon=True, args=[args])
     simThread.start( )
+    print("Welcome to sim.py -- Starting visualization at http://localhost:5000\n")
     visApp.run( )
