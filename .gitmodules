@@ -10,3 +10,9 @@
 [submodule "external/racebian"]
 	path = external/racebian
 	url = https://github.com/tblaha/racebian
+[submodule "Groundstation/newMocapClient/UnifiedOptitrackClients"]
+	path = Groundstation/newMocapClient/UnifiedOptitrackClients
+	url = https://github.com/tudelft/UnifiedOptitrackClients/
+[submodule "Groundstation/newMocapClient/relay/ext/pi-protocol"]
+	path = Groundstation/newMocapClient/relay/ext/pi-protocol
+	url = https://github.com/tblaha/pi-protocol

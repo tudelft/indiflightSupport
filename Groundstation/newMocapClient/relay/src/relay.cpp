@@ -3,17 +3,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
-#include <fstream>
-#include <sys/time.h>
-
-#include <chrono>
-#include <ctime>
-
-using std::chrono::duration_cast;
-using std::chrono::milliseconds;
-using std::chrono::seconds;
-using std::chrono::system_clock;
-
 //#include <common/mavlink.h>
 //#include "mavlink/common/mavlink.h"
 #include <iostream>
@@ -24,6 +13,7 @@ using std::chrono::system_clock;
 
 #include <stdlib.h>
 #include <arpa/inet.h>
+#include <math.h>
 
 #define OPTITRACK_PORT 5005
 #define SETPOINT_PORT 5006
@@ -100,7 +90,6 @@ int openUdpPort(const uint16_t port) {
 }
 
 int serialPortFd; // needs to be global to be used inside serialWriter
-static pi_parse_states_t piParseStates = {0};
 
 void serialWriter(uint8_t byte)
 {
@@ -114,47 +103,33 @@ float ntohf(float in) {
     return *(float*)(&dummy);
 }
 
-// functions for writing IMU message to csv file
-FILE* createImuLogFile() {
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    char filename[100];
-    sprintf(filename, "/home/pi/logs/imu-%d-%d-%d-%d-%d-%d.csv", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-    // convert to std::string
-    std::string filename_str(filename);
-    // if /home/pi/logs doesnt exists we make it
-    std::ifstream file_stream(filename_str.c_str());
+typedef struct pose_s {
+    uint64_t timeUs;
+    float x;
+    float y;
+    float z;
+    float qx;
+    float qy;
+    float qz;
+    float qw;
+} pose_t;
 
-    if (!file_stream.good()) {
-        system("mkdir -p /home/pi/logs");
-    }
-    
-    FILE* file = fopen(filename, "w");
-    printf("Logging IMU data to %s\n", filename);
-    return file;
-}
+typedef struct pose_der_s {
+    uint64_t timeUs;
+    float x;
+    float y;
+    float z;
+    float wx;
+    float wy;
+    float wz;
+} pose_der_t;
 
-void writeImuToCsvHeader(FILE* file) {
-    // time_ms_rec is the time the message was received
-    // time_ms is the time the message was created
-    fprintf(file, "time_ms_rec,time_ms_msg,roll,pitch,yaw,x,y,z\n");
-}
-
-void writeImuToCsv(pi_IMU_t* imuMsg, FILE* file) {
-    // get current time ms
-    auto millisec_since_epoch = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-    
-    uint32_t time_ms_rec = (uint32_t)millisec_since_epoch;
-    fprintf(file, "%u,%u,%f,%f,%f,%f,%f,%f\n", time_ms_rec, imuMsg->time_ms, imuMsg->roll, imuMsg->pitch, imuMsg->yaw, imuMsg->x, imuMsg->y, imuMsg->z);
-}
+static pi_parse_states_t piParseStates = {0};
 
 int main(int argc, char** argv) {
-    // enable logging if the first argument is -l
-    bool logging = (argc == 2) && !strcmp(argv[1], "-l"); 
-
     const char* serialPort = "/dev/ttyAMA0";
     //int baudrate = B57600;
-    //const char* serialPort = "/dev/ttyS0";
+    //const char* serialPort = "/tmp/ttyS2";
     //int baudrate = B500000; //todo: make commandline argument
     int baudrate = B921600; //todo: make commandline argument
 
@@ -177,22 +152,14 @@ int main(int argc, char** argv) {
     uint8_t buffer[PI_MAX_PACKET_LEN];
 
     // open udps
-
-#define OPTITRACK_BUFFER_SIZE (PI_MSG_FAKE_GPS_PAYLOAD_LEN + PI_MSG_EXTERNAL_POSE_PAYLOAD_LEN)
     int optitrackFd = openUdpPort(OPTITRACK_PORT);
     printf("Server listening on port %d for Optitrack...\n", OPTITRACK_PORT);
+    static constexpr size_t OPTITRACK_BUFFER_SIZE = sizeof(unsigned int) + sizeof(pose_t) + sizeof(pose_der_t);
     uint8_t optitrackBuffer[OPTITRACK_BUFFER_SIZE];
 
     int setpointFd = openUdpPort(SETPOINT_PORT);
     printf("Server listening on port %d for Setpoints...\n", SETPOINT_PORT);
     uint8_t setpointBuffer[PI_MSG_POS_SETPOINT_PAYLOAD_LEN];
-
-    // create imu log file and write to header
-    FILE* imuLogFile = NULL;
-    if (logging) {
-        imuLogFile = createImuLogFile();
-        writeImuToCsvHeader(imuLogFile);
-    }
 
     while (true) {
         // Q1: doesnt this add a lot of delay? Because the buffer is only filled once
@@ -202,82 +169,87 @@ int main(int argc, char** argv) {
         // answer, seems like the PL011 buffer is 32byte deep. termios wraps it
         // in a PAGE_SIZE deep buffer (4096bytes), so this is fine at least
         ssize_t numBytes = read(serialPortFd, buffer, PI_MAX_PACKET_LEN);
-        uint8_t res;
+        bool newMessage = false;
         if (numBytes) {
-            for (int i=0; i < numBytes; i++){
-                res = piParse(&piParseStates, buffer[i]);
-
-                if ((logging) && (res == PI_MSG_IMU_ID)) {
-                    // write to csv
-                    // if message parse successful then write to csv
-                    writeImuToCsv(piMsgImuRx, imuLogFile);
-                }
-            }
+            for (int i=0; i < numBytes; i++)
+                if (piParse(&piParseStates, buffer[i]) == PI_MSG_IMU_ID)
+                    newMessage = true;
         }
 
-        //if ((piMsgImuRxState == PI_MSG_RX_STATE_NONE) || (res != PI_MSG_IMU_ID)) {
-        //    usleep(250); // reduce CPU load a bit
-        //    continue;
-        //}
+        if ((piMsgImuRxState == PI_MSG_RX_STATE_NONE) || (!newMessage)) {
+            // cannot go on, no time information to timestamp gps msgs, or setpoints
+            usleep(500); // sleep 0.5ms, this is bound to miss some gyro messages, but what gives
+            continue;
+        }
 
+        newMessage = false;
 
-        pi_FAKE_GPS_t msgFakeGps;
-        pi_EXTERNAL_POSE_t msgExternalPose;
-#define PI_MSG_PAYLOAD_OFFSET (PI_MSG_ID_BYTES + PI_MSG_PAYLOAD_LEN_BYTES)
+        pose_t pose;
+        pose_der_t pose_der;
+
         //int bytes_received = recvfrom(sockfd, (char*)(piMsgFakeGpsRx)+PI_MSG_PAYLOAD_OFFSET, PI_MSG_FAKE_GPS_PAYLOAD_LEN, 0, (struct sockaddr *)&client_addr, &client_addr_len);
         struct sockaddr_in client_addr;
         socklen_t client_addr_len = sizeof(client_addr);
         int bytes_received = recvfrom(optitrackFd, (uint8_t *)(optitrackBuffer), OPTITRACK_BUFFER_SIZE, 0, (struct sockaddr *)&client_addr, &client_addr_len);
-        memcpy((uint8_t *)(&msgFakeGps)+PI_MSG_PAYLOAD_OFFSET, optitrackBuffer, PI_MSG_FAKE_GPS_PAYLOAD_LEN);
-        memcpy((uint8_t *)(&msgExternalPose)+PI_MSG_PAYLOAD_OFFSET, optitrackBuffer+PI_MSG_FAKE_GPS_PAYLOAD_LEN, PI_MSG_EXTERNAL_POSE_PAYLOAD_LEN);
-        //if (bytes_received == -1) {
-        //    perror("recvfrom failed");
-        //    exit(EXIT_FAILURE);
-        //}
-
-        //bool udpReceived = false;
-        //if (bytes_received > 0) {
-        //    printf
-        //    for (int i=0; i < bytes_received; i++)
-        //        updReceived |= (piParse(udpbuffer[i]) == PI_MSG_FAKE_GPS_ID);
-        //}
+        memcpy((uint8_t *)(&pose), optitrackBuffer+sizeof(unsigned int), sizeof(pose_t));
+        memcpy((uint8_t *)(&pose_der), optitrackBuffer+sizeof(unsigned int)+sizeof(pose_t), sizeof(pose_der_t));
 
         if (bytes_received > 0) {
+            //pose.timeUs = __builtin_bswap64(pose.timeUs);
+            //printf("Received optitrack for time %ld at IMU time %d\n", pose.timeUs, piMsgImuRx->time_ms);
             /*
-            piPrintMsgs(&printf);
-            printf("Hello: ");
-            for (int j = 0; j < bytes_received; j++) {
-                printf(" 0x%x", *(uint8_t*)(piMsgFakeGpsRx+PI_MSG_PAYLOAD_OFFSET+j));
-            }
+            pose.x = ntohf(pose.x);
+            pose.y = ntohf(pose.y);
+            pose.z = ntohf(pose.z);
+            pose.qx = ntohf(pose.qx);
+            pose.qy = ntohf(pose.qy);
+            pose.qz = ntohf(pose.qz);
+            pose.qw = ntohf(pose.qw);
+
+            pose_der.x = ntohf(pose_der.x);
+            pose_der.y = ntohf(pose_der.y);
+            pose_der.z = ntohf(pose_der.z);
+            pose_der.wx = ntohf(pose_der.wx);
+            pose_der.wy = ntohf(pose_der.wy);
+            pose_der.wz = ntohf(pose_der.wz);
             */
+
             piMsgFakeGpsTx.time_ms = piMsgImuRx->time_ms;
-            piMsgFakeGpsTx.lat = ntohl(msgFakeGps.lat);
-            piMsgFakeGpsTx.lon = ntohl(msgFakeGps.lon);
-            piMsgFakeGpsTx.altCm = ntohl(msgFakeGps.altCm);
-            piMsgFakeGpsTx.hdop =  ntohs(msgFakeGps.hdop);
-            piMsgFakeGpsTx.groundSpeed = ntohs(msgFakeGps.groundSpeed);
-            piMsgFakeGpsTx.groundCourse = ntohs(msgFakeGps.groundCourse);
-            piMsgFakeGpsTx.numSat = msgFakeGps.numSat;
+            static constexpr double CYBERZOO_LAT = 51.99071002805145;
+            static constexpr double CYBERZOO_LON = 4.376727452462819;
+            static constexpr double RE = 6378137.;
+            piMsgFakeGpsTx.lat = (int) 1e7 * 
+                (CYBERZOO_LAT + 180. / M_PI * (pose.y / RE));
+            piMsgFakeGpsTx.lon = (int) 1e7 *
+                (CYBERZOO_LON + 180 / M_PI * (pose.x / RE) / cos(CYBERZOO_LON * M_PI / 180.));
+            piMsgFakeGpsTx.altCm = (int) (pose.z * 100.f);
+            piMsgFakeGpsTx.hdop =  (short) 150;
+            piMsgFakeGpsTx.groundSpeed = (short) (hypotf(pose_der.x, pose_der.y) * 100.f);
+            piMsgFakeGpsTx.groundCourse = (short) (1800.f * atan2(pose_der.y, pose_der.x) / M_PI);
+            piMsgFakeGpsTx.numSat = 8;
             piSendMsg(&piMsgFakeGpsTx, &serialWriter);
 
             piMsgExternalPoseTx.time_ms = piMsgImuRx->time_ms;
-            piMsgExternalPoseTx.enu_x = ntohf(msgExternalPose.enu_x);
-            piMsgExternalPoseTx.enu_y = ntohf(msgExternalPose.enu_y);
-            piMsgExternalPoseTx.enu_z = ntohf(msgExternalPose.enu_z);
-            piMsgExternalPoseTx.enu_xd = ntohf(msgExternalPose.enu_xd);
-            piMsgExternalPoseTx.enu_yd = ntohf(msgExternalPose.enu_yd);
-            piMsgExternalPoseTx.enu_zd = ntohf(msgExternalPose.enu_zd);
-            piMsgExternalPoseTx.body_qi = ntohf(msgExternalPose.body_qi);
-            piMsgExternalPoseTx.body_qx = ntohf(msgExternalPose.body_qx);
-            piMsgExternalPoseTx.body_qy = ntohf(msgExternalPose.body_qy);
-            piMsgExternalPoseTx.body_qz = ntohf(msgExternalPose.body_qz);
+            piMsgExternalPoseTx.enu_x = pose.x;
+            piMsgExternalPoseTx.enu_y = pose.y;
+            piMsgExternalPoseTx.enu_z = pose.z;
+            piMsgExternalPoseTx.enu_xd = pose_der.x;
+            piMsgExternalPoseTx.enu_yd = pose_der.y;
+            piMsgExternalPoseTx.enu_zd = pose_der.z;
+            piMsgExternalPoseTx.body_qi = pose.qw;
+            piMsgExternalPoseTx.body_qx = pose.qx;
+            piMsgExternalPoseTx.body_qy = pose.qy;
+            piMsgExternalPoseTx.body_qz = pose.qz;
             piSendMsg(&piMsgExternalPoseTx, &serialWriter);
         }
-
+        //else {
+            //printf("No optitrack bytes received at %ld at IMU time %d\n", pose.timeUs, piMsgImuRx->time_ms);
+        //}
 
         // ---- setpoints ----
         pi_POS_SETPOINT_t msgPosSetpoint;
         bytes_received = recvfrom(setpointFd, (uint8_t *)(setpointBuffer), PI_MSG_POS_SETPOINT_PAYLOAD_LEN, 0, (struct sockaddr *)&client_addr, &client_addr_len);
+#define PI_MSG_PAYLOAD_OFFSET (PI_MSG_ID_BYTES + PI_MSG_PAYLOAD_LEN_BYTES)
         memcpy((uint8_t *)(&msgPosSetpoint)+PI_MSG_PAYLOAD_OFFSET, setpointBuffer, PI_MSG_POS_SETPOINT_PAYLOAD_LEN);
         //if (bytes_received == -1) {
         //    perror("recvfrom failed");
@@ -316,10 +288,6 @@ int main(int argc, char** argv) {
     close(serialPortFd);
     close(optitrackFd);
     close(setpointFd);
-
-    if (logging) {
-        fclose(imuLogFile);
-    }
 
     return 0;
 }

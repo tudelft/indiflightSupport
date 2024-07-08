@@ -1,16 +1,12 @@
-if you want make changes: do it in `src/relay.cpp`
+if you want make changes: do it in src/relay.cpp
 
 to build:
-
-    mkdir build
-    cmake ..
-    make
+mkdir build
+cmake ..
+make
 
 start connection:
-
-    sudo ./relay [-l]
-
-The option `-l` enables logging of IMU messages to a `.csv`. file at `/home/pi/logs`
+sudo ./relay
 
 ## Optional: unit file
 
@@ -23,5 +19,3 @@ sudo systemctl daemon-reload
 sudo systemctl enable relay.service
 sudo systemctl start relay.service
 ```
-
-If you need logging, just add the `-l` flag to the exec command in `relay.service`

@@ -141,7 +141,7 @@ class IndiflightHIL:
         self.ser = serial.Serial(port=device, baudrate=baud, timeout=0.0001)
         self.ser.set_low_latency_mode(True) # only works on linux, i think
         self.fmtSend = '< B I hhh hhh h hhhh'
-        self.fmtReceive = '< B I hhhh'
+        self.fmtReceive = '< B I hhhh B' # checksum byte at the end
         self.len_fmtReceive = struct.calcsize(self.fmtReceive)
         self.parse_state = self.IDLE
         self.escape_state = False
@@ -167,6 +167,12 @@ class IndiflightHIL:
                                  0, # baro
                                  *(w * 60 / (2*3.1415) / self.HIL_TO_RPM).astype(np.int16),
                                  )
+
+        checksum = msg_packed[0]
+        for byte in msg_packed:
+            checksum ^= byte
+
+        msg_packed.append(checksum)
 
         msg_escaped = bytearray()
         msg_escaped.append(self.STX)
@@ -215,8 +221,16 @@ class IndiflightHIL:
                 self.len_bytes += 1
 
             if self.len_bytes == self.len_fmtReceive:
+                self.parse_state = self.IDLE # definitely return to idle, but checksum decides if we accept the package
+
+                checksum = self.bytes[0]
+                for byte in self.bytes[1:-1]:
+                    checksum ^= byte
+
+                if checksum != self.bytes[-1]:
+                    continue
+
                 self.num_msgs += 1
-                self.parse_state = self.IDLE
                 msg_unpacked = struct.unpack(self.fmtReceive, self.bytes)
                 if msg_unpacked[0] == self.HIL_OUT_ID:
                     self.uav.inputs[0] = msg_unpacked[2] / self.MOTOR_TO_HIL

@@ -1,0 +1,15 @@
+[Unit]
+Description=Setup UART connection to INDIflight and listen for optitrack/setpoints
+#Documentation=man:ser2net(8)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+#EnvironmentFile=-/etc/default/ser2net
+ExecStart=/home/pi/relay/build-aarch64-linux-gnu/relay
+Type=exec
+Restart=on-failure
+#Restart=always
+
+[Install]
+WantedBy=multi-user.target
