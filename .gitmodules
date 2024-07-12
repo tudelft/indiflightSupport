@@ -16,3 +16,6 @@
 [submodule "Groundstation/newMocapClient/relay/ext/pi-protocol"]
 	path = Groundstation/newMocapClient/relay/ext/pi-protocol
 	url = https://github.com/tblaha/pi-protocol
+[submodule "external/indiflight"]
+	path = external/indiflight
+	url = https://github.com/tudelft/indiflight

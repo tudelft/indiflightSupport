@@ -75,6 +75,32 @@ class Mocap:
         self.sock.sendto(msg_packed, self.addr)
 
 
+#%% software in the loop interface
+
+class IndiflightSITLWrapper():
+    def __init__(self, uav, imu, libfile, profile_txt=None, N=4):
+        from indiflight_mockup_interface import IndiflightSITLMockup
+        self.uav = uav
+        self.imu = imu
+        self.mockup = IndiflightSITLMockup(libfile, profile_txt, N)
+
+    def sendImuAndMotor(self):
+        self.mockup.sendImu( self.imu.gyro, self.imu.acc )
+        self.mockup.sendMotorSpeeds( self.uav.rotorVelocity )
+
+    def sendMocap(self):
+        self.mockup.sendMocap( self.uav.xI, self.uav.vI, self.uav.q )
+
+    def receive(self):
+        inputs = self.mockup.getMotorCommands()
+        n = min(len(inputs), len(self.uav.inputs))
+        self.uav.inputs[:n] = self.mockup.getMotorCommands()
+        self.uav.inputs = np.clip(self.uav.inputs, 0., 1.)
+
+    def tick(self, dt):
+        self.mockup.tick( int(dt*1e6) )
+
+
 #%% hardware in the loop interface
 
 import serial
