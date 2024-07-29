@@ -19,6 +19,8 @@ class VisData():
 
 visData = VisData()
 visApp = fl.Flask(__name__, static_url_path='/static')
+visApp.debug = False
+visApp.use_reloader = False
 
 @visApp.route("/")
 def hello_world():
@@ -32,6 +34,10 @@ def pose():
     ctl = list(visData.inputs)
     arr.append({'id': 0, 'type': 0, 'pos': pos, 'quat': quat, 'ctl': ctl})
     return json.dumps(arr)
+
+@visApp.route("/shutdown")
+def shutdown():
+    fl.request.environ.get('werkzeug.server.shutdown()')()
 
 # dont spam the console
 import logging
@@ -78,11 +84,11 @@ class Mocap:
 #%% software in the loop interface
 
 class IndiflightSITLWrapper():
-    def __init__(self, uav, imu, libfile, profile_txt=None, N=4):
+    def __init__(self, uav, imu, libfile, N=4):
         from indiflight_mockup_interface import IndiflightSITLMockup
         self.uav = uav
         self.imu = imu
-        self.mockup = IndiflightSITLMockup(libfile, profile_txt, N)
+        self.mockup = IndiflightSITLMockup(libfile, N=N)
 
     def sendImuAndMotor(self):
         self.mockup.sendImu( self.imu.gyro, self.imu.acc )
