@@ -3,4 +3,5 @@ numba
 numpy
 pyserial
 scipy
+netifaces
 tqdm @ git+https://github.com/tblaha/tqdm.git@ddca2c8aae3bac58fec43ccd7c2b7c639cd832fc

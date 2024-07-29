@@ -11,7 +11,7 @@
             "program": "/home/tmblaha/.venv/bin/python3",
             //"args": ["--eval-command='run ${workspaceFolder}/mockup.py'"],
             "args": [
-                "${workspaceFolder}/Simulation/Python/sim.py",
+                "${workspaceFolder}/Simulation/Python/simThrow.py",
                 "--sil-mockup",
                 "--sil-profile-txt",
                 "Simulation/Python/configs/BTFL_cli_20240314_MATEKH743_CineRat_HoverAtt_NN.txt",
