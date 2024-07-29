@@ -132,6 +132,7 @@ if __name__=="__main__":
             sil.mockup.enableFlightMode(flightModeFlags.CATAPULT_MODE)
         elif args.throw:
             sil.mockup.enableRxBox(boxId.BOXTHROWTOARM)
+            sil.mockup.enableRxBox(boxId.BOXARM)
 
     # initial conditions
     mc.setPose(x=[0., 0., -0.1], q=[1., 0., 0., 0.])
