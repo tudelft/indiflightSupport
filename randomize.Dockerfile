@@ -22,9 +22,10 @@ RUN pip install -r requirements.txt
 
 EXPOSE 5000
 WORKDIR /
-ENTRYPOINT [ "python3", "/sim/sim.py", \
-    "--sil-mockup", "/indiflight/obj/main/indiflight_MOCKUP.so", \
-    "--sil-profile-txt", "/sim/configs/BTFL_cli_20240314_MATEKH743_CineRat_HoverAtt_NN.txt"]
+ENTRYPOINT [ "python3", "/sim/quadSILRandomize.py", \
+    "/indiflight/obj/main/indiflight_MOCKUP.so", \
+    "--sil-profile-txt", "/sim/configs/BTFL_cli_20240314_MATEKH743_CineRat_HoverAtt_NN.txt", \
+    "--sil-log", "--no-real-time"]
 
 
 # TODO: motor commands seem broken in logs? 

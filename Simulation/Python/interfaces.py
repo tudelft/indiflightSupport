@@ -5,6 +5,8 @@ import numpy as np
 
 import flask as fl
 import json
+from netifaces import interfaces, ifaddresses, AF_INET
+
 class VisData():
     def __init__(self):
         self.x = np.zeros(3, dtype=np.float64)
