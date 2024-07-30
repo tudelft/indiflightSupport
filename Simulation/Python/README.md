@@ -4,9 +4,13 @@ Install
 
 Run (I think Linux only right now, if using the IndiflightHIL interface)
 
-    ./sim.py --hil /dev/ttyUSB0 --mocap 10.0.0.1 5005
+    ./quadSimExample.py --hil /dev/ttyUSB0 --mocap 10.0.0.1 5005
 
-See `./sim.py --help` for all interface config options.
-Modify `./sim.py:runSim()` to suit your multicopter model needs
+If you have a compiled Indiflight TARGET=MOCKUP library, you can run that SIL:
+
+    ./quadSimExample.py --sil
+
+See `./quadSimExample.py --help` for all interface config options.
+Modify `./quadSimExample.py` to suit your multicopter model needs
 
 Open browser to http://localhost:5000

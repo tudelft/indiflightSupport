@@ -55,8 +55,8 @@ class MultiRotor:
 
         self.throw_time = +np.inf
         self.throw_duration = 0.
-        self.FextI = np.array([0., 0., 0.], dtype=np.float32)
-        self.MextB = np.array([0., 0., 0.], dtype=np.float32)
+        self.FthrowI = np.array([0., 0., 0.], dtype=np.float32)
+        self.MthrowB = np.array([0., 0., 0.], dtype=np.float32)
 
     def __repr__(self):
         qWrong = np.zeros_like(self.q)
@@ -66,7 +66,7 @@ class MultiRotor:
         eulers = rot.as_euler('ZYX', degrees=True)
         return f"MultiRotor( n={len(self.rotors)}, x={self.xI}m, v={self.vI}m/s, roll={eulers[2]}deg, pitch={eulers[1]}deg, yaw={eulers[0]}deg )"
 
-    def throw(self, height=3.5, acc=45., wB=[0., 0., 0.], vHorz=[0., 0.]):
+    def throw(self, height=3.5, acc=45., wB=[0., 0., 0.], vHorz=[0., 0.], at_time=0.):
         force = self.m * ( acc + GRAVITY )
 
         # solve duration:
@@ -77,25 +77,12 @@ class MultiRotor:
         # sC = 0.5*vT**2 / g,  becayse 0.5*vT**2 = g*sC
         # 
         # then, solve  height == sT + sC  for time
-        self.throw_time = 0.
+        self.throw_time = -at_time
         self.throw_duration = np.sqrt( 2. * height / (acc * (1. + acc / GRAVITY)) )
 
-        self.FextI[:2] = self.m * np.asarray(vHorz) / self.throw_duration
-        self.FextI[2] = -force
-        self.MextB[:] = self.I @ ( wB / self.throw_duration )
-
-    def tick(self, dt):
-        self.t += dt
-        if self.t <= self.duration:
-            self.F[:2] = self.fHorz
-            self.F[2] = -self.force
-            self.M[:] = self.moment
-        else:
-            self.F[:] = 0.
-            self.M[:] = 0.
-
-        self.uav.setExternalForceInInertialFrame(self.F)
-        self.uav.setExternalMomentInBodyFrame(self.M)
+        self.FthrowI[:2] = self.m * np.asarray(vHorz) / self.throw_duration
+        self.FthrowI[2] = -force
+        self.MthrowB[:] = self.I @ ( wB / self.throw_duration )
 
     def setInertia(self, m, I):
         self.m = m
@@ -117,12 +104,12 @@ class MultiRotor:
         self.wB[:] = np.asarray(w, dtype=np.float32)
 
     def setExternalForceInInertialFrame(self, F):
-        self.FextI[:] = F
+        self.FthrowI[:] = F
 
     def setExternalMomentInBodyFrame(self, M):
-        self.MextB[:] = M
+        self.MthrowB[:] = M
 
-    def step(self, dt):
+    def tick(self, dt):
         F = np.zeros(3, dtype=np.float32)
         M = np.zeros(3, dtype=np.float32)
         for i, (u, rotor) in enumerate(zip(self.inputs, self.rotors)):
@@ -143,12 +130,9 @@ class MultiRotor:
 
         # throw timekeeping and add external force and moment
         self.throw_time += dt
-        if self.throw_time > self.throw_duration:
-            self.FextI[:] = 0
-            self.MextB[:] = 0
-
-        F += quatRotate( qInv, self.FextI )
-        M += self.MextB
+        if self.throw_time > 0. and self.throw_time <= self.throw_duration:
+            F += quatRotate( qInv, self.FthrowI )
+            M += self.MthrowB
 
         self.wDotB[:] = angularRateDerivative( self.wB, M, self.I, self.Iinv )
         qDot = quaternionDerivative( self.q, self.wB )
