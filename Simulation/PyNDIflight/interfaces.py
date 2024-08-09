@@ -84,17 +84,12 @@ class Mocap:
         self.w = np.zeros(3, dtype=np.float32)
 
     def update(self):
-        # convert NED to ENU
-        self.x[0] = self.uav.xI[1]
-        self.x[1] = self.uav.xI[0]  
-        self.x[2] = -self.uav.xI[2] 
-        self.v[0] = self.uav.vI[1]  
-        self.v[1] = self.uav.vI[0]  
-        self.v[2] = -self.uav.vI[2] 
+        self.x[:] = self.uav.xI
+        self.v[:] = self.uav.vI
         self.q[3] = self.uav.q[0] # also reverse order...
-        self.q[0] = self.uav.q[2]
-        self.q[1] = self.uav.q[1]
-        self.q[2] = -self.uav.q[3]
+        self.q[0] = self.uav.q[1]
+        self.q[1] = self.uav.q[2]
+        self.q[2] = self.uav.q[3]
         self.w[0] = 666.
 
         msg_packed = struct.pack(self.fmt, 0, 0, *self.x, *self.q, 0, 0, *self.v, *self.w)

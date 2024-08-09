@@ -1,12 +1,20 @@
 if you want make changes: do it in src/relay.cpp
 
 to build:
-mkdir build
-cmake ..
-make
+
+    mkdir build && cd build
+    cmake ..
+    make
+
+to build for orin
+
+    mkdir build && cd build
+    cmake .. -DORIN=ON
+    make
 
 start connection:
-sudo ./relay
+
+    sudo ./relay
 
 ## Optional: unit file
 

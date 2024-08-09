@@ -30,8 +30,8 @@ RUN apt-get update && \
   #rm -rf /var/lib/apt/lists/*
 
 # system config
-ENV SYSROOT /rootfs
-ENV PACKAGE /package
+ENV SYSROOT=/rootfs
+ENV PACKAGE=/package
 
 # cmake config
 #ENV CROSS_INSTALL_PREFIX=/usr/$GNU_HOST
@@ -66,9 +66,9 @@ RUN echo "set(CMAKE_SYSTEM_NAME Linux)" >> $CROSS_TOOLCHAIN && \
 # https://stackoverflow.com/questions/10599038/can-i-skip-cmake-compiler-tests-or-avoid-error-unrecognized-option-rdynamic#comment86573469_30642130
 
 # remote config
-ENV REMOTE_IP 10.0.0.1
-ENV REMOTE_USER pi
-ENV REMOTE_PASSWORD pi
+ENV REMOTE_IP=10.0.0.1
+ENV REMOTE_USER=pi
+ENV REMOTE_PASSWORD=pi
 
 # entry point config
 ADD --chmod=755 build.sh /build.sh
