@@ -29,6 +29,10 @@ set blackbox_disable_setpoint = ON
 set blackbox_disable_bat = ON
 set blackbox_disable_rssi = ON
 set blackbox_disable_debug = ON
+set blackbox_disable_indi = OFF
+set blackbox_disable_pos = ON
+set blackbox_disable_ekf = ON
+set blackbox_disable_learner = OFF
 set blackbox_high_resolution = ON
 set dshot_bidir = ON
 set motor_pwm_protocol = DSHOT600
@@ -76,12 +80,12 @@ set throw_to_arm_acc_clip = 45
 set throw_to_arm_acc_low = 20
 set throw_to_arm_gyro_high = 600
 set throw_to_arm_momentum_thresh = 400
-set throw_to_arm_release_delay_ms = 250
+set throw_to_arm_release_delay_ms = 150
 
 # 0: none, 1: learn during flight, 2: query and learn after catapult, 4: idem. after throw
 set learner_mode = 6
-set learner_num_actuators = 4
-set learner_delay_time_ms = 150
+set learner_num_actuators = 8
+set learner_delay_time_ms = 100
 set learner_step_time_ms = 50
 set learner_ramp_time_ms = 100
 set learner_overlap_time_ms = 50
@@ -157,7 +161,7 @@ set indi_manual_use_coordinated_yaw = 1
 # --- indi config ---
 set indi_use_increment = 1
 set indi_use_rpm_dot_feedback = 1
-set indi_act_num = 4
+set indi_act_num = 8
 set indi_sync_lowpass_hz = 15
 
 # fx, fy, fz, roll, pitch, yaw
@@ -203,6 +207,7 @@ indiprofile 2
 
 # these values are slightly more conservative than indiprofile 0
 
+set indi_act_num = 8
 # set indi_attitude_gains = 1552,1552,1552
 # set indi_rate_gains = 174,174,174
 set indi_attitude_max_tilt_rate = 500
@@ -212,11 +217,11 @@ set indi_manual_max_upwards_accel = 20
 # set indi_act_time_constant_ms = 22,21,21,21,25,25,25,25
 # set indi_act_max_rpm = 32757,28254,34458,35347,40000,40000,40000,40000
 # set indi_act_hover_rpm = 16378,14127,17229,17673,20000,20000,20000,20000
-set indi_act_limit = 60,60,60,60,100,100,100,100
+set indi_act_limit = 100,100,100,100,100,100,100,100
 
 set indi_sync_lowpass_hz = 15
 set indi_wls_axes_weights = 1, 1, 50, 50, 50, 5
-set indi_wls_act_penalties = 1,1,1,1
+set indi_wls_act_penalties = 1,1,1,1,1,1,1,1
 
 
 positionprofile 0
@@ -259,7 +264,7 @@ set position_max_tilt = 40
 # set position_vertical_d = 45
 set position_max_upwards_speed = 100
 set position_max_downwards_speed = 100
-set position_max_upwards_accel = 1500
+set position_max_upwards_accel = 2500
 set position_max_downwards_accel = 500
 # set position_yaw_p = 44
 set position_weathervane_p = 0

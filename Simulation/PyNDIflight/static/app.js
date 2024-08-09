@@ -25,13 +25,16 @@ import {
     quadRotor,
     tailSitter,
     airplane,
+    quadRotorExternal,
     } from "./crafts.js";
 
 var clock = new THREE.Clock();
 
-function updateVisualization(data) {
+async function updateVisualization(data) {
     for (let i = 0; i < data.length; i++) {
-        if (!idList.includes(data[i].id)) {
+        var existsAlready = idList.includes(data[i].id);
+        var shouldReload = data[i].newCraft;
+        if (!existsAlready || shouldReload) {
             // never seen this id, add new craft to scene
             var newCraft;
             switch (data[i].type) {
@@ -44,12 +47,25 @@ function updateVisualization(data) {
                 case craftTypes.airplane:
                     newCraft = new airplane(1., 0.3, 8*0.0254);
                     break;
+                case craftTypes.quadRotorExternal:
+                    // synchronous call because i'm lazy
+                    const response = await fetch('/craftdata');
+                    const json = await response.json();
+                    newCraft = new quadRotorExternal(json);
+                    break;
                 default:
                     break;
             }
-            craftList.push(newCraft);
-            newCraft.addToScene(scene);
-            idList.push(data[i].id);
+
+            if (!existsAlready) {
+                idList.push(data[i].id);
+                craftList.push(newCraft);
+            } else {
+                scene.remove(craftList[data[i].id].obj);
+                craftList[data[i].id] = newCraft;
+            }
+
+            scene.add(newCraft.obj);
         }
         var idx = idList.indexOf(data[i].id);
         craftList[idx].setPose(data[i].pos, data[i].quat);
@@ -114,6 +130,17 @@ document.body.appendChild( renderer.domElement )
 // scene with white background
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff);
+
+//const width = 5;
+//const height = 7;
+//const depth = 0.1;  // Very thin depth, almost like a 2D rectangle
+//
+//const geometry = new THREE.BoxGeometry(width, height, depth);
+//const edges = new THREE.EdgesGeometry(geometry);
+//const material = new THREE.LineBasicMaterial({ color: 0x000000 });
+//const gateOutline = new THREE.LineSegments(edges, material);
+//
+//scene.add(gateOutline);
 
 // camera, such that North East Down makes sense
 const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 1000 );

@@ -5,7 +5,7 @@ import numpy as np
 
 import flask as fl
 import json
-from netifaces import interfaces, ifaddresses, AF_INET
+from copy import deepcopy
 
 class VisData():
     def __init__(self):
@@ -13,6 +13,14 @@ class VisData():
         self.q = np.zeros(4, dtype=np.float64)
         self.q[0] = 1.
         self.inputs = np.zeros(4, dtype=np.float64)
+        self.newCraft = False
+        self.rotors = []
+        self.n = 0
+
+    def spawn(self, uav):
+        self.n = len(uav.rotors)
+        self.rotors = deepcopy(uav.rotors)
+        self.newCraft = True
 
     def update(self, uav):
         self.x[:] = uav.xI.round(4)
@@ -34,7 +42,17 @@ def pose():
     pos = list(visData.x.round(4))
     quat = list(visData.q.round(4))
     ctl = list(visData.inputs)
-    arr.append({'id': 0, 'type': 0, 'pos': pos, 'quat': quat, 'ctl': ctl})
+    arr.append({'id': 0, 'type': 3, 'newCraft': visData.newCraft, 'pos': pos, 'quat': quat, 'ctl': ctl})
+    return json.dumps(arr)
+
+@visApp.route("/craftdata")
+def craftdata():
+    visData.newCraft = False
+    arr = []
+    for i, rotor in enumerate(visData.rotors):
+        r = list(rotor.r.astype(np.float64).round(4))
+        axis = list(rotor.axis.astype(np.float64).round(4))
+        arr.append({'id': i, 'd': np.round(3.5e-2*np.sqrt(rotor.Tmax), 4), 'r': r, 'axis': axis, 'dir': rotor.dir})
     return json.dumps(arr)
 
 @visApp.route("/shutdown")
@@ -114,43 +132,6 @@ class IndiflightSITLWrapper():
 import serial
 import struct
 
-#import numba as nb
-#
-#@nb.njit#("u1(u1[::1], u1[::1])")
-#def parse_input(bytes, msg, msgFull, msg_pointer, parse_state, escape_state):
-#    numBytes = 0
-#    for byte in bytes:
-#        if byte == IndiflightHIL.STX:
-#            msgFull[:] = msg.copy()
-#            numBytes = msg_pointer[0]
-#            parse_state[0] = IndiflightHIL.MSG
-#            msg_pointer[0] = 0
-#            continue
-#
-#        if parse_state[0] == IndiflightHIL.IDLE:
-#            continue
-#
-#        if escape_state[0] == True:
-#            if byte == IndiflightHIL.ESC_ESC:
-#                msg[msg_pointer[0]] = IndiflightHIL.ESC
-#            elif byte == IndiflightHIL.STX_ESC:
-#                msg[msg_pointer[0]] = IndiflightHIL.ESC
-#            else:
-#                parse_state[0] = IndiflightHIL.IDLE
-#                escape_state[0] = False
-#                continue
-#
-#            msg_pointer[0] += 1
-#            escape_state[0] = False
-#
-#        elif byte == IndiflightHIL.ESC:
-#            escape_state[0] = True
-#        else:
-#            msg[msg_pointer[0]] = byte
-#            msg_pointer += 1
-#
-#    return numBytes
-
 class IndiflightHIL:
     # serial interface with an INDIflight controller compiled with HIL_BUILD
     HIL_TO_DEGS = 0.1
@@ -203,14 +184,15 @@ class IndiflightHIL:
                                  )
 
         checksum = msg_packed[0]
-        for byte in msg_packed:
+        for byte in msg_packed[1:]:
             checksum ^= byte
 
-        msg_packed.append(checksum)
+        msg_with_checksum = bytearray(msg_packed)
+        msg_with_checksum.append(checksum)
 
         msg_escaped = bytearray()
         msg_escaped.append(self.STX)
-        for byte in msg_packed:
+        for byte in msg_with_checksum:
             if byte == self.STX:
                 msg_escaped.append(self.ESC)
                 msg_escaped.append(self.STX_ESC)
@@ -272,45 +254,3 @@ class IndiflightHIL:
                     self.uav.inputs[2] = msg_unpacked[4] / self.MOTOR_TO_HIL
                     self.uav.inputs[3] = msg_unpacked[5] / self.MOTOR_TO_HIL
                     self.uav.inputs = np.clip(self.uav.inputs, 0., 1.)
-
-    #def receive(self):
-    #    data = self.ser.read(self.MAX_PACKET_LEN*2)
-
-    #    for byte in data:
-    #        if byte == self.STX:
-    #            self.parse_state = self.MSG
-    #            self.len_bytes = 0
-    #            continue
-
-    #        if self.parse_state == self.IDLE:
-    #            continue
-
-    #        if self.escape_state == True:
-    #            if byte == self.ESC_ESC:
-    #                self.bytes[self.len_bytes] = self.ESC
-    #            elif byte == self.STX_ESC:
-    #                self.bytes[self.len_bytes] = self.STX
-    #            else:
-    #                self.parse_state = self.IDLE
-    #                self.escape_state = False
-    #                continue
-
-    #            self.len_bytes += 1
-    #            self.escape_state = False
-
-    #        elif byte == self.ESC:
-    #            self.escape_state = True
-    #        else:
-    #            self.bytes[self.len_bytes] = byte
-    #            self.len_bytes += 1
-
-    #        if self.len_bytes == self.len_fmtReceive:
-    #            self.num_msgs += 1
-    #            self.parse_state = self.IDLE
-    #            msg_unpacked = struct.unpack(self.fmtReceive, self.bytes[:self.len_bytes])
-    #            if msg_unpacked[0] == self.HIL_OUT_ID:
-    #                self.uav.inputs[0] = msg_unpacked[2] / self.MOTOR_TO_HIL
-    #                self.uav.inputs[1] = msg_unpacked[3] / self.MOTOR_TO_HIL
-    #                self.uav.inputs[2] = msg_unpacked[4] / self.MOTOR_TO_HIL
-    #                self.uav.inputs[3] = msg_unpacked[5] / self.MOTOR_TO_HIL
-    #                self.uav.inputs = np.clip(self.uav.inputs, 0., 1.)

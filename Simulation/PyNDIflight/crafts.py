@@ -3,7 +3,7 @@ import numpy as np
 from scipy.spatial.transform import rotation as R
 from scipy.constants import g as GRAVITY
 
-from helpers import (
+from .helpers import (
     cross,
     quatRotate,
     quaternionDerivative,
@@ -16,6 +16,7 @@ class Rotor:
     def __init__(self, r=[0., 0., 0.], axis=[0., 0., -1.], wmax=4000., Tmax=4., kESC=0., cm=0.01, tau=0.03, Izz=1e-6, dir='rh'):
         self.r = np.asarray(r, dtype=np.float32)
         self.axis = np.asarray(axis, dtype=np.float32)
+        self.axis /= np.linalg.norm(self.axis)
         self.wmax = wmax
         self.Tmax = Tmax
         self.kESC = kESC
