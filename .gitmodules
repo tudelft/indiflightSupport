@@ -1,18 +1,18 @@
 [submodule "external/indiflight-configurator"]
 	path = external/indiflight-configurator
-	url = https://github.com/tblaha/indiflight-configurator/
+	url = https://www.github.com/tudelft/indiflight-configurator.git
 [submodule "external/blackbox-log-viewer"]
 	path = external/blackbox-log-viewer
-	url = https://github.com/tblaha/blackbox-log-viewer/
+	url = https://www.github.com/tudelft/blackbox-log-viewer.git
 [submodule "Groundstation/oldMocapClient/relay/ext/pi-protocol"]
 	path = Groundstation/oldMocapClient/relay/ext/pi-protocol
-	url = https://github.com/tblaha/pi-protocol
+	url = https://www.github.com/tudelft/pi-protocol.git
 [submodule "external/racebian"]
 	path = external/racebian
-	url = https://github.com/tblaha/racebian
+	url = https://www.github.com/tudelft/racebian.git
 [submodule "Groundstation/newMocapClient/UnifiedOptitrackClients"]
 	path = Groundstation/newMocapClient/UnifiedOptitrackClients
-	url = https://github.com/tudelft/UnifiedOptitrackClients/
+	url = https://www.github.com/tudelft/UnifiedOptitrackClients.git
 [submodule "Groundstation/newMocapClient/relay/ext/pi-protocol"]
 	path = Groundstation/newMocapClient/relay/ext/pi-protocol
-	url = https://github.com/tblaha/pi-protocol
+	url = https://www.github.com/tudelft/pi-protocol.git
