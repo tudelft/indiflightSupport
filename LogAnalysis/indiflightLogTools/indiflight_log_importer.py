@@ -133,8 +133,21 @@ class IndiflightLog(object):
 
             # dump data rows into pandas frame. # TODO: only import until range?
             logger.info("Importing into dataframe")
-            self.raw = pd.DataFrame([frame.data for frame in bfl.frames()],
-                                   columns=bfl.field_names )
+            try:
+                data = [frame.data for frame in bfl.frames()]
+            except (IndexError, TypeError):
+                # work around really annoying issue in orangebox
+                logger.warning("Encountered internal error, trying to append EOF to datafile")
+                with open(filename, 'ab') as file:
+                    EOF = bytes(1024) # loads of zeros
+                    EOF += b'E' + bytes.fromhex("ff") + b'End of log' + bytes.fromhex("00")
+                    file.write(EOF)
+
+                bfl = BFLParser.load(filename)
+                data = [frame.data for frame in bfl.frames()]
+                logger.warning("Recovered succesfully")
+
+            self.raw = pd.DataFrame(data, columns=bfl.field_names )
             self.raw.set_index('loopIteration', inplace=True)
 
             # get parameters
@@ -143,6 +156,10 @@ class IndiflightLog(object):
             # pickle, if requested
             if useCache:
                 self._storeCache()
+
+        self.num_learner_vars = sum([
+            re.match(r'^fx_p_rls_x\[[0-9]+\]$', c) is not None 
+            for c in self.raw.columns])
 
         # crop to time range and apply scaling
         logger.info("Apply scaling and crop to range")
@@ -305,9 +322,12 @@ class IndiflightLog(object):
                 elif match.group(1) in ['p', 'q', 'r']:
                     # rotations. First 4 regressors have scale 1e-5. Last 4 scale 1e-3 Output has scaler 1.
                     yscaler = 1.
-                    if match.group(2) in ['0', '1', '2', '3']:
+                    num_vars = 8 if self.num_learner_vars > 4 else 4
+                    w2vars = [str(i) for i in range(num_vars)]
+                    wdotvars = [str(i) for i in range(num_vars, num_vars*2)]
+                    if match.group(2) in w2vars:
                         ascaler = 1e-5
-                    elif match.group(2) in ['4', '5', '6', '7']:
+                    elif match.group(2) in wdotvars:
                         ascaler = 1e-3
                     else:
                         raise NotImplementedError(f"Regressor {match.group(2)} not expected")

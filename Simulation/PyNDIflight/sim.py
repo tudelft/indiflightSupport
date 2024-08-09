@@ -1,4 +1,4 @@
-from interfaces import visData
+from .interfaces import visData
 
 class Sim():
     def __init__(self, uav, imu=None, mocap=None, hil=None, sil=None):
@@ -9,6 +9,9 @@ class Sim():
         self.sil = sil
         self.t = 0.
         self.i = 0
+
+        # spawn craft
+        visData.spawn(self.uav)
 
     def tick(self, dt):
         if not (self.i % 2):

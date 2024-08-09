@@ -7,15 +7,15 @@ import threading
 import os
 import sys
 
-from crafts import MultiRotor, Rotor, IMU
-from interfaces import IndiflightSITLWrapper, visApp
-from sim import Sim
+from PyNDIflight.crafts import MultiRotor, Rotor, IMU
+from PyNDIflight.interfaces import IndiflightSITLWrapper, visApp
+from PyNDIflight.sim import Sim
 
 import pickle
 
-N = 100
+N = 1000
 np.random.seed(42)
-from numpy.random import random
+from numpy.random import random, randint, permutation
 
 def runOneSim(mc, imu, args):
     # disable all console output from the cdll
@@ -92,21 +92,30 @@ if __name__=="__main__":
         pass
 
     uavs = []
-    for i in tqdm(range(N)):
-        mass = .2 + 0.5 * random()
-        I = 1e-4 + 2e-3 * random(3)
+    for j in tqdm(range(N)):
         n_rotors = 4
-        throw_height = 3. + 2.*random()
+        throw_height = 4.
         throw_rotation = 10.*random(3) - 5.
         throw_direction = 4.*random(2) - 2.
 
+        offset = np.pi/3. * random(n_rotors)
+        phi = random(n_rotors) * np.pi/3  +  np.arange(0, 2.*np.pi, np.pi/2.)
+        R = random(n_rotors) * 0.1 + 0.05
+        X = R * np.stack(( np.cos(phi), np.sin(phi), np.zeros(n_rotors) ))
+        X[2, :] = -0.02
+
+        kappas = random(n_rotors) * 0.5 + 0.25
+        taus = random(n_rotors) * 0.02 + 0.015
+        cms = random(n_rotors) * 0.01 + 0.01
+
+        dirs = ["lh", "rh", "lh", "rh"] if randint(0,2) else ["rh", "lh", "rh", "lh"]
+
         mc = MultiRotor()
         uavs.append(mc)
-        mc.setInertia(m=mass, I=np.diag(I))
-        mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh')) # RR
-        mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh')) # FR
-        mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh')) # RL
-        mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh')) # FL
+        mc.setInertia(m=.45, I=np.diag([0.75e-3, 0.75e-3, 0.75e-3]))
+        perm = permutation(range(n_rotors))
+        for i in perm:
+            mc.addRotor(Rotor(r=X[:, i], Tmax=5., kESC=kappas[i], tau=taus[i], Izz=5e-7, cm=cms[i], dir=dirs[i]))
 
         # initial conditions
         mc.setPose(x=[0., 0., -0.1], q=[1., 0., 0., 0.])
@@ -115,7 +124,7 @@ if __name__=="__main__":
         # throw config
         mc.throw(height=throw_height, acc=40., wB=throw_rotation, vHorz=throw_direction, at_time=0.5)
 
-        with open(f'./logs/copter_{i:05}.pickle', 'wb') as file:
+        with open(f'./logs/copter_{j:05}.pickle', 'wb') as file:
             pickle.dump(mc, file, protocol=pickle.HIGHEST_PROTOCOL)
 
         imu = IMU(mc, r=[0., 0., 0.], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)

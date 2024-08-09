@@ -6,7 +6,101 @@ export const craftTypes = {
     quadRotor: 0,
     tailSitter: 2,
     airplane: 1,
+    quadRotorExternal: 3,
 };
+
+export class quadRotorExternal { 
+    constructor(craftdata) {
+        this.obj = new THREE.Object3D();
+
+        var rotorLines = [];
+        this.diameters = [];
+        this.thrustArrows = [];
+        for (var rotor of craftdata) {
+            this.diameters.push(rotor.d);
+            var rotorGeo = new THREE.CircleGeometry( .5*rotor.d, 16 );
+            var edges = new THREE.EdgesGeometry( rotorGeo ); 
+            // right hand --> black. left hand --> red
+            var col = (rotor.dir > 0) ? 0x000000 : 0xAA0000;
+            var mat = new THREE.LineBasicMaterial( { color: col } );
+            var line = new THREE.LineSegments( edges, mat );
+
+            var arrow = new THREE.ArrowHelper(
+                //new THREE.Vector3( rotor.axis[0], rotor.axis[1], rotor.axis[2] ),
+                new THREE.Vector3( 0, 0, 1 ),
+                new THREE.Vector3( 0, 0, 0 ),
+                0.,
+                0xaa5500,
+                );
+
+            var rotorObj = new THREE.Object3D();
+            rotorObj.add(line);
+            rotorObj.add(arrow);
+            rotorObj.lookAt( new THREE.Vector3( rotor.axis[0], rotor.axis[1], rotor.axis[2] ));
+            rotorObj.position.x = rotor.r[0];
+            rotorObj.position.y = rotor.r[1];
+            rotorObj.position.z = rotor.r[2];
+
+            this.obj.add(rotorObj);
+            rotorLines.push(line);
+            this.thrustArrows.push(arrow);
+        };
+
+        this.addTriangle();
+        this.addCG();
+    }
+    addTriangle() {
+        const triangleGeometry = new THREE.BufferGeometry();
+        const vertices = new Float32Array ( [
+                    0.1, 0, 0,  // Top
+                    0.04, -0.025, 0, // Bottom left
+                    0.04, +0.025, 0,   // Bottom right
+        ] );
+        const indices = [
+            0,1,2, // top
+            0,2,1, // bottom (right hand rule)
+        ];
+
+        triangleGeometry.setIndex( indices );
+        triangleGeometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+
+        const darkGreenMaterial = new THREE.MeshBasicMaterial({ color: 0x006400 });
+        const triangleMesh = new THREE.Mesh(triangleGeometry, darkGreenMaterial);
+
+        this.obj.add(triangleMesh);
+    }
+    addCG() {
+        // Create a red sphere
+        const geometry = new THREE.SphereGeometry(0.01, 32, 32);
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const sphere = new THREE.Mesh(geometry, material);
+
+        this.obj.add(sphere);
+    }
+    setPose(pos, quat) {
+        this.obj.position.x = pos[0];
+        this.obj.position.y = pos[1];
+        this.obj.position.z = pos[2];
+        this.obj.quaternion.w = quat[0];
+        this.obj.quaternion.x = quat[1];
+        this.obj.quaternion.y = quat[2];
+        this.obj.quaternion.z = quat[3];
+    }
+    setControls(controls) {
+        for (let i = 0; i < controls.length; i++) {
+            if (i >= this.thrustArrows.length)
+                break;
+
+            let arrowLength = 2.*controls[i]*this.diameters[i]
+            let arrowHeadLength = arrowLength < 0.4*this.diameters[i] ? arrowLength : 0.4*this.diameters[i];
+            this.thrustArrows[i].setLength(
+                arrowLength,
+                arrowHeadLength,
+                0.4*this.diameters[i],
+                );
+        }
+    }
+}
 
 export class quadRotor {
     constructor(width, length, diameter) {
@@ -56,9 +150,6 @@ export class quadRotor {
             this.obj.add(arrow);
             this.thrustArrows.push(arrow);
         }
-    }
-    addToScene(theScene) {
-        theScene.add(this.obj);
     }
     setPose(pos, quat) {
         this.obj.position.x = pos[0];
@@ -183,9 +274,6 @@ export class tailSitter {
             this.obj.add(arrow);
             this.thrustArrows.push(arrow);
         }
-    }
-    addToScene(theScene) {
-        theScene.add(this.obj);
     }
     setPose(pos, quat) {
         this.obj.position.x = pos[0];
@@ -378,9 +466,6 @@ export class airplane {
             this.obj.add(arrow);
             this.thrustArrows.push(arrow);
         }
-    }
-    addToScene(theScene) {
-        theScene.add(this.obj);
     }
     setPose(pos, quat) {
         this.obj.position.x = pos[0];

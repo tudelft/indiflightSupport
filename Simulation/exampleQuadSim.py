@@ -7,9 +7,9 @@ import threading
 import os
 import sys
 
-from crafts import MultiRotor, Rotor, IMU
-from interfaces import Mocap, IndiflightHIL, IndiflightSITLWrapper, visApp, visData
-from sim import Sim
+from PyNDIflight.crafts import MultiRotor, Rotor, IMU
+from PyNDIflight.interfaces import Mocap, IndiflightHIL, IndiflightSITLWrapper, visApp, visData
+from PyNDIflight.sim import Sim
 
 SUPPORTED_BAUDS = [
 #57600, 115200, # unlikely to work 
@@ -20,8 +20,10 @@ SUPPORTED_BAUDS = [
 
 if __name__=="__main__":
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
+    # required arguments for docker to work
     parser.add_argument("--sil", required=False, type=str, metavar="LIBRARY", default=None, help="Load INDIflight interface as shared library.")
     parser.add_argument("--sil-profile-txt", required=False, type=str, metavar="PROFILE.txt", help="Import these profile settings into the SIL")
+    # further arguments
     parser.add_argument("--sil-log", required=False, action="store_true", help="Write Indiflight logs into ./logs")
     parser.add_argument("--hil", required=False, type=str, metavar="DEVICE", help="Use INDIflight hardware interface. Use either --hil or --sil")
     parser.add_argument("--hil-baud", required=False, choices=SUPPORTED_BAUDS, type=int, default=921600, help="HIL baudrate ")
@@ -68,20 +70,20 @@ if __name__=="__main__":
             raise ArgumentTypeError ("PORT must be integer")
 
     mc = MultiRotor()
-    mc.setInertia(m=0.45, I=np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
+    mc.setInertia(m=0.65, I=np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
     mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh')) # RR
     mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh')) # FR
     mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh')) # RL
     mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh')) # FL
+    # some additional rotors
+    #mc.addRotor(Rotor(r=[+0.0, -0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[0, -1., -1.]))
+    #mc.addRotor(Rotor(r=[+0.0, +0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[0, 1., -1.]))
+    #mc.addRotor(Rotor(r=[-0.1, +0.0, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[-1, 0., -1.]))
+    #mc.addRotor(Rotor(r=[+0.1, +0.0, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[1, 0., -1.]))
 
-    #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
-
-    #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
-    #imu = IMU(mc, r=[0., 0., 0.], qBody=[0., 0., 0., 1.], accStd=0.4, gyroStd=0.04)
+    #imu = IMU(mc, r=[0., 0., 0.], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
     #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
     imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
-    #imu = IMU(mc, r=[-0.014, -0.008, 0.01], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
-    #imu = IMU(mc, r=[-0.03, -0.02, 0.045], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
 
     mocap = Mocap(mc, args.mocap_host, args.mocap_port) if args.mocap else None
     hil = IndiflightHIL(mc, imu, device=args.hil, baud=args.hil_baud) if args.hil else None
@@ -92,7 +94,7 @@ if __name__=="__main__":
         if args.sil_log:
             try:
                 os.mkdir("./logs")
-            except OSError:
+            except OSError: # is raised if logs already exists. ignore
                 pass
 
         sil.mockup.sendPositionSetpoint( [0., 0., -1.5], 0. )
@@ -120,10 +122,11 @@ if __name__=="__main__":
         visThread.start( )
 
     # run loop
-    dt = 0.0005 # 1kHz
-    dt_rt = None if args.no_real_time else 1*dt
+    dt = 0.0005 # 2kHz
+    T = 1000. # seconds
+    dt_rt = None if args.no_real_time else dt
     thrown = False
-    for i in tqdm(range(int(1e8)), target_looptime=dt_rt):
+    for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):
         if not thrown and args.throw and sim.t > 0.5:
             mc.throw(wB=[2., -4., 3.], # approx body rotation in rad/s
                      vHorz=[1., -2.], # final speed in x-y-plane in m/s

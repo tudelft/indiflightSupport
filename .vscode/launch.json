@@ -5,16 +5,27 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python Debugger: Parsing Logfile",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/test.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "INDIflight MOCKUP",
             "type": "cppdbg",
             "request": "launch",
             "program": "/home/tmblaha/.venv/bin/python3",
             //"args": ["--eval-command='run ${workspaceFolder}/mockup.py'"],
             "args": [
-                "${workspaceFolder}/Simulation/Python/simThrow.py",
-                "--sil-mockup",
+                "${workspaceFolder}/Simulation/exampleQuadSim.py",
+                "--sil",
+                "${workspaceFolder}/external/indiflight/obj/main/indiflight_MOCKUP.so",
                 "--sil-profile-txt",
-                "Simulation/Python/configs/BTFL_cli_20240314_MATEKH743_CineRat_HoverAtt_NN.txt",
+                "${workspaceFolder}/Simulation/exampleINDIflightProfile.txt",
+                "--throw",
+                "--learn",
+                "--sil-log"
                 //"--no-viz",
             ],
             "stopAtEntry": false,
