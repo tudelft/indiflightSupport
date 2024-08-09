@@ -1,6 +1,12 @@
 cmake_minimum_required (VERSION 3.18)
 project(relay)
 
+# when compiling for the orin, enable the parts of the code that do ROS2 things
+option(ORIN "Compile for Orin with ROS2 VIO support" OFF)
+if(ORIN)
+    add_definitions(-DORIN)
+endif()
+
 set(PI_GEN_DIR ${CMAKE_BINARY_DIR}/pi-protocol)
 include_directories(${PI_GEN_DIR})
 

@@ -3,8 +3,18 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
-//#include <common/mavlink.h>
-//#include "mavlink/common/mavlink.h"
+
+
+#include <fstream>
+#include <sys/time.h>
+#include <chrono>
+#include <ctime>
+using std::chrono::duration_cast;
+using std::chrono::milliseconds;
+using std::chrono::seconds;
+using std::chrono::system_clock;
+
+
 #include <iostream>
 // to use the std:min function
 #include <algorithm>
@@ -17,6 +27,7 @@
 
 #define OPTITRACK_PORT 5005
 #define SETPOINT_PORT 5006
+#define KEYBOARD_PORT 5007
 #define MAX_BUFFER_SIZE 1024
 
 // hypersimple on-demand status updates similar to dd
@@ -126,16 +137,97 @@ typedef struct pose_der_s {
 
 static pi_parse_states_t piParseStates = {0};
 
+// functions for writing IMU message to csv file
+FILE* createImuLogFile() {
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    char filename[100];
+    sprintf(filename, "/home/pi/logs/imu-%d-%d-%d-%d-%d-%d.csv", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    // convert to std::string
+    std::string filename_str(filename);
+    // if /home/pi/logs doesnt exists we make it
+    std::ifstream file_stream(filename_str.c_str());
+
+    if (!file_stream.good()) {
+        system("mkdir -p /home/pi/logs");
+    }
+    
+    FILE* file = fopen(filename, "w");
+    printf("Logging IMU data to %s\n", filename);
+    return file;
+}
+
+void writeImuToCsvHeader(FILE* file) {
+    // time_ms_rec is the time the message was received
+    // time_ms is the time the message was created
+    fprintf(file, "time_ms_rec,time_ms_msg,roll,pitch,yaw,x,y,z\n");
+}
+
+void writeImuToCsv(pi_IMU_t* imuMsg, FILE* file) {
+    // get current time ms
+    auto millisec_since_epoch = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+
+    uint32_t time_ms_rec = (uint32_t)millisec_since_epoch;
+    fprintf(file, "%u,%u,%f,%f,%f,%f,%f,%f\n", time_ms_rec, imuMsg->time_ms, imuMsg->roll, imuMsg->pitch, imuMsg->yaw, imuMsg->x, imuMsg->y, imuMsg->z);
+}
+
+
+#ifdef ORIN
+// STUFF FOR ROS2
+#include <rclcpp/rclcpp.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+#include <mutex>
+#include <thread>
+#include <chrono>
+
+void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
+    std::lock_guard<std::mutex> lock(odom_mutex);
+
+    // get time in ms
+    static uint32_t start_s = msg->header.stamp.sec;
+    // difference of first time and current time
+    uint32_t diff_s = msg->header.stamp.sec - start_s;
+    // diff to ms
+    uint32_t time_ms = diff_s * 1000 + msg->header.stamp.nanosec / 1e6;
+
+    // VIO_POSE MESSAGE
+    piMsgVioPoseTx.time_ms = time_ms;
+    piMsgVioPoseTx.x = msg->pose.pose.position.x;
+    piMsgVioPoseTx.y = msg->pose.pose.position.y;
+    piMsgVioPoseTx.z = msg->pose.pose.position.z;
+    piMsgVioPoseTx.vx = msg->twist.twist.linear.x;
+    piMsgVioPoseTx.vy = msg->twist.twist.linear.y;
+    piMsgVioPoseTx.vz = msg->twist.twist.linear.z;
+    piMsgVioPoseTx.qw = msg->pose.pose.orientation.w;
+    piMsgVioPoseTx.qx = msg->pose.pose.orientation.x;
+    piMsgVioPoseTx.qy = msg->pose.pose.orientation.y;
+    piMsgVioPoseTx.qz = msg->pose.pose.orientation.z;
+    piMsgVioPoseTx.p = msg->twist.twist.angular.x;
+    piMsgVioPoseTx.q = msg->twist.twist.angular.y;
+    piMsgVioPoseTx.r = msg->twist.twist.angular.z;
+
+    // print content of piMsgVioPoseTx
+    printf("VIO_POSE: time_ms: %u, x: %f, y: %f, z: %f, vx: %f, vy: %f, vz: %f, qw: %f, qx: %f, qy: %f, qz: %f\n", piMsgVioPoseTx.time_ms, piMsgVioPoseTx.x, piMsgVioPoseTx.y, piMsgVioPoseTx.z, piMsgVioPoseTx.vx, piMsgVioPoseTx.vy, piMsgVioPoseTx.vz, piMsgVioPoseTx.qw, piMsgVioPoseTx.qx, piMsgVioPoseTx.qy, piMsgVioPoseTx.qz);
+
+    piSendMsg(&piMsgVioPoseTx, &serialWriter);
+}
+#endif
+
+
 int main(int argc, char** argv) {
+    // enable logging if the first argument is -l
+    bool logging = (argc == 2) && !strcmp(argv[1], "-l"); 
+
+#ifdef ORIN
+    const char* serialPort = "/dev/ttyTHS1";
+#else
     const char* serialPort = "/dev/ttyAMA0";
-    //int baudrate = B57600;
-    //const char* serialPort = "/tmp/ttyS2";
-    //int baudrate = B500000; //todo: make commandline argument
-    int baudrate = B921600; //todo: make commandline argument
+#endif
+    int baudrate = B921600;
 
     serialPortFd = openSerialPort(serialPort, baudrate);
     if (serialPortFd == -1) {
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // register signal handlers (https://en.wikipedia.org/wiki/C_signal_handling)
@@ -148,8 +240,7 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    // TODO: make sure PI_MAX_PACKET_LEN is less than PAGE_SIZE (4096)
-    uint8_t buffer[PI_MAX_PACKET_LEN];
+    uint8_t piBuffer[PI_MAX_PACKET_LEN];
 
     // open udps
     int optitrackFd = openUdpPort(OPTITRACK_PORT);
@@ -161,6 +252,28 @@ int main(int argc, char** argv) {
     printf("Server listening on port %d for Setpoints...\n", SETPOINT_PORT);
     uint8_t setpointBuffer[PI_MSG_POS_SETPOINT_PAYLOAD_LEN];
 
+    // create imu log file and write to header
+    FILE* imuLogFile = NULL;
+    if (logging) {
+        imuLogFile = createImuLogFile();
+        writeImuToCsvHeader(imuLogFile);
+    }
+
+#ifdef ORIN
+    // ROS2 stuff for subscribing to odometry messages from ZED camera
+    rclcpp::init(argc, argv);
+    auto node = rclcpp::Node::make_shared("zed_odometry_listener");
+
+    auto subscription = node->create_subscription<nav_msgs::msg::Odometry>(
+        "/zed/zed_node/odom", 10, odomCallback);
+
+    // Start a separate thread for ROS2 spinning
+    std::thread ros_thread([&node]() {
+        rclcpp::spin(node);
+    });
+    // --------------------------------------------------------------------
+#endif
+
     while (true) {
         // Q1: doesnt this add a lot of delay? Because the buffer is only filled once
         // PI_MAX_PACKET_LENGTH is read?
@@ -168,52 +281,41 @@ int main(int argc, char** argv) {
         // Q2: Is the UART TX buffer even big enough?
         // answer, seems like the PL011 buffer is 32byte deep. termios wraps it
         // in a PAGE_SIZE deep buffer (4096bytes), so this is fine at least
-        ssize_t numBytes = read(serialPortFd, buffer, PI_MAX_PACKET_LEN);
+        ssize_t numBytes = read(serialPortFd, piBuffer, PI_MAX_PACKET_LEN);
         bool newMessage = false;
         if (numBytes) {
-            for (int i=0; i < numBytes; i++)
-                if (piParse(&piParseStates, buffer[i]) == PI_MSG_IMU_ID)
+            for (int i=0; i < numBytes; i++) {
+                if (piParse(&piParseStates, piBuffer[i]) == PI_MSG_IMU_ID) {
                     newMessage = true;
+                    if (logging) {
+                        writeImuToCsv(piMsgImuRx, imuLogFile);
+                    }
+                }
+            }
         }
 
         if ((piMsgImuRxState == PI_MSG_RX_STATE_NONE) || (!newMessage)) {
             // cannot go on, no time information to timestamp gps msgs, or setpoints
-            usleep(500); // sleep 0.5ms, this is bound to miss some gyro messages, but what gives
+            usleep(250); // reduce CPU load a bit
             continue;
+        } else {
+            newMessage = false;
         }
 
-        newMessage = false;
-
+        // 
         pose_t pose;
         pose_der_t pose_der;
 
-        //int bytes_received = recvfrom(sockfd, (char*)(piMsgFakeGpsRx)+PI_MSG_PAYLOAD_OFFSET, PI_MSG_FAKE_GPS_PAYLOAD_LEN, 0, (struct sockaddr *)&client_addr, &client_addr_len);
         struct sockaddr_in client_addr;
         socklen_t client_addr_len = sizeof(client_addr);
-        int bytes_received = recvfrom(optitrackFd, (uint8_t *)(optitrackBuffer), OPTITRACK_BUFFER_SIZE, 0, (struct sockaddr *)&client_addr, &client_addr_len);
-        memcpy((uint8_t *)(&pose), optitrackBuffer+sizeof(unsigned int), sizeof(pose_t));
-        memcpy((uint8_t *)(&pose_der), optitrackBuffer+sizeof(unsigned int)+sizeof(pose_t), sizeof(pose_der_t));
+        int optitrackBytes = recvfrom(optitrackFd, (uint8_t *)(optitrackBuffer), OPTITRACK_BUFFER_SIZE, 0, (struct sockaddr *)&client_addr, &client_addr_len);
 
-        if (bytes_received > 0) {
-            //pose.timeUs = __builtin_bswap64(pose.timeUs);
-            //printf("Received optitrack for time %ld at IMU time %d\n", pose.timeUs, piMsgImuRx->time_ms);
-            /*
-            pose.x = ntohf(pose.x);
-            pose.y = ntohf(pose.y);
-            pose.z = ntohf(pose.z);
-            pose.qx = ntohf(pose.qx);
-            pose.qy = ntohf(pose.qy);
-            pose.qz = ntohf(pose.qz);
-            pose.qw = ntohf(pose.qw);
+        if (optitrackBytes > 0) {
+            // we have optitrack copy from the buffer into the structs
+            memcpy((uint8_t *)(&pose), optitrackBuffer+sizeof(unsigned int), sizeof(pose_t));
+            memcpy((uint8_t *)(&pose_der), optitrackBuffer+sizeof(unsigned int)+sizeof(pose_t), sizeof(pose_der_t));
 
-            pose_der.x = ntohf(pose_der.x);
-            pose_der.y = ntohf(pose_der.y);
-            pose_der.z = ntohf(pose_der.z);
-            pose_der.wx = ntohf(pose_der.wx);
-            pose_der.wy = ntohf(pose_der.wy);
-            pose_der.wz = ntohf(pose_der.wz);
-            */
-
+            // proceed to send Fake GPS and External Pose
             piMsgFakeGpsTx.time_ms = piMsgImuRx->time_ms;
             static constexpr double CYBERZOO_LAT = 51.99071002805145;
             static constexpr double CYBERZOO_LON = 4.376727452462819;
@@ -242,35 +344,34 @@ int main(int argc, char** argv) {
             piMsgExternalPoseTx.body_qz = pose.qz;
             piSendMsg(&piMsgExternalPoseTx, &serialWriter);
         }
-        //else {
-            //printf("No optitrack bytes received at %ld at IMU time %d\n", pose.timeUs, piMsgImuRx->time_ms);
-        //}
 
         // ---- setpoints ----
         pi_POS_SETPOINT_t msgPosSetpoint;
-        bytes_received = recvfrom(setpointFd, (uint8_t *)(setpointBuffer), PI_MSG_POS_SETPOINT_PAYLOAD_LEN, 0, (struct sockaddr *)&client_addr, &client_addr_len);
+        int setpointBytes = recvfrom(setpointFd, (uint8_t *)(setpointBuffer), PI_MSG_POS_SETPOINT_PAYLOAD_LEN, 0, (struct sockaddr *)&client_addr, &client_addr_len);
+
+        if (setpointBytes > 0) {
 #define PI_MSG_PAYLOAD_OFFSET (PI_MSG_ID_BYTES + PI_MSG_PAYLOAD_LEN_BYTES)
-        memcpy((uint8_t *)(&msgPosSetpoint)+PI_MSG_PAYLOAD_OFFSET, setpointBuffer, PI_MSG_POS_SETPOINT_PAYLOAD_LEN);
-        //if (bytes_received == -1) {
-        //    perror("recvfrom failed");
-        //    exit(EXIT_FAILURE);
-        //}
+            memcpy((uint8_t *)(&msgPosSetpoint)+PI_MSG_PAYLOAD_OFFSET, setpointBuffer, PI_MSG_POS_SETPOINT_PAYLOAD_LEN);
+            piMsgPosSetpointTx.time_ms = piMsgImuRx->time_ms;
 
-        //bool udpReceived = false;
-        //if (bytes_received > 0) {
-        //    printf
-        //    for (int i=0; i < bytes_received; i++)
-        //        updReceived |= (piParse(udpbuffer[i]) == PI_MSG_FAKE_GPS_ID);
-        //}
+            piMsgPosSetpointTx.enu_x = ntohf(msgPosSetpoint.enu_x);
+            piMsgPosSetpointTx.enu_y = ntohf(msgPosSetpoint.enu_y);
+            piMsgPosSetpointTx.enu_z = ntohf(msgPosSetpoint.enu_z);
+            piMsgPosSetpointTx.enu_xd = ntohf(msgPosSetpoint.enu_xd);
+            piMsgPosSetpointTx.enu_yd = ntohf(msgPosSetpoint.enu_yd);
+            piMsgPosSetpointTx.enu_zd = ntohf(msgPosSetpoint.enu_zd);
+            piMsgPosSetpointTx.yaw = ntohf(msgPosSetpoint.yaw);
 
-        if (bytes_received > 0) {
-            /*
-            piPrintMsgs(&printf);
-            printf("Hello: ");
-            for (int j = 0; j < bytes_received; j++) {
-                printf(" 0x%x", *(uint8_t*)(piMsgFakeGpsRx+PI_MSG_PAYLOAD_OFFSET+j));
-            }
-            */
+            piSendMsg(&piMsgPosSetpointTx, &serialWriter);
+        }
+
+        // ---- keystrokes ----
+        pi_POS_SETPOINT_t msgPosSetpoint;
+        int setpointBytes = recvfrom(setpointFd, (uint8_t *)(setpointBuffer), PI_MSG_POS_SETPOINT_PAYLOAD_LEN, 0, (struct sockaddr *)&client_addr, &client_addr_len);
+
+        if (setpointBytes > 0) {
+#define PI_MSG_PAYLOAD_OFFSET (PI_MSG_ID_BYTES + PI_MSG_PAYLOAD_LEN_BYTES)
+            memcpy((uint8_t *)(&msgPosSetpoint)+PI_MSG_PAYLOAD_OFFSET, setpointBuffer, PI_MSG_POS_SETPOINT_PAYLOAD_LEN);
             piMsgPosSetpointTx.time_ms = piMsgImuRx->time_ms;
 
             piMsgPosSetpointTx.enu_x = ntohf(msgPosSetpoint.enu_x);

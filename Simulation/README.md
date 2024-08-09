@@ -17,7 +17,7 @@ Run all commands from this directory (`./Simulation`).
 
     docker build . -t pyndiflight -f githash.Dockerfile \
         --build-arg COMMIT=f582a29 \
-        --build-arg BUILD_CONFIG=./config/IndiflightConfig.mk
+        --build-arg BUILD_CONFIG=./config/mockupConfig.mk
 
 - downloads an `indiflight` commit
 - builds the `MOCKUP` library using a build configuration (aka. `local.mk` file)
@@ -62,7 +62,7 @@ the builder container:
 #### Step 2 -- Build local pyndiflight docker container
 
     docker build . -t pyndiflight-local -f local.Dockerfile \
-        --build-arg BUILD_CONFIG=./config/IndiflightConfig.mk
+        --build-arg BUILD_CONFIG=./config/mockupConfig.mk
 
 (rebuild when `indiflight` build container or `PyNDIflight` simulation code changes)
 
@@ -136,10 +136,9 @@ the builder container:
 #### Step 2 -- Compile for target hardware
 
 Provide a `make/local.mk` for your target hardware in the cloned indiflight
-repo (see its README) and make sure to add `EXTRA_FLAGS += -DHIL_BUILD`.
+repo (see its README) and make sure to add `EXTRA_FLAGS += -DHIL_BUILD` (see 
+for instance `config/hilConfig.mk`).
 This disables the dshot drivers and enables the HIL drivers.
-
-baudrate).
 
 Now compile and flash the resulting binary (also check README):
 
@@ -148,7 +147,7 @@ Now compile and flash the resulting binary (also check README):
 
 #### Step 3 -- Configure using indiflight-configurator
 
-Setup the HIL interfaces in the Ports tab of the Configurator (use `auto`
+Setup the HIL interfaces in the Ports tab of the Configurator (use `auto` baudrate).
 Compile and flash INDIflight with `EXTRA_FLAGS += -DHIL_BUILD` in the build
 configuration.
 

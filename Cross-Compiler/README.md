@@ -38,8 +38,8 @@ docker plugin install vieux/sshfs
 Setup of the image:
 ```bash
 cd cross-compiler
-docker buildx build -f Dockerfile.cross --tag=pi-cross-base .
-docker buildx build -f Dockerfile.cross.custom --tag=pi-cross .
+docker build . -t pi-cross-base -f Dockerfile.cross
+docker build . -t pi-cross -f Dockerfile.cross.custom
 docker volume create rootfs # not sure where this is actually saved on disk... but somewhere
 ```
 
