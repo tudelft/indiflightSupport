@@ -17,3 +17,8 @@ submodules and instructions
 ## Simulation 
 
 see `Simulation/README.md`
+
+
+## Drone profiles for Indiflight
+
+see `Documentation/Drones`
