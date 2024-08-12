@@ -29,6 +29,7 @@ using std::chrono::system_clock;
 #define SETPOINT_PORT 5006
 #define KEYBOARD_PORT 5007
 #define MAX_BUFFER_SIZE 1024
+#define PI_MSG_PAYLOAD_OFFSET (PI_MSG_ID_BYTES + PI_MSG_PAYLOAD_LEN_BYTES)
 
 // hypersimple on-demand status updates similar to dd
 // https://en.wikipedia.org/wiki/C_signal_handling
@@ -160,15 +161,15 @@ FILE* createImuLogFile() {
 void writeImuToCsvHeader(FILE* file) {
     // time_ms_rec is the time the message was received
     // time_ms is the time the message was created
-    fprintf(file, "time_ms_rec,time_ms_msg,roll,pitch,yaw,x,y,z\n");
+    fprintf(file, "time_us_rec,time_us_msg,roll,pitch,yaw,x,y,z\n");
 }
 
 void writeImuToCsv(pi_IMU_t* imuMsg, FILE* file) {
     // get current time ms
-    auto millisec_since_epoch = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+    auto microsec_since_epoch = 1e3f * duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
-    uint32_t time_ms_rec = (uint32_t)millisec_since_epoch;
-    fprintf(file, "%u,%u,%f,%f,%f,%f,%f,%f\n", time_ms_rec, imuMsg->time_ms, imuMsg->roll, imuMsg->pitch, imuMsg->yaw, imuMsg->x, imuMsg->y, imuMsg->z);
+    uint32_t time_us_rec = (uint32_t)microsec_since_epoch;
+    fprintf(file, "%u,%u,%f,%f,%f,%f,%f,%f\n", time_us_rec, imuMsg->time_us, imuMsg->roll, imuMsg->pitch, imuMsg->yaw, imuMsg->x, imuMsg->y, imuMsg->z);
 }
 
 
@@ -188,10 +189,10 @@ void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
     // difference of first time and current time
     uint32_t diff_s = msg->header.stamp.sec - start_s;
     // diff to ms
-    uint32_t time_ms = diff_s * 1000 + msg->header.stamp.nanosec / 1e6;
+    uint32_t time_us = diff_s * 1000000 + msg->header.stamp.nanosec / 1e3;
 
     // VIO_POSE MESSAGE
-    piMsgVioPoseTx.time_ms = time_ms;
+    piMsgVioPoseTx.time_us = time_us;
     piMsgVioPoseTx.x = msg->pose.pose.position.x;
     piMsgVioPoseTx.y = msg->pose.pose.position.y;
     piMsgVioPoseTx.z = msg->pose.pose.position.z;
@@ -207,7 +208,7 @@ void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
     piMsgVioPoseTx.r = msg->twist.twist.angular.z;
 
     // print content of piMsgVioPoseTx
-    printf("VIO_POSE: time_ms: %u, x: %f, y: %f, z: %f, vx: %f, vy: %f, vz: %f, qw: %f, qx: %f, qy: %f, qz: %f\n", piMsgVioPoseTx.time_ms, piMsgVioPoseTx.x, piMsgVioPoseTx.y, piMsgVioPoseTx.z, piMsgVioPoseTx.vx, piMsgVioPoseTx.vy, piMsgVioPoseTx.vz, piMsgVioPoseTx.qw, piMsgVioPoseTx.qx, piMsgVioPoseTx.qy, piMsgVioPoseTx.qz);
+    printf("VIO_POSE: time_us: %u, x: %f, y: %f, z: %f, vx: %f, vy: %f, vz: %f, qw: %f, qx: %f, qy: %f, qz: %f\n", piMsgVioPoseTx.time_us, piMsgVioPoseTx.x, piMsgVioPoseTx.y, piMsgVioPoseTx.z, piMsgVioPoseTx.vx, piMsgVioPoseTx.vy, piMsgVioPoseTx.vz, piMsgVioPoseTx.qw, piMsgVioPoseTx.qx, piMsgVioPoseTx.qy, piMsgVioPoseTx.qz);
 
     piSendMsg(&piMsgVioPoseTx, &serialWriter);
 }
@@ -251,6 +252,10 @@ int main(int argc, char** argv) {
     int setpointFd = openUdpPort(SETPOINT_PORT);
     printf("Server listening on port %d for Setpoints...\n", SETPOINT_PORT);
     uint8_t setpointBuffer[PI_MSG_POS_SETPOINT_PAYLOAD_LEN];
+
+    int keyboardFd = openUdpPort(KEYBOARD_PORT);
+    printf("Server listening on port %d for Keystrokes...\n", KEYBOARD_PORT);
+    uint8_t keyboardBuffer[PI_MSG_KEYBOARD_PAYLOAD_LEN];
 
     // create imu log file and write to header
     FILE* imuLogFile = NULL;
@@ -316,28 +321,28 @@ int main(int argc, char** argv) {
             memcpy((uint8_t *)(&pose_der), optitrackBuffer+sizeof(unsigned int)+sizeof(pose_t), sizeof(pose_der_t));
 
             // proceed to send Fake GPS and External Pose
-            piMsgFakeGpsTx.time_ms = piMsgImuRx->time_ms;
+            piMsgFakeGpsTx.time_us = piMsgImuRx->time_us;
             static constexpr double CYBERZOO_LAT = 51.99071002805145;
             static constexpr double CYBERZOO_LON = 4.376727452462819;
             static constexpr double RE = 6378137.;
             piMsgFakeGpsTx.lat = (int) 1e7 * 
-                (CYBERZOO_LAT + 180. / M_PI * (pose.y / RE));
+                (CYBERZOO_LAT + 180. / M_PI * (pose.x / RE));
             piMsgFakeGpsTx.lon = (int) 1e7 *
-                (CYBERZOO_LON + 180 / M_PI * (pose.x / RE) / cos(CYBERZOO_LON * M_PI / 180.));
+                (CYBERZOO_LON + 180 / M_PI * (pose.y / RE) / cos(CYBERZOO_LON * M_PI / 180.));
             piMsgFakeGpsTx.altCm = (int) (pose.z * 100.f);
             piMsgFakeGpsTx.hdop =  (short) 150;
             piMsgFakeGpsTx.groundSpeed = (short) (hypotf(pose_der.x, pose_der.y) * 100.f);
-            piMsgFakeGpsTx.groundCourse = (short) (1800.f * atan2(pose_der.y, pose_der.x) / M_PI);
+            piMsgFakeGpsTx.groundCourse = (short) (1800.f * atan2(pose_der.x, pose_der.y) / M_PI);
             piMsgFakeGpsTx.numSat = 8;
             piSendMsg(&piMsgFakeGpsTx, &serialWriter);
 
-            piMsgExternalPoseTx.time_ms = piMsgImuRx->time_ms;
-            piMsgExternalPoseTx.enu_x = pose.x;
-            piMsgExternalPoseTx.enu_y = pose.y;
-            piMsgExternalPoseTx.enu_z = pose.z;
-            piMsgExternalPoseTx.enu_xd = pose_der.x;
-            piMsgExternalPoseTx.enu_yd = pose_der.y;
-            piMsgExternalPoseTx.enu_zd = pose_der.z;
+            piMsgExternalPoseTx.time_us = piMsgImuRx->time_us;
+            piMsgExternalPoseTx.ned_x   = pose.x;
+            piMsgExternalPoseTx.ned_y   = pose.y;
+            piMsgExternalPoseTx.ned_z   = pose.z;
+            piMsgExternalPoseTx.ned_xd  = pose_der.x;
+            piMsgExternalPoseTx.ned_yd  = pose_der.y;
+            piMsgExternalPoseTx.ned_zd  = pose_der.z;
             piMsgExternalPoseTx.body_qi = pose.qw;
             piMsgExternalPoseTx.body_qx = pose.qx;
             piMsgExternalPoseTx.body_qy = pose.qy;
@@ -350,45 +355,39 @@ int main(int argc, char** argv) {
         int setpointBytes = recvfrom(setpointFd, (uint8_t *)(setpointBuffer), PI_MSG_POS_SETPOINT_PAYLOAD_LEN, 0, (struct sockaddr *)&client_addr, &client_addr_len);
 
         if (setpointBytes > 0) {
-#define PI_MSG_PAYLOAD_OFFSET (PI_MSG_ID_BYTES + PI_MSG_PAYLOAD_LEN_BYTES)
             memcpy((uint8_t *)(&msgPosSetpoint)+PI_MSG_PAYLOAD_OFFSET, setpointBuffer, PI_MSG_POS_SETPOINT_PAYLOAD_LEN);
-            piMsgPosSetpointTx.time_ms = piMsgImuRx->time_ms;
+            piMsgPosSetpointTx.time_us = piMsgImuRx->time_us;
 
-            piMsgPosSetpointTx.enu_x = ntohf(msgPosSetpoint.enu_x);
-            piMsgPosSetpointTx.enu_y = ntohf(msgPosSetpoint.enu_y);
-            piMsgPosSetpointTx.enu_z = ntohf(msgPosSetpoint.enu_z);
-            piMsgPosSetpointTx.enu_xd = ntohf(msgPosSetpoint.enu_xd);
-            piMsgPosSetpointTx.enu_yd = ntohf(msgPosSetpoint.enu_yd);
-            piMsgPosSetpointTx.enu_zd = ntohf(msgPosSetpoint.enu_zd);
+            piMsgPosSetpointTx.ned_x  = ntohf(msgPosSetpoint.ned_x);
+            piMsgPosSetpointTx.ned_y  = ntohf(msgPosSetpoint.ned_y);
+            piMsgPosSetpointTx.ned_z  = ntohf(msgPosSetpoint.ned_z);
+            piMsgPosSetpointTx.ned_xd = ntohf(msgPosSetpoint.ned_xd);
+            piMsgPosSetpointTx.ned_yd = ntohf(msgPosSetpoint.ned_yd);
+            piMsgPosSetpointTx.ned_zd = ntohf(msgPosSetpoint.ned_zd);
             piMsgPosSetpointTx.yaw = ntohf(msgPosSetpoint.yaw);
 
             piSendMsg(&piMsgPosSetpointTx, &serialWriter);
         }
 
-        // ---- keystrokes ----
-        pi_POS_SETPOINT_t msgPosSetpoint;
-        int setpointBytes = recvfrom(setpointFd, (uint8_t *)(setpointBuffer), PI_MSG_POS_SETPOINT_PAYLOAD_LEN, 0, (struct sockaddr *)&client_addr, &client_addr_len);
+        // ---- keyboard ----
+        pi_KEYBOARD_t msgKeyboard;
+        int keyboardBytes = recvfrom(keyboardFd, (uint8_t *)(keyboardBuffer), PI_MSG_KEYBOARD_PAYLOAD_LEN, 0, (struct sockaddr *)&client_addr, &client_addr_len);
 
-        if (setpointBytes > 0) {
-#define PI_MSG_PAYLOAD_OFFSET (PI_MSG_ID_BYTES + PI_MSG_PAYLOAD_LEN_BYTES)
-            memcpy((uint8_t *)(&msgPosSetpoint)+PI_MSG_PAYLOAD_OFFSET, setpointBuffer, PI_MSG_POS_SETPOINT_PAYLOAD_LEN);
-            piMsgPosSetpointTx.time_ms = piMsgImuRx->time_ms;
+        if (keyboardBytes > 0) {
+            memcpy((uint8_t *)(&msgKeyboard)+PI_MSG_PAYLOAD_OFFSET, keyboardBuffer, PI_MSG_KEYBOARD_PAYLOAD_LEN);
+            piMsgKeyboardTx.time_us = piMsgImuRx->time_us;
+            piMsgKeyboardTx.key = msgKeyboard.key;
 
-            piMsgPosSetpointTx.enu_x = ntohf(msgPosSetpoint.enu_x);
-            piMsgPosSetpointTx.enu_y = ntohf(msgPosSetpoint.enu_y);
-            piMsgPosSetpointTx.enu_z = ntohf(msgPosSetpoint.enu_z);
-            piMsgPosSetpointTx.enu_xd = ntohf(msgPosSetpoint.enu_xd);
-            piMsgPosSetpointTx.enu_yd = ntohf(msgPosSetpoint.enu_yd);
-            piMsgPosSetpointTx.enu_zd = ntohf(msgPosSetpoint.enu_zd);
-            piMsgPosSetpointTx.yaw = ntohf(msgPosSetpoint.yaw);
+            printf("relayed keystroke %d\n", piMsgKeyboardTx.key);
+            piSendMsg(&piMsgKeyboardTx, &serialWriter);
 
-            piSendMsg(&piMsgPosSetpointTx, &serialWriter);
         }
     }
 
     close(serialPortFd);
     close(optitrackFd);
     close(setpointFd);
+    close(keyboardFd);
 
     return 0;
 }

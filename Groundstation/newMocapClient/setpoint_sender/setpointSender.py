@@ -17,7 +17,7 @@ f: float 4 byte
 """
 
 POS_SETPOINT = {
-    'time_ms': 0,
+    'time_us': 0,
     'ned_x': 0.,
     'ned_y': 0.,
     'ned_z': 0.,
@@ -41,7 +41,7 @@ args = parser.parse_args()
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 msg = POS_SETPOINT.copy()
-msg['time_ms'] = int(0)
+msg['time_us'] = int(0)
 msg['ned_x'] = args.pos[0]
 msg['ned_y'] = args.pos[1]
 msg['ned_z'] = args.pos[2]

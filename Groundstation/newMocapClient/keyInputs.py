@@ -1,4 +1,9 @@
+#!/usr/bin/env python3
+
 import curses
+from argparse import ArgumentParser
+import socket
+import struct
 
 # HID codes for various keys
 hid_codes = {
@@ -13,7 +18,20 @@ hid_codes = {
     'ESC': 0x29, 'LEFT': 0x50, 'UP': 0x48, 'RIGHT': 0x4D, 'DOWN': 0x50
 }
 
-def main(stdscr):
+# msg definitions for udp sending
+KEYBOARD = {
+    'time_us': 0,
+    'key': 0,
+}
+
+KEYBOARD_format = '!IB'
+
+
+def main(stdscr, sock, host, port):
+    msg = KEYBOARD.copy()
+    msg['time_us'] = int(0)
+    msg['key'] = 0x0
+
     # Clear screen
     stdscr.clear()
     stdscr.addstr("Press keys to see their HID codes. Press ESC to exit.\n")
@@ -31,25 +49,50 @@ def main(stdscr):
         stdscr.clrtoeol()  # Clear the line
 
         # Check if the key is an ASCII character
+        key_hid = None
         if 32 <= key <= 126:  # Printable characters
             char = chr(key)
             if char in hid_codes:
-                stdscr.addstr(f"HID Code for '{char}': 0x{hid_codes[char]:02X}\n")
+                key_hid = hid_codes[char]
+                stdscr.addstr(f"HID Code for '{char}': 0x{key_hid:02X}\n")
         elif key == curses.KEY_LEFT:
-            stdscr.addstr("HID Code for Left Arrow: 0x{:02X}\n".format(hid_codes['LEFT']))
+            key_hid = hid_codes['LEFT']
+            stdscr.addstr("HID Code for Left Arrow: 0x{:02X}\n".format(key_hid))
         elif key == curses.KEY_RIGHT:
-            stdscr.addstr("HID Code for Right Arrow: 0x{:02X}\n".format(hid_codes['RIGHT']))
+            key_hid = hid_codes['RIGHT']
+            stdscr.addstr("HID Code for Right Arrow: 0x{:02X}\n".format(key_hid))
         elif key == curses.KEY_UP:
-            stdscr.addstr("HID Code for Up Arrow: 0x{:02X}\n".format(hid_codes['UP']))
+            key_hid = hid_codes['UP']
+            stdscr.addstr("HID Code for Up Arrow: 0x{:02X}\n".format(key_hid))
         elif key == curses.KEY_DOWN:
-            stdscr.addstr("HID Code for Down Arrow: 0x{:02X}\n".format(hid_codes['DOWN']))
+            key_hid = hid_codes['DOWN']
+            stdscr.addstr("HID Code for Down Arrow: 0x{:02X}\n".format(key_hid))
         elif key == 8:  # Backspace key
-            stdscr.addstr("HID Code for Backspace: 0x{:02X}\n".format(hid_codes['\b']))
+            key_hid = hid_codes['\b']
+            stdscr.addstr("HID Code for Backspace: 0x{:02X}\n".format(key_hid))
         elif key == 9:  # Tab key
-            stdscr.addstr("HID Code for Tab: 0x{:02X}\n".format(hid_codes['\t']))
+            key_hid = hid_codes['\t']
+            stdscr.addstr("HID Code for Tab: 0x{:02X}\n".format(key_hid))
         elif key == 10:  # Enter key
-            stdscr.addstr("HID Code for Enter: 0x{:02X}\n".format(hid_codes['\n']))
+            key_hid = hid_codes['\n']
+            stdscr.addstr("HID Code for Enter: 0x{:02X}\n".format(key_hid))
 
+        # send over UDP
+        if key_hid is not None:
+            msg['time_us'] = int(0)
+            msg['key'] = key_hid
+            msg_packed = struct.pack(KEYBOARD_format, *msg.values())
+            sock.sendto(msg_packed, (args.host, args.port))
+
+        # refresh terminal
         stdscr.refresh()
 
-curses.wrapper(main)
+if __name__=="__main__":
+    parser = ArgumentParser()
+    parser.add_argument('--host', required=False, default="10.0.0.1", type=str)
+    parser.add_argument('--port', required=False, default=5007, type=int)
+    args = parser.parse_args()
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    curses.wrapper(main, sock, args.host, args.port)
