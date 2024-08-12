@@ -113,7 +113,7 @@ feature OSD
 serial 5 64 115200 57600 0 115200
 set baro_bustype = I2C
 set baro_i2c_device = 2
-set serialrx_provider = CRSF
+set serialrx_provider = SBUS
 set blackbox_device = SDCARD
 set current_meter = ADC
 set battery_meter = ADC
@@ -198,10 +198,12 @@ set blackbox_disable_pos = OFF
 set blackbox_disable_ekf = OFF
 set blackbox_disable_learner = ON
 set blackbox_high_resolution = ON
+set blackbox_sample_rate = 1/4
 set dshot_bidir = ON
 set motor_pwm_protocol = DSHOT600
 set motor_poles = 14
 set failsafe_delay = 5
+set failsafe_switch_mode = KILL
 set ibata_scale = 280
 set pid_process_denom = 4
 set simplified_gyro_filter_multiplier = 40
@@ -220,8 +222,8 @@ set gyro_1_align_yaw = 1800
 set rpm_filter_min_hz = 60
 
 # ekf (these are the defaults)
-set ekf_use_attitude_estimate = 0
-set ekf_use_position_estimate = 0
+set ekf_use_attitude_estimate = 1
+set ekf_use_position_estimate = 1
 set ekf_use_angles = 1, 1, 1
 set ekf_proc_noise_acc = 5000, 5000, 5000
 set ekf_proc_noise_gyro = 1000, 1000, 1000
@@ -280,15 +282,11 @@ set nn_rate_denom = 20
 profile 0
 
 # profile 0
-set dterm_lpf1_dyn_min_hz = 0
-set dterm_lpf1_dyn_max_hz = 75
-set dterm_lpf1_type = PT1
-set dterm_lpf1_static_hz = 37
-set dterm_lpf2_type = PT1
+set dterm_lpf1_static_hz = 0
 set dterm_lpf2_static_hz = 0
 set yaw_lowpass_hz = 0
 set thrust_linear = 55
-set simplified_dterm_filter = ON
+set simplified_dterm_filter = OFF
 
 profile 1
 

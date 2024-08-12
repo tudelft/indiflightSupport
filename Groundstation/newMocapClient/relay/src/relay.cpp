@@ -301,7 +301,7 @@ int main(int argc, char** argv) {
 
         if ((piMsgImuRxState == PI_MSG_RX_STATE_NONE) || (!newMessage)) {
             // cannot go on, no time information to timestamp gps msgs, or setpoints
-            usleep(250); // reduce CPU load a bit
+            //usleep(250); // reduce CPU load a bit
             continue;
         } else {
             newMessage = false;
