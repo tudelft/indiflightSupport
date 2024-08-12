@@ -70,26 +70,30 @@ if __name__=="__main__":
             raise ArgumentTypeError ("PORT must be integer")
 
     mc = MultiRotor()
-    mc.setInertia(m=0.65, I=2*np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
-    #mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh')) # RR
-    #mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh')) # FR
-    #mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh')) # RL
-    #mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh')) # FL
+    mc.setInertia(m=0.45, I=np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
+    mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh')) # RR
+    mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh')) # FR
+    mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh')) # RL
+    mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh')) # FL
     # some additional rotors
+    #mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], wmax=4900., Tmax=4.5, kESC=0.5, tau=0.04, Izz=1e-6, dir='lh')) # RR
+    #mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], wmax=4900., Tmax=4.5, kESC=0.5, tau=0.04, Izz=1e-6, dir='rh')) # FR
+    #mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], wmax=4900., Tmax=4.5, kESC=0.5, tau=0.04, Izz=1e-6, dir='rh')) # RL
+    #mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], wmax=4900., Tmax=4.5, kESC=0.5, tau=0.04, Izz=1e-6, dir='lh')) # FL
     #mc.addRotor(Rotor(r=[+0.0, -0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[0, -1., -1.]))
     #mc.addRotor(Rotor(r=[+0.0, +0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[0, 1., -1.]))
     #mc.addRotor(Rotor(r=[-0.1, +0.0, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[-1, 0., -1.]))
     #mc.addRotor(Rotor(r=[+0.1, +0.0, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[1, 0., -1.]))
 
     # Robin
-    mc.addRotor(Rotor(r=[-0.075, +0.1, 0.0], Tmax=15., kESC=0.5, tau=0.02, Izz=2e-6, dir='lh')) # RR
-    mc.addRotor(Rotor(r=[+0.075, +0.1, 0.0], Tmax=15., kESC=0.5, tau=0.02, Izz=2e-6, dir='rh')) # FR
-    mc.addRotor(Rotor(r=[-0.075, -0.1, 0.0], Tmax=15., kESC=0.5, tau=0.02, Izz=2e-6, dir='rh')) # RL
-    mc.addRotor(Rotor(r=[+0.075, -0.1, 0.0], Tmax=15., kESC=0.5, tau=0.02, Izz=2e-6, dir='lh')) # FL
+    #mc.addRotor(Rotor(r=[-0.075, +0.1, 0.0], wmax=3300., Tmax=15., kESC=0.5, tau=0.02, Izz=2e-6, dir='lh')) # RR
+    #mc.addRotor(Rotor(r=[+0.075, +0.1, 0.0], wmax=3300., Tmax=15., kESC=0.5, tau=0.02, Izz=2e-6, dir='rh')) # FR
+    #mc.addRotor(Rotor(r=[-0.075, -0.1, 0.0], wmax=3300., Tmax=15., kESC=0.5, tau=0.02, Izz=2e-6, dir='rh')) # RL
+    #mc.addRotor(Rotor(r=[+0.075, -0.1, 0.0], wmax=3300., Tmax=15., kESC=0.5, tau=0.02, Izz=2e-6, dir='lh')) # FL
 
     #imu = IMU(mc, r=[0., 0., 0.], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
-    #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
-    imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
+    imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
+    #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
 
     mocap = Mocap(mc, args.mocap_host, args.mocap_port) if args.mocap else None
     hil = IndiflightHIL(mc, imu, device=args.hil, baud=args.hil_baud) if args.hil else None

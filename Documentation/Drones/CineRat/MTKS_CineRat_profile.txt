@@ -113,7 +113,7 @@ feature OSD
 serial 5 64 115200 57600 0 115200
 set baro_bustype = I2C
 set baro_i2c_device = 2
-set serialrx_provider = CRSF
+set serialrx_provider = SBUS
 set blackbox_device = SDCARD
 set current_meter = ADC
 set battery_meter = ADC
@@ -184,6 +184,7 @@ set gyro_lpf1_dyn_min_hz = 0
 set gyro_lpf1_dyn_max_hz = 250
 set acc_calibration = 0,0,0,1
 set acc_offset = -10, -12, 8
+set acc_lpf_hz = 25
 set blackbox_disable_pids = ON
 set blackbox_disable_setpoint = ON
 set blackbox_disable_bat = OFF
@@ -191,7 +192,7 @@ set blackbox_disable_rssi = OFF
 set blackbox_disable_debug = ON
 set blackbox_disable_indi = OFF
 set blackbox_disable_pos = OFF
-set blackbox_disable_ekf = OFF
+set blackbox_disable_ekf = ON
 set blackbox_disable_learner = ON
 set blackbox_high_resolution = ON
 set blackbox_sample_rate = 1/4
@@ -247,7 +248,7 @@ set throw_to_arm_release_delay_ms = 150
 # 0: none, 1: learn during flight, 2: query and learn after catapult, 4: idem. after throw
 set learner_mode = 6
 set learner_num_actuators = 4
-set learner_delay_time_ms = 100
+set learner_delay_time_ms = 150
 set learner_step_time_ms = 50
 set learner_ramp_time_ms = 100
 set learner_overlap_time_ms = 50
@@ -272,13 +273,11 @@ set learner_apply_position_profile = 1
 set learner_apply_hover_rotation = 1
 
 # Neural Nets
-set nn_rate_denom = 20
+set nn_rate_denom = 2
 
 profile 0
 
 # profile 0
-set dterm_lpf1_dyn_min_hz = 0
-set dterm_lpf1_dyn_max_hz = 75
 set dterm_lpf1_static_hz = 0
 set dterm_lpf2_static_hz = 0
 set yaw_lowpass_hz = 0
@@ -379,7 +378,7 @@ set indi_manual_max_upwards_accel = 20
 # set indi_act_time_constant_ms = 22,21,21,21,25,25,25,25
 # set indi_act_max_rpm = 32757,28254,34458,35347,40000,40000,40000,40000
 # set indi_act_hover_rpm = 16378,14127,17229,17673,20000,20000,20000,20000
-set indi_act_limit = 60,60,60,60,100,100,100,100
+set indi_act_limit = 100,100,100,100,100,100,100,100
 
 # -- roll -56, pitch 81, yaw 170
 set indi_act_g1_fx = -1037, -1037, -1037, -1037
@@ -437,7 +436,7 @@ set position_max_tilt = 40
 # set position_vertical_d = 45
 set position_max_upwards_speed = 100
 set position_max_downwards_speed = 100
-set position_max_upwards_accel = 2000
+set position_max_upwards_accel = 2500
 set position_max_downwards_accel = 500
 # set position_yaw_p = 44
 set position_weathervane_p = 0

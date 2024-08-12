@@ -152,7 +152,7 @@ Compile and flash INDIflight with `EXTRA_FLAGS += -DHIL_BUILD` in the build
 configuration.
 
 
-#### Step 4 -- Build the hil container
+#### Step 4 -- Build the hil-simulation container
 
     docker build . -t pyndiflight-hil -f hil.Dockerfile
 
@@ -161,6 +161,6 @@ configuration.
 
     docker run --privileged -it -p 5000:5000                     \
         -v ./exampleQuadSim.py:/sim.py                           \
-        pyndiflight-hil --hil /dev/ttyUSB0 --mocap 10.0.0.5 5005 \
+        pyndiflight-hil --hil /dev/ttyUSB0 --mocap 10.0.0.1 5005 \
         --throw
 

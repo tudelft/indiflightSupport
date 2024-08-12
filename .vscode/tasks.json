@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "getLogs",
+            "command": "${workspaceFolder}/LogAnalysis/log_downloader/get_logs.sh",
+            "args": [
+                "/dev/sda1",
+                "${input:mirrorDestination}"
+            ],
+            "type": "shell",
+        },
+    ],
+    "inputs": [
+        {
+            "type": "promptString",
+            "id": "mirrorDestination",
+            "description": "Provide folder to dump all log files. WARNING: THE CONTENTS OF THIS FOLDER WILL BE OVERWRITTEN!",
+            "default": ""
+        }
+    ]
+}

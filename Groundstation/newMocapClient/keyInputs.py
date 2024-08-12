@@ -32,6 +32,11 @@ def main(stdscr, sock, host, port):
     msg['time_us'] = int(0)
     msg['key'] = 0x0
 
+    # detect overruns
+    rows, _ = stdscr.getmaxyx()
+    if rows < 15:
+        raise TypeError(f"Terminal must have height of at least 15 rows, has {rows}")
+
     # Clear screen
     stdscr.clear()
     stdscr.addstr("Press keys to see their HID codes. Press ESC to exit.\n")
