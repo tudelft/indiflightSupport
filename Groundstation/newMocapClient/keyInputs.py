@@ -35,9 +35,20 @@ def main(stdscr, sock, host, port):
     # Clear screen
     stdscr.clear()
     stdscr.addstr("Press keys to see their HID codes. Press ESC to exit.\n")
-    stdscr.addstr("...\n")
-    stdscr.addstr("...\n")
-    stdscr.addstr("...\n")
+    info = '''
+0 = go to center
+1 = initTrajectoryTracker
+2 = decrease speed by 0.5 m/s
+3 = increase speed by 0.5 m/s
+4 = stopTrajectoryTracker
+5 = land
+6 = nn_init
+7 = nn_activate
+8 = recovery_mode
+9 = kill
+
+    '''
+    stdscr.addstr(info)
 
     while True:
         key = stdscr.getch()  # Wait for a key press
@@ -45,7 +56,8 @@ def main(stdscr, sock, host, port):
             break
 
         # Clear the previous output
-        stdscr.move(4, 0)
+        move_down_by = info.count('\n') + 1
+        stdscr.move(move_down_by, 0)
         stdscr.clrtoeol()  # Clear the line
 
         # Check if the key is an ASCII character
