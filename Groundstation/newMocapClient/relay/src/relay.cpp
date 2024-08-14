@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
-
+#include <sys/stat.h>
 
 #include <fstream>
 #include <sys/time.h>
@@ -115,6 +115,7 @@ float ntohf(float in) {
     return *(float*)(&dummy);
 }
 
+// for external pose
 typedef struct pose_s {
     uint64_t timeUs;
     float x;
@@ -136,42 +137,88 @@ typedef struct pose_der_s {
     float wz;
 } pose_der_t;
 
+pose_t pose;
+pose_der_t pose_der;
+
 static pi_parse_states_t piParseStates = {0};
 
-// functions for writing IMU message to csv file
-FILE* createImuLogFile() {
+// functions for writing messages to csv file
+FILE* createLogFile() {
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
-    char filename[100];
-    sprintf(filename, "/home/pi/logs/imu-%d-%d-%d-%d-%d-%d.csv", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-    // convert to std::string
-    std::string filename_str(filename);
-    // if /home/pi/logs doesnt exists we make it
-    std::ifstream file_stream(filename_str.c_str());
+    char filename[200];
 
-    if (!file_stream.good()) {
-        system("mkdir -p /home/pi/logs");
+    // Get the home directory
+    const char* homeDir = getenv("HOME");
+    if (homeDir == NULL) {
+        fprintf(stderr, "Cannot get HOME directory\n");
+        return NULL;
     }
-    
+
+    // Construct the full path for the log directory and file
+    sprintf(filename, "%s/logs/imu-%d-%d-%d-%d-%d-%d.csv", homeDir, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    std::string filename_str(filename);
+
+    // Check if the directory exists, if not create it
+    struct stat st = {0};
+    std::string logDir = std::string(homeDir) + "/logs";
+    if (stat(logDir.c_str(), &st) == -1) {
+        if (mkdir(logDir.c_str(), 0700) != 0) {
+            perror("mkdir failed");
+            return NULL;
+        }
+    }
+
     FILE* file = fopen(filename, "w");
-    printf("Logging IMU data to %s\n", filename);
+    if (file == NULL) {
+        perror("fopen failed");
+    } else {
+        printf("Logging data to %s\n", filename);
+    }
     return file;
 }
 
-void writeImuToCsvHeader(FILE* file) {
-    // time_ms_rec is the time the message was received
-    // time_ms is the time the message was created
-    fprintf(file, "time_us_rec,time_us_msg,roll,pitch,yaw,x,y,z\n");
+void writeCsvHeader(FILE* file) {
+    // time
+    fprintf(file, "time_us,");
+    // piMsgImu
+    fprintf(file, "imu_time_us, imu_roll, imu_pitch, imu_yaw, imu_x, imu_y, imu_z,");
+    // piMsgExternalPose
+    fprintf(file, "ext_time_us, ext_x, ext_y, ext_z, ext_vx, ext_vy, ext_vz, ext_qw, ext_qx, ext_qy, ext_qz,");
+#ifdef ORIN
+    // piMsgVioPose
+    fprintf(file, "vio_time_us, vio_x, vio_y, vio_z, vio_vx, vio_vy, vio_vz, vio_qw, vio_qx, vio_qy, vio_qz, vio_p, vio_q, vio_r\n");
+#endif
 }
 
-void writeImuToCsv(pi_IMU_t* imuMsg, FILE* file) {
-    // get current time ms
-    auto microsec_since_epoch = 1e3f * duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
-    uint32_t time_us_rec = (uint32_t)microsec_since_epoch;
-    fprintf(file, "%u,%u,%f,%f,%f,%f,%f,%f\n", time_us_rec, imuMsg->time_us, imuMsg->roll, imuMsg->pitch, imuMsg->yaw, imuMsg->x, imuMsg->y, imuMsg->z);
+void writeCsvRow(FILE* file) {
+    // get current time us
+    auto now = system_clock::now();
+    auto now_us = std::chrono::time_point_cast<std::chrono::microseconds>(now);
+    // static uint64_t time_us_start = now_us.time_since_epoch().count();
+    // uint32_t time_us = (uint32_t)(now_us.time_since_epoch().count() - time_us_start);
+    uint64_t time_us = now_us.time_since_epoch().count();
+    
+    // time
+    fprintf(file, "%lu,", time_us);
+
+    // piMsgImu
+    if (piMsgImuRx != NULL) {
+        fprintf(file, "%u, %f, %f, %f, %f, %f, %f, ", piMsgImuRx->time_us, piMsgImuRx->roll, piMsgImuRx->pitch, piMsgImuRx->yaw, piMsgImuRx->x, piMsgImuRx->y, piMsgImuRx->z);
+    } else {
+        fprintf(file, "0, 0, 0, 0, 0, 0, 0, ");
+    }
+    // piMsgExternalPose
+    // static uint64_t ext_time_us_start = pose.timeUs;
+    // uint32_t ext_time_us = (uint32_t)(pose.timeUs - ext_time_us_start);
+    uint64_t ext_time_us = pose.timeUs;
+    fprintf(file, "%lu, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, ", ext_time_us, piMsgExternalPoseTx.ned_x, piMsgExternalPoseTx.ned_y, piMsgExternalPoseTx.ned_z, piMsgExternalPoseTx.ned_xd, piMsgExternalPoseTx.ned_yd, piMsgExternalPoseTx.ned_zd, piMsgExternalPoseTx.body_qi, piMsgExternalPoseTx.body_qx, piMsgExternalPoseTx.body_qy, piMsgExternalPoseTx.body_qz);
+#ifdef ORIN
+    fprintf(file, "%u, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f ", piMsgVioPoseTx.time_us, piMsgVioPoseTx.x, piMsgVioPoseTx.y, piMsgVioPoseTx.z, piMsgVioPoseTx.vx, piMsgVioPoseTx.vy, piMsgVioPoseTx.vz, piMsgVioPoseTx.qw, piMsgVioPoseTx.qx, piMsgVioPoseTx.qy, piMsgVioPoseTx.qz, piMsgVioPoseTx.p, piMsgVioPoseTx.q, piMsgVioPoseTx.r);
+#endif
+    fprintf(file, "\n");
 }
-
 
 #ifdef ORIN
 // STUFF FOR ROS2
@@ -181,8 +228,9 @@ void writeImuToCsv(pi_IMU_t* imuMsg, FILE* file) {
 #include <thread>
 #include <chrono>
 
+
 void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
-    std::lock_guard<std::mutex> lock(odom_mutex);
+    // std::lock_guard<std::mutex> lock(odom_mutex);
 
     // get time in ms
     static uint32_t start_s = msg->header.stamp.sec;
@@ -208,9 +256,10 @@ void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
     piMsgVioPoseTx.r = msg->twist.twist.angular.z;
 
     // print content of piMsgVioPoseTx
-    printf("VIO_POSE: time_us: %u, x: %f, y: %f, z: %f, vx: %f, vy: %f, vz: %f, qw: %f, qx: %f, qy: %f, qz: %f\n", piMsgVioPoseTx.time_us, piMsgVioPoseTx.x, piMsgVioPoseTx.y, piMsgVioPoseTx.z, piMsgVioPoseTx.vx, piMsgVioPoseTx.vy, piMsgVioPoseTx.vz, piMsgVioPoseTx.qw, piMsgVioPoseTx.qx, piMsgVioPoseTx.qy, piMsgVioPoseTx.qz);
+    // printf("VIO_POSE: time_us: %u, x: %f, y: %f, z: %f, vx: %f, vy: %f, vz: %f, qw: %f, qx: %f, qy: %f, qz: %f\n", piMsgVioPoseTx.time_us, piMsgVioPoseTx.x, piMsgVioPoseTx.y, piMsgVioPoseTx.z, piMsgVioPoseTx.vx, piMsgVioPoseTx.vy, piMsgVioPoseTx.vz, piMsgVioPoseTx.qw, piMsgVioPoseTx.qx, piMsgVioPoseTx.qy, piMsgVioPoseTx.qz);
 
     piSendMsg(&piMsgVioPoseTx, &serialWriter);
+    printf("received VIO_POSE \n");
 }
 #endif
 
@@ -260,8 +309,8 @@ int main(int argc, char** argv) {
     // create imu log file and write to header
     FILE* imuLogFile = NULL;
     if (logging) {
-        imuLogFile = createImuLogFile();
-        writeImuToCsvHeader(imuLogFile);
+        imuLogFile = createLogFile();
+        writeCsvHeader(imuLogFile);
     }
 
 #ifdef ORIN
@@ -293,7 +342,7 @@ int main(int argc, char** argv) {
                 if (piParse(&piParseStates, piBuffer[i]) == PI_MSG_IMU_ID) {
                     newMessage = true;
                     if (logging) {
-                        writeImuToCsv(piMsgImuRx, imuLogFile);
+                        writeCsvRow(imuLogFile);
                     }
                 }
             }
@@ -307,9 +356,6 @@ int main(int argc, char** argv) {
             newMessage = false;
         }
 
-        // 
-        pose_t pose;
-        pose_der_t pose_der;
 
         struct sockaddr_in client_addr;
         socklen_t client_addr_len = sizeof(client_addr);
@@ -348,6 +394,7 @@ int main(int argc, char** argv) {
             piMsgExternalPoseTx.body_qy = pose.qy;
             piMsgExternalPoseTx.body_qz = pose.qz;
             piSendMsg(&piMsgExternalPoseTx, &serialWriter);
+            printf("received EXTERNAL_POSE \n");
         }
 
         // ---- setpoints ----
@@ -365,8 +412,8 @@ int main(int argc, char** argv) {
             piMsgPosSetpointTx.ned_yd = ntohf(msgPosSetpoint.ned_yd);
             piMsgPosSetpointTx.ned_zd = ntohf(msgPosSetpoint.ned_zd);
             piMsgPosSetpointTx.yaw = ntohf(msgPosSetpoint.yaw);
-
             piSendMsg(&piMsgPosSetpointTx, &serialWriter);
+            printf("received SETPOINT \n");
         }
 
         // ---- keyboard ----
@@ -377,9 +424,8 @@ int main(int argc, char** argv) {
             memcpy((uint8_t *)(&msgKeyboard)+PI_MSG_PAYLOAD_OFFSET, keyboardBuffer, PI_MSG_KEYBOARD_PAYLOAD_LEN);
             piMsgKeyboardTx.time_us = piMsgImuRx->time_us;
             piMsgKeyboardTx.key = msgKeyboard.key;
-
-            printf("relayed keystroke %d\n", piMsgKeyboardTx.key);
             piSendMsg(&piMsgKeyboardTx, &serialWriter);
+            printf("received KEYBOARD \n");
 
         }
     }

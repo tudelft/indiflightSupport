@@ -1,11 +1,6 @@
 cmake_minimum_required (VERSION 3.18)
 project(relay)
 
-# when compiling for the orin, enable the parts of the code that do ROS2 things
-option(ORIN "Compile for Orin with ROS2 VIO support" OFF)
-if(ORIN)
-    add_definitions(-DORIN)
-endif()
 
 set(PI_GEN_DIR ${CMAKE_BINARY_DIR}/pi-protocol)
 include_directories(${PI_GEN_DIR})
@@ -19,11 +14,22 @@ add_executable(relay ${CMAKE_SOURCE_DIR}/src/relay.cpp
     ${PI_GEN_DIR}/pi-messages.c
 )
 
+# when compiling for the orin, enable the parts of the code that do ROS2 things
+option(ORIN "Compile for Orin with ROS2 VIO support" OFF)
+if(ORIN)
+    add_definitions(-DORIN)
+    find_package(ament_cmake REQUIRED)
+    find_package(rclcpp REQUIRED)
+    find_package(nav_msgs REQUIRED)
+    # ament_target_dependencies(client rclcpp geometry_msgs)
+    ament_target_dependencies(relay rclcpp nav_msgs)
+endif()
+
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD C++11)
 
-#target_link_libraries(connect ${PROJECT_NAME})
+# target_link_libraries(connect ${PROJECT_NAME})
 
 # ----- python generation of pi protocol headers -----
 # find Py3, setting the Python3_EXECUTATBLE CMAKE variable
