@@ -21,16 +21,16 @@ set dyn_notch_q = 500
 set gyro_lpf1_dyn_min_hz = 0
 set gyro_lpf1_dyn_max_hz = 250
 set acc_calibration = 0,0,0,1
-#set acc_offset = -10, -10, 15
 set acc_offset = -10, -12, 8
 #set acc_offset = 0,0,0
+set acc_lpf_hz = 50
 set blackbox_disable_pids = ON
 set blackbox_disable_setpoint = ON
 set blackbox_disable_bat = ON
 set blackbox_disable_rssi = ON
 set blackbox_disable_debug = ON
 set blackbox_disable_indi = OFF
-set blackbox_disable_pos = ON
+set blackbox_disable_pos = OFF
 set blackbox_disable_ekf = ON
 set blackbox_disable_learner = OFF
 set blackbox_high_resolution = ON
@@ -142,8 +142,8 @@ indiprofile 0
 # indiprofile 0
 # --- attitude control config and limits ---
 # Attitude: (deg/s/s) / (deg) * 10    Rate: (deg/s/s) / (deg/s)*10
-set indi_attitude_gains = 3000, 3000, 3000
-set indi_rate_gains     =  230,  230,  230
+set indi_attitude_gains = 3000, 3000, 1000
+set indi_rate_gains     =  230,  230,  150
 
 # deg/s
 set indi_attitude_max_tilt_rate = 800
@@ -181,7 +181,7 @@ set indi_act_hover_rpm = 20000, 20000, 20000, 20000
 set indi_act_nonlinearity = 50, 50, 50, 50
 
 # in %. upper bounded by motor_output_limit
-set indi_act_limit = 80, 80, 80, 80
+set indi_act_limit = 100, 100, 100, 100
 
 # fx, fy, fz is N/kg / 1 * 100.  Roll, pitch is Nm / (kgm^2) / 1 * 10.  Yaw is Nm / (kgm^2) / 1 * 10
 set indi_act_g1_fx = 0,0,0,0
@@ -241,6 +241,7 @@ set position_max_downwards_speed = 500
 set position_max_upwards_accel = 2000
 set position_max_downwards_accel = 2000
 set position_yaw_p = 50
+set position_use_thrust_attenuation = 1
 
 positionprofile 1
 

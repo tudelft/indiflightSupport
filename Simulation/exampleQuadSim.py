@@ -69,35 +69,40 @@ if __name__=="__main__":
         except ValueError:
             raise ArgumentTypeError ("PORT must be integer")
 
+
+    #%% Generate craft
     mc = MultiRotor()
-    mc.setInertia(m=0.45, I=np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
-    mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh')) # RR
-    mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh')) # FR
-    mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh')) # RL
-    mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh')) # FL
+    # approx model of CineRat 3inch race drone
+    mc.setInertia(m=0.41, I=0.75*np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
+    mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=4.5, dir='lh')) # RR
+    mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=4.5, dir='rh')) # FR
+    mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=4.5, dir='rh')) # RL
+    mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=4.5, dir='lh')) # FL
     # some additional rotors
-    #mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], wmax=4900., Tmax=4.5, kESC=0.5, tau=0.04, Izz=1e-6, dir='lh')) # RR
-    #mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], wmax=4900., Tmax=4.5, kESC=0.5, tau=0.04, Izz=1e-6, dir='rh')) # FR
-    #mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], wmax=4900., Tmax=4.5, kESC=0.5, tau=0.04, Izz=1e-6, dir='rh')) # RL
-    #mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], wmax=4900., Tmax=4.5, kESC=0.5, tau=0.04, Izz=1e-6, dir='lh')) # FL
     #mc.addRotor(Rotor(r=[+0.0, -0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[0, -1., -1.]))
     #mc.addRotor(Rotor(r=[+0.0, +0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[0, 1., -1.]))
     #mc.addRotor(Rotor(r=[-0.1, +0.0, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[-1, 0., -1.]))
     #mc.addRotor(Rotor(r=[+0.1, +0.0, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[1, 0., -1.]))
 
-    # Robin
-    #mc.addRotor(Rotor(r=[-0.075, +0.1, 0.0], wmax=3300., Tmax=15., kESC=0.5, tau=0.02, Izz=2e-6, dir='lh')) # RR
-    #mc.addRotor(Rotor(r=[+0.075, +0.1, 0.0], wmax=3300., Tmax=15., kESC=0.5, tau=0.02, Izz=2e-6, dir='rh')) # FR
-    #mc.addRotor(Rotor(r=[-0.075, -0.1, 0.0], wmax=3300., Tmax=15., kESC=0.5, tau=0.02, Izz=2e-6, dir='rh')) # RL
-    #mc.addRotor(Rotor(r=[+0.075, -0.1, 0.0], wmax=3300., Tmax=15., kESC=0.5, tau=0.02, Izz=2e-6, dir='lh')) # FL
+    # approx model of Robin's 5inch race drone
+    #mc.setInertia(m=0.50, I=2.5*np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
+    #mc.addRotor(Rotor(r=[-0.075, +0.1, 0.0], wmax=3300., Tmax=15., kESC=0.8, tau=0.04, Izz=3e-6, dir='lh')) # RR
+    #mc.addRotor(Rotor(r=[+0.075, +0.1, 0.0], wmax=3300., Tmax=15., kESC=0.8, tau=0.04, Izz=3e-6, dir='rh')) # FR
+    #mc.addRotor(Rotor(r=[-0.075, -0.1, 0.0], wmax=3300., Tmax=15., kESC=0.8, tau=0.04, Izz=3e-6, dir='rh')) # RL
+    #mc.addRotor(Rotor(r=[+0.075, -0.1, 0.0], wmax=3300., Tmax=15., kESC=0.8, tau=0.04, Izz=3e-6, dir='lh')) # FL
 
+
+    #%% craft interfaces
     #imu = IMU(mc, r=[0., 0., 0.], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
-    imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
-    #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
+    #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
+    imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
 
     mocap = Mocap(mc, args.mocap_host, args.mocap_port) if args.mocap else None
     hil = IndiflightHIL(mc, imu, device=args.hil, baud=args.hil_baud) if args.hil else None
     sil = IndiflightSITLWrapper(mc, imu, args.sil, N=len(mc.rotors)) if args.sil else None
+
+
+    #%% indiflight configuration, if software in the loop
     if sil is not None:
         sil.mockup.load_profile( args.sil_profile_txt ) if args.sil_profile_txt else None
         sil.mockup.setLogging( args.sil_log )
@@ -119,7 +124,8 @@ if __name__=="__main__":
             sil.mockup.enableRxBox(boxId.BOXTHROWTOARM)
             sil.mockup.enableRxBox(boxId.BOXARM)
 
-    # initial conditions
+
+    #%% initial conditions
     mc.setPose(x=[0., 0., -0.1], q=[1., 0., 0., 0.])
     mc.setTwist(v=[0., 0., 0.], w=[0., 0., 0.])
 
@@ -131,19 +137,31 @@ if __name__=="__main__":
         visThread = threading.Thread(target=visApp.run, daemon=True, kwargs={'host':'0.0.0.0'})
         visThread.start( )
 
-    # run loop
+    if args.throw:
+        mc.throw(height=4.,
+                 wB=[2., -4., 3.], # approx body rotation in rad/s
+                 vHorz=[1., -2.], # final speed in x-y-plane in m/s
+                 at_time=1.)
+
+
+    #%% run loop
     dt = 0.0005 # 2kHz
     T = 1000. # seconds
     dt_rt = None if args.no_real_time else dt
-    thrown = False
+    start_trajectory = False
     for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):
-        if not thrown and args.throw and sim.t > 0.5:
-            mc.throw(wB=[2., -4., 3.], # approx body rotation in rad/s
-                     vHorz=[1., -2.], # final speed in x-y-plane in m/s
-                     )
-            thrown = True
-
-        if not args.throw and sim.t > 0.5:
+        if not args.throw and sim.t > 1.:
             sil.mockup.arm() if sil else None
+
+        if not start_trajectory and sim.t > 5.:
+            # start trajectory tracking at 8*0.5 = 4m/s target speed
+            sil.mockup.sendKeyboard('1')
+            if sim.t > 7.:
+                for _ in range(8):
+                    sil.mockup.sendKeyboard('3')
+                start_trajectory = True
+
+        #if sim.t > 3.:
+        #    sil.mockup.sendPositionSetpoint( [2., 2., -1.5], 90. / 180 * np.pi )
 
         sim.tick(dt)
