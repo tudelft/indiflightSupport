@@ -48,6 +48,36 @@ export class quadRotorExternal {
 
         this.addTriangle();
         this.addCG();
+
+        this.maxPoints = 200;
+        this.points = new Array(this.maxPoints).fill(new THREE.Vector3(0, 0, 0));
+        this.lineGeometry = new THREE.BufferGeometry().setFromPoints(this.points);
+        this.lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+        this.line = new THREE.Line(this.lineGeometry, this.lineMaterial);
+    }
+    addHistoryPoint(newPoint) {
+        // Update the points array
+        this.points.push(newPoint); // Add the new point at the end
+        if (this.points.length > this.maxPoints) {
+            this.points.shift(); // Remove the oldest point if exceeding maxPoints
+        }
+
+        // Update the geometry's position attribute
+        const positions = [];
+        for (let i = 0; i < this.points.length; i++) {
+            positions.push(this.points[i].x, this.points[i].y, this.points[i].z);
+        }
+
+        this.lineGeometry.setAttribute(
+            'position',
+            new THREE.Float32BufferAttribute(positions, 3)
+        );
+
+        // Notify Three.js that the positions have been updated
+        this.lineGeometry.attributes.position.needsUpdate = true;
+
+        // Adjust the draw range
+        this.lineGeometry.setDrawRange(0, this.points.length);
     }
     addTriangle() {
         const triangleGeometry = new THREE.BufferGeometry();
@@ -81,6 +111,7 @@ export class quadRotorExternal {
         this.obj.position.x = pos[0];
         this.obj.position.y = pos[1];
         this.obj.position.z = pos[2];
+        this.addHistoryPoint(new THREE.Vector3(pos[0], pos[1], pos[2]));
         this.obj.quaternion.w = quat[0];
         this.obj.quaternion.x = quat[1];
         this.obj.quaternion.y = quat[2];

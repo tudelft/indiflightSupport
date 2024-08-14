@@ -153,15 +153,12 @@ if __name__=="__main__":
         if not args.throw and sim.t > 1.:
             sil.mockup.arm() if sil else None
 
-        if not start_trajectory and sim.t > 5.:
+        if not start_trajectory and sim.t > 5. and sil is not None:
             # start trajectory tracking at 8*0.5 = 4m/s target speed
             sil.mockup.sendKeyboard('1')
             if sim.t > 7.:
                 for _ in range(8):
                     sil.mockup.sendKeyboard('3')
                 start_trajectory = True
-
-        #if sim.t > 3.:
-        #    sil.mockup.sendPositionSetpoint( [2., 2., -1.5], 90. / 180 * np.pi )
 
         sim.tick(dt)

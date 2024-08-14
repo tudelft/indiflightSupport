@@ -66,6 +66,7 @@ async function updateVisualization(data) {
             }
 
             scene.add(newCraft.obj);
+            scene.add(newCraft.line);
         }
         var idx = idList.indexOf(data[i].id);
         craftList[idx].setPose(data[i].pos, data[i].quat);
