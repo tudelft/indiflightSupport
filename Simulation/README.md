@@ -11,13 +11,13 @@ debugging device drivers, schedulers, or interfaces. We call such a build a
 
 (tested on Ubuntu 22.04, install docker like https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
 
-Run all commands from this directory (`./Simulation`).
+Run all commands from the root directory of this repo.
 
 #### Step 1 -- Build the container:
 
-    docker build . -t pyndiflight -f sil-githash.Dockerfile \
-        --build-arg COMMIT=f582a29 \
-        --build-arg BUILD_CONFIG=./config/mockupConfig.mk
+    docker build . -t pyndiflight -f Simulation/sil-githash.Dockerfile \
+        --build-arg COMMIT=baae5515e \
+        --build-arg BUILD_CONFIG=./Simulation/config/mockupConfig.mk
 
 - downloads an `indiflight` commit
 - builds the `MOCKUP` library using a build configuration (aka. `local.mk` file)
@@ -25,23 +25,23 @@ Run all commands from this directory (`./Simulation`).
 
 #### Step 2 -- Run the container (sorry for the long arguments...) and open http://localhost:5000
 
-    docker run -it -p 5000:5000                                \
-        -v ./exampleQuadSim.py:/sim.py                         \
-        -v ./config/exampleINDIflightProfile.txt:/profile.txt  \
+    docker run -it -p 5000:5000                                           \
+        -v ./Simulation/exampleQuadSim.py:/sim.py                         \
+        -v ./Simulation/config/exampleINDIflightProfile.txt:/profile.txt  \
         pyndiflight --throw --learn --sil-log
 
 Explanation of arguments:
 
 ```
--it                                                    # ensure proper printing of status bar
--p 5000:5000                                           # Map ports for visualisation
--v ./exampleQuadSim.py:/sim.py                         # Map simulation script into container
--v ./config/exampleINDIflightProfile.txt:/profile.txt  # Map runtime config into container
-pyndiflight                                            # Container tag (see build command)
---throw --learn --sil-log                              # see ./exampleQuadSim.py --help
+-it                                                               # ensure proper printing of status bar
+-p 5000:5000                                                      # Map ports for visualisation
+-v ./Simulation/exampleQuadSim.py:/sim.py                         # Map simulation script into container
+-v ./Simulation/config/exampleINDIflightProfile.txt:/profile.txt  # Map runtime config into container
+pyndiflight                                                       # Container tag (see build command)
+--throw --learn --sil-log                                         # see exampleQuadSim.py --help
 ```
 
-#### Step 3 -- Get log from latest container
+#### Step 3 -- Get log from last-run container
 
     docker cp $(docker ps -alq):/logs/ ./logs/
 
@@ -50,40 +50,47 @@ NB: logs are not persistent (unless you mount another volume to `:/logs`)
 
 ### Dev setup using Docker
 
+This variant uses a local copy of the `indiflight` source code, which is build
+at container runtime. Furthermore it launches the simulation with `gdbserver`,
+so the `indiflight` c-code can be debugged from within VSCode (or any other 
+debugger than can connect to a `gdbserver`).
 
 #### Step 1 -- Build indiflight docker builder
 
-Clone the indiflight repo (https://github.com/tudelft/indiflight), and build 
-the builder container as indicated in its `README.md`.
+Clone the indiflight firmware repo (https://github.com/tudelft/indiflight), 
+and build the builder container as indicated in its `README.md`.
 
 #### Step 2 -- Build local pyndiflight docker container
 
-Run all following commands in `./Simulation/` folder.
+**NOTE**: Run all following commands from the root folder of this repo.
 
-    docker build . -t pyndiflight-local -f sil-local.Dockerfile
+    docker build . -t pyndiflight-local -f ./Simulation/sil-local.Dockerfile
 
-(rebuild when `indiflight` build container or `PyNDIflight` simulation code changes)
+(rebuild it only when `indiflight` build container or `PyNDIflight` simulation
+code changes)
 
 #### Step 3 -- Run the container and open http://localhost:5000
 
-Run all following commands in `./Simulation/` folder.
+Don't forget to provide a `make/local.mk` file in the `indiflight` repo (see
+its `README`). Also enable `USE_THROW_TO_ARM` and `USE_LEARNER`, for the
+example simulation to make sense.
 
-    docker run -it -p 5000:5000 - 3333:3333                   \
-        -v ./exampleQuadSim.py:/sim.py                        \
-        -v ./config/exampleINDIflightProfile.txt:/profile.txt \
-        -v <path/to/indiflight>:/indiflight                   \
+    docker run -it -p 5000:5000 -p 3333:3333                             \
+        -v ./Simulation/exampleQuadSim.py:/sim.py                        \
+        -v ./Simulation/config/exampleINDIflightProfile.txt:/profile.txt \
+        -v <path/to/indiflight>:/indiflight                              \
         pyndiflight-local --throw --learn --sil-log
 
 Explanation of arguments:
 
 ```
--it                                                    # ensure proper printing of status bar
--p 5000:5000 -p 3333:3333                              # Map ports for visualisation and gdb
--v ./exampleQuadSim.py:/sim.py                         # Map simulation script into container
--v ./config/exampleINDIflightProfile.txt:/profile.txt  # Map runtime config into container
--v <path/to/indiflight>:/indiflight                    # Map indiflight into the container
-pyndiflight-local                                      # Container tag (see build command)
---throw --learn --sil-log                              # see ./exampleQuadSim.py --help
+-it                                                               # ensure proper printing of status bar
+-p 5000:5000 -p 3333:3333                                         # Map ports for visualisation and gdb
+-v ./Simulation/exampleQuadSim.py:/sim.py                         # Map simulation script into container
+-v ./Simulation/config/exampleINDIflightProfile.txt:/profile.txt  # Map runtime config into container
+-v <path/to/indiflight>:/indiflight                               # Map indiflight into the container
+pyndiflight-local                                                 # Container tag (see build command)
+--throw --learn --sil-log                                         # see ./exampleQuadSim.py --help
 ```
 
 #### Step 4 -- Connect to the debug server from VSCode
@@ -93,8 +100,8 @@ Open a VSCode window in the `indiflight` repo that you cloned. Install the
 It will connect to the container and allow pausing the app and settings 
 breakpoints and so on. Open your browser at `http://localhost:5000` for the visualization
 
-Of course you can also connect other debuggers, see the `.vscode/launch.json` 
-for the arguments used.
+Of course you can also connect other debuggers, see the `.vscode/launch.json`
+in `indiflight` for the arguments used.
 
 
 #### Step 5 -- Get log from latest container
@@ -118,7 +125,7 @@ following tasks:
 
 
 
-## Hardware in the Loop simulation (docs WIP)
+## Hardware in the Loop simulation
 
 With HIL simulation, Indiflight runs on the target hardware as it would during 
 flight. However, a serial communications link provides simulated sensor values
@@ -130,7 +137,6 @@ requires a full Flight Controller + Remote Control setup, and additionally
 an FTDI serial-to-usb connection.
 
 **Limitation: only up to 4 actuators for now**
-**Limitation: no one-in-all dockerfile**
 
 ### Setup
 
@@ -143,30 +149,32 @@ the builder container as indicated in its `README.md`.
 #### Step 2 -- Compile for target hardware
 
 Provide a `make/local.mk` for your target hardware in the cloned indiflight
-repo (see its README) and make sure to add `EXTRA_FLAGS += -DHIL_BUILD`.
-This disables the dshot drivers and enables the HIL drivers.
+repo (see its README).
 
 Now compile and flash the resulting binary (also check README):
 
-    docker run --privileged -v </path/to/indiflight>:/indiflight indiflight DEBUG=GDB dfu_flash
+    docker run --privileged                                  \
+        -v </path/to/indiflight>:/indiflight                 \
+        indiflight                                           \
+        DEBUG=GDB EXTRA_FLAGS_CMDLINE=-DHIL_BUILD dfu_flash
+
+(if configured, you can also use `remote_flash_swd`, see indiflight README)
 
 
 #### Step 3 -- Configure using indiflight-configurator
 
-Setup the HIL interfaces in the Ports tab of the Configurator (use `auto` baudrate).
-Compile and flash INDIflight with `EXTRA_FLAGS += -DHIL_BUILD` in the build
-configuration.
+Setup the HIL interface in the Ports tab of the Configurator (use `auto` baudrate).
 
 
 #### Step 4 -- Build the hil-simulation container
 
-    docker build . -t pyndiflight-hil -f hil.Dockerfile
+    docker build . -t pyndiflight-hil -f Simulation/hil.Dockerfile
 
 
 #### Step 5 -- Run the container and open http://localhost:5000
 
     docker run --privileged -it -p 5000:5000                     \
-        -v ./exampleQuadSim.py:/sim.py                           \
+        -v ./Simulation/exampleQuadSim.py:/sim.py                \
         pyndiflight-hil --hil /dev/ttyUSB0 --mocap 10.0.0.1 5005 \
         --throw
 

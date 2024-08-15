@@ -13,11 +13,11 @@ RUN apt-get update && \
 RUN pip install --upgrade pip
 
 # do requirements first, so rebuilding caches this even if Simulation code changes
-COPY requirements.txt /requirements.txt
+COPY Simulation/requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 
 # copy sim code
-COPY PyNDIflight /PyNDIflight
+COPY Simulation/PyNDIflight /PyNDIflight
 
 # download and build INDIflight mockup
 # adding the heads is just to ensure that git clone runs when there is new commits
