@@ -1,0 +1,17 @@
+# supported datatypes
+# (u)int8_t, (u)int16_t, (u)int32_t, (u)int64_t, float, double (double needs to be verified working)
+
+# see src/main/io/gps.h
+fields:
+  time_us: uint32_t
+  # LLH lication in NEU axis system 
+  ned_x: float # pos
+  ned_y: float
+  ned_z: float
+  ned_xd: float # vel
+  ned_yd: float
+  ned_zd: float
+  body_qi: float # attitude quaternion
+  body_qx: float
+  body_qy: float
+  body_qz: float

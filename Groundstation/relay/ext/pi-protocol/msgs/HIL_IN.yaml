@@ -1,0 +1,16 @@
+# supported datatypes
+# (u)int8_t, (u)int16_t, (u)int32_t, (u)int64_t, float, double (double needs to be verified working)
+
+fields:
+  time_us: uint32_t
+  gyro_x: int16_t
+  gyro_y: int16_t
+  gyro_z: int16_t
+  acc_x: int16_t
+  acc_y: int16_t
+  acc_z: int16_t
+  baro: int16_t
+  rpm_1: int16_t
+  rpm_2: int16_t
+  rpm_3: int16_t
+  rpm_4: int16_t

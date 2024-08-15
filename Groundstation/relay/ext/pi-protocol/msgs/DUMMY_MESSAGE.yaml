@@ -1,0 +1,38 @@
+# supported datatypes
+# uint8_t, uint16_t, uint32_t, uint64_t, float, double
+
+fields:
+  time_us: uint32_t
+  roll: double
+  roll1: double
+  # to trigger error because messages exceeds :
+  # roll2: double
+  # roll3: double
+  # roll4: double
+  # roll5: double
+  # roll6: double
+  # roll7: double
+  # roll8: double
+  # roll9: double
+  # roll10: double
+  # roll11: double
+  # roll12: double
+  # roll13: double
+  # roll14: double
+  # roll15: double
+  # roll16: double
+  # roll17: double
+  # roll18: double
+  # roll19: double
+  # roll20: double
+  # roll21: double
+  # roll22: double
+  # roll23: double
+  # roll24: double
+  # roll25: double
+  # roll26: double
+  # roll27: double
+  # roll28: double
+  # roll29: double
+  # roll30: double
+  # roll31: double

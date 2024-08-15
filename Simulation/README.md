@@ -136,7 +136,9 @@ This can be used to test all components except the IMU and DSHOT drivers, but
 requires a full Flight Controller + Remote Control setup, and additionally 
 an FTDI serial-to-usb connection.
 
-**Limitation: only up to 4 actuators for now**
+**NOTE: ALWAYS** power the FTDI adapter before the flight controller.
+
+(Limitation: only up to 4 actuators for now)
 
 ### Setup
 
