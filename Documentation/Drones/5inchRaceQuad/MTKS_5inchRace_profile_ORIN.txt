@@ -220,6 +220,7 @@ set blackbox_disable_debug = ON
 set blackbox_high_resolution = ON
 set dshot_bidir = ON
 set motor_pwm_protocol = DSHOT600
+set motor_output_reordering = 2,3,0,1,4,5,6,7
 set failsafe_delay = 5
 set failsafe_switch_mode = KILL
 set current_meter = ADC
@@ -286,7 +287,7 @@ set indi_act_hover_rpm = 8000,8000,8000,8000,20000,20000,20000,20000
 set indi_act_nonlinearity = 40,40,40,40,50,50,50,50
 set indi_act_g1_fz = -2885,-2885,-2885,-2885,0,0,0,0
 set indi_act_g1_roll = -5408,-5408,5408,5408,0,0,0,0
-set indi_act_g1_pitch = -7252,7252,-7252,7252,0,0,0,0
+set indi_act_g1_pitch = -5000,5000,-5000,5000,0,0,0,0
 set indi_act_g1_yaw = -1646,1646,1646,-1646,0,0,0,0
 set indi_act_g2_yaw = -307,307,307,-307,0,0,0,0
 
