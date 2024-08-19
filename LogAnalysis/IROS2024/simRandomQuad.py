@@ -13,7 +13,6 @@ from PyNDIflight.sim import Sim
 
 import pickle
 
-N = 1000
 np.random.seed(42)
 from numpy.random import random, randint, permutation
 
@@ -31,7 +30,7 @@ def runOneSim(mc, imu, args):
         os.close(devnull)
 
     # load, configure and initialize indiflight.
-    sil = IndiflightSITLWrapper(mc, imu, args.library, N=len(mc.rotors))
+    sil = IndiflightSITLWrapper(mc, imu, args.sil, N=len(mc.rotors))
     sil.mockup.load_profile( args.sil_profile_txt ) if args.sil_profile_txt else None
     sil.mockup.setLogging( args.sil_log )
 
@@ -65,19 +64,20 @@ def runOneSim(mc, imu, args):
 
 if __name__=="__main__":
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument("library", type=str, default=None, help="Load INDIflight interface as shared library.")
+    parser.add_argument("--sil", type=str, default=None, help="Load INDIflight interface as shared library.")
     parser.add_argument("--sil-profile-txt", required=False, type=str, metavar="PROFILE.txt", help="Import these profile settings into the SIL")
     parser.add_argument("--sil-log", required=False, action="store_true", help="Write Indiflight logs into ./logs")
     parser.add_argument("--no-vis", required=False, action="store_true", help="Do not launch visualization webserver")
     parser.add_argument("--no-real-time", required=False, action="store_true", help="Run as fast as possible")
+    parser.add_argument("--num", required=False, type=int, default=20, help="Number of randomized runs")
     parser.add_argument("--verbose", required=False, action="store_true", help="Print debugging output from INDIflight")
     args = parser.parse_args()
 
-    if not os.path.isfile(args.library):
+    if not os.path.isfile(args.sil):
         raise FileNotFoundError("Library not found. Likely you didnt compile it yet. In external/indiflight, run `make TARGET=MOCKUP so`")
 
     # import python indiflight bindings
-    sys.path.append(os.path.join((os.path.dirname(args.library)), "../../src/utils"))
+    sys.path.append(os.path.join((os.path.dirname(args.sil)), "../../src/utils"))
     from indiflight_mockup_interface import flightModeFlags, boxId
 
     if not args.no_vis:
@@ -86,11 +86,9 @@ if __name__=="__main__":
         visThread = threading.Thread(target=visApp.run, daemon=True, kwargs={'host':'0.0.0.0'})
         visThread.start( )
 
-    try:
-        os.mkdir('./logs')
-    except OSError:
-        pass
+    os.makedirs('./logs', exist_ok=True)
 
+    N = args.num
     uavs = []
     for j in tqdm(range(N)):
         n_rotors = 4
@@ -125,7 +123,16 @@ if __name__=="__main__":
         mc.throw(height=throw_height, acc=40., wB=throw_rotation, vHorz=throw_direction, at_time=0.5)
 
         with open(f'./logs/copter_{j:05}.pickle', 'wb') as file:
-            pickle.dump(mc, file, protocol=pickle.HIGHEST_PROTOCOL)
+            G1, G2, Gs = mc.calculateG1G2()
+            pickle.dump({
+                'G1': G1,
+                'G2': G2,
+                'Gs': Gs,
+                'kappas': kappas[perm],
+                'taus': taus[perm],
+                'cms': cms[perm],
+                'wmax': np.array([r.wmax for r in mc.rotors])
+            }, file, protocol=pickle.HIGHEST_PROTOCOL)
 
         imu = IMU(mc, r=[0., 0., 0.], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
 

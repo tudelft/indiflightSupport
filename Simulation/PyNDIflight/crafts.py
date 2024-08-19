@@ -1,6 +1,6 @@
 
 import numpy as np
-from scipy.spatial.transform import rotation as R
+from scipy.spatial.transform import Rotation as R
 from scipy.constants import g as GRAVITY
 
 from .helpers import (
@@ -109,6 +109,71 @@ class MultiRotor:
 
     def setExternalMomentInBodyFrame(self, M):
         self.MthrowB[:] = M
+
+    def calculateG1G2(self):
+        # 2024-02-25 slightly nicer formulation for online learning (G2 not scaled with Tmax)
+        # 
+        #  let O = (Fx Fy Fz Mx My Mz)
+        # idea: DeltaO = B1 * DeltaT  +  B2 * DeltaWdot
+        # 
+        # where B1 holds information about thrust axes and motor locations
+        # and   B2 holds information about thrust axes and propeller inertia
+        # 
+        # using w = sqrt(T/k), first-order dynamics wdot = (w - w0)/tau and taylor 
+        # expansion of the square root results in:
+        # 
+        #   DeltaO = B1 DeltaT  +  B2 / (2*w0*tau*k) * (DeltaT - DeltaTprev)
+        #
+        # Introduce the normalized unitless control U = T / Tmax
+        #
+        #   DeltaO = B1 Tmax DeltaU                +  B2 * Tmax / (2*tau*k*w0) * (DeltaU - DeltaUprev)
+        #   DeltaO = B1 * k * omegaMax^2 * DeltaU  +  B2 * omegaMax^2 / (2*tau*w0) * (DeltaU - DeltaUprev)
+        #
+        # Introduce specific generalized forces A = (fx fy fz taux tauy tauz) with 
+        # units (N/kg N/kg N/kg Nm/(kgm^2) Nm/(kgm^2) Nm/(kgm^2)) and
+        #
+        #   DeltaA = G1 DeltaU  +  G2 * omegaMax^2 / (2*tau*w0) * (DeltaU - DeltaUprev)
+        #      where  G1   == (Minv B1) * k * omegaMax^2  , where (Minv B1 * k) can be learned online and then scaled with omegaMax^2 which is separetely learned online
+        #        or   G1   == (Minv B1) * Tmax            , which seems more accurate, if available
+        #      and    G2   == (Minv B2)                   , which can be learned online
+        #      and    Minv == inv(diag(m,m,m,Ixx,Iyy,Izz)), called generalized mass matrix
+        # 
+        # this can later be inverted to compute DeltaU by solving:
+        #
+        #   DeltaA + G2n / w0 DeltaU_prev = ( G1 + G2n / w0 )  DeltaU
+        #      where G2n = G2 * omegaMax^2 / (2*tau)
+        #
+        # or, assuming wdot feedback is available
+        #
+        #   DeltaA + G2 * wdot_prev = ( G1 + G2n / w0 ) DeltaU
+        ##################
+        N = len(self.rotors)
+
+        B1 = np.zeros((6, N))
+        B2 = np.zeros((6, N))
+        for i, rotor in enumerate(self.rotors):
+            # force contribution from thrust
+            B1[:3, i] = rotor.axis
+
+            # moment contribution from thrust
+            # and moment contribution from rotor drag
+            B1[3:, i] = np.cross(rotor.r, rotor.axis) \
+                        -rotor.dir * rotor.cm * rotor.axis
+
+            B1[:, i] *= rotor.Tmax
+
+            # moment contribution from spinup
+            B2[3:, i] = -rotor.dir * rotor.axis * rotor.Izz
+
+        M = np.zeros((6,6))
+        M[:3, :3] = self.m * np.eye(3)
+        M[3:, 3:] = np.diag(np.diag(self.I)) # remove offdiagonal elements
+        #M[3:, 3:] = self._I # isnt this more accurate?
+
+        G1 = np.linalg.solve(M, B1)
+        G2 = np.linalg.solve(M, B2)
+        G2_scaler = np.array([0.5 * r.wmax**2 / (0.5*r.tau) for r in self.rotors])
+        return G1, G2, G2_scaler
 
     def tick(self, dt):
         F = np.zeros(3, dtype=np.float32)

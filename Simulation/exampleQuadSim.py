@@ -107,10 +107,7 @@ if __name__=="__main__":
         sil.mockup.load_profile( args.sil_profile_txt ) if args.sil_profile_txt else None
         sil.mockup.setLogging( args.sil_log )
         if args.sil_log:
-            try:
-                os.mkdir("./logs")
-            except OSError: # is raised if logs already exists. ignore
-                pass
+            os.makedirs('./logs', exist_ok=True)
 
         sil.mockup.sendPositionSetpoint( [0., 0., -1.5], 0. )
         sil.mockup.enableFlightMode(flightModeFlags.ANGLE_MODE | flightModeFlags.POSITION_MODE)

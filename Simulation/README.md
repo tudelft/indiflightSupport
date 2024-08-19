@@ -43,7 +43,7 @@ pyndiflight                                                       # Container ta
 
 #### Step 3 -- Get log from last-run container
 
-    docker cp $(docker ps -alq):/logs/ ./logs/
+    docker cp $(docker ps -alq):/logs/. ./logs/
 
 NB: logs are not persistent (unless you mount another volume to `:/logs`)
 
@@ -106,7 +106,7 @@ in `indiflight` for the arguments used.
 
 #### Step 5 -- Get log from latest container
 
-    docker cp $(docker ps -alq):/logs/ ./logs/
+    docker cp $(docker ps -alq):/logs/. ./logs/
 
 NB: logs are not persistent (unless you mount another volume to `:/logs`)
 

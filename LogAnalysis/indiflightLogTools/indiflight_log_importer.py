@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-import numpy as np
 import pandas as pd
 from orangebox import Parser as BFLParser
 
-from argparse import ArgumentParser
 import logging
 import pickle
-import sys
 import os
 import re
 from matplotlib import pyplot as plt
@@ -72,43 +69,45 @@ class IndiflightLog(object):
                 case 9: return "POSCTL"
                 case 10: return "CATAPULT"
                 case 11: return "LEARNER"
-                case 12: return "ANTIGRAVITY"
-                case 13: return "HEADADJ"
-                case 14: return "CAMSTAB"
-                case 15: return "BEEPERON"
-                case 16: return "LEDLOW"
-                case 17: return "CALIB"
-                case 18: return "OSD"
-                case 19: return "TELEMETRY"
-                case 20: return "SERVO1"
-                case 21: return "SERVO2"
-                case 22: return "SERVO3"
-                case 23: return "BLACKBOX"
-                case 24: return "AIRMODE"
-                case 25: return "3D"
-                case 26: return "FPVANGLEMIX"
-                case 27: return "BLACKBOXERASE"
-                case 28: return "CAMERA1"
-                case 29: return "CAMERA2"
-                case 30: return "CAMERA3"
-                case 31: return "FLIPOVERAFTERCRASH"
-                case 32: return "PREARM"
-                case 33: return "THROWTOARM"
-                case 34: return "BEEPGPSCOUNT"
-                case 35: return "VTXPITMODE"
-                case 36: return "PARALYZE"
-                case 37: return "USER1"
-                case 38: return "USER2"
-                case 39: return "USER3"
-                case 40: return "USER4"
-                case 41: return "PIDAUDIO"
-                case 42: return "ACROTRAINER"
-                case 43: return "VTXCONTROLDISABLE"
-                case 44: return "LAUNCHCONTROL"
-                case 45: return "MSPOVERRIDE"
-                case 46: return "STICKCOMMANDDISABLE"
-                case 47: return "BEEPERMUTE"
-                case 48: return "READY"
+                case 12: return "PIDCTL"
+                case 13: return "NNCTL"
+                case 14: return "ANTIGRAVITY"
+                case 15: return "HEADADJ"
+                case 16: return "CAMSTAB"
+                case 17: return "BEEPERON"
+                case 18: return "LEDLOW"
+                case 19: return "CALIB"
+                case 20: return "OSD"
+                case 21: return "TELEMETRY"
+                case 22: return "SERVO1"
+                case 23: return "SERVO2"
+                case 24: return "SERVO3"
+                case 25: return "BLACKBOX"
+                case 26: return "AIRMODE"
+                case 27: return "3D"
+                case 28: return "FPVANGLEMIX"
+                case 29: return "BLACKBOXERASE"
+                case 30: return "CAMERA1"
+                case 31: return "CAMERA2"
+                case 32: return "CAMERA3"
+                case 33: return "FLIPOVERAFTERCRASH"
+                case 34: return "PREARM"
+                case 35: return "THROWTOARM"
+                case 36: return "BEEPGPSCOUNT"
+                case 37: return "VTXPITMODE"
+                case 38: return "PARALYZE"
+                case 39: return "USER1"
+                case 40: return "USER2"
+                case 41: return "USER3"
+                case 42: return "USER4"
+                case 43: return "PIDAUDIO"
+                case 44: return "ACROTRAINER"
+                case 45: return "VTXCONTROLDISABLE"
+                case 46: return "LAUNCHCONTROL"
+                case 47: return "MSPOVERRIDE"
+                case 48: return "STICKCOMMANDDISABLE"
+                case 49: return "BEEPERMUTE"
+                case 50: return "READY"
 
         try:
             return [single(bit) for bit in bits]
@@ -322,7 +321,7 @@ class IndiflightLog(object):
                 elif match.group(1) in ['p', 'q', 'r']:
                     # rotations. First 4 regressors have scale 1e-5. Last 4 scale 1e-3 Output has scaler 1.
                     yscaler = 1.
-                    num_vars = 8 if self.num_learner_vars > 4 else 4
+                    num_vars = 8 if self.num_learner_vars > 8 else 4
                     w2vars = [str(i) for i in range(num_vars)]
                     wdotvars = [str(i) for i in range(num_vars, num_vars*2)]
                     if match.group(2) in w2vars:

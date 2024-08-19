@@ -1,6 +1,0 @@
-cycler
-matplotlib
-numpy
-numpy_quaternion
-pandas
-orangebox

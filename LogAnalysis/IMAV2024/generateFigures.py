@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 
+import sys
+from os import path, makedirs
+absPath = path.dirname(__file__)
+sys.path.append(path.join(absPath, '..'))
+
+outputPath = path.join(absPath, "figures")
+makedirs(outputPath, exist_ok=True)
+
 import numpy as np
-import quaternion
+from pyquaternion import Quaternion
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 from cycler import cycler
 
-from LogAnalysis.indiflightLogTools import IndiflightLog, Signal, imuOffsetCorrection
-
-from os import path, makedirs
-outputPath = path.join(path.dirname(__file__), "output")
-makedirs(outputPath, exist_ok=True)
+from indiflightLogTools import IndiflightLog, Signal, imuOffsetCorrection
 
 plt.rcParams.update({
     "xtick.labelsize": 10,
@@ -33,16 +37,16 @@ plt.rcParams.update({
 backupCycle = plt.rcParams['axes.prop_cycle']
 plt.rcParams['axes.prop_cycle'] = cycler('linestyle', ['-', '--', ':', '-.'])
 
-log = IndiflightLog("Documentation/Papers/Data/IMAV2024_ExperimentData/LOG00472.BFL", (1368, 1820))
+log = IndiflightLog(path.join(absPath, "IMAV2024_ExperimentData", "LOG00472.BFL"), (1368, 1820))
 log.resetTime()
 crop = log.data
 timeMs = log.data['timeMs']
 
-qTrue = np.quaternion(0.837, -0.491, 0.242, 0.).normalized()
+qTrue = Quaternion(scalar=0.837, vector=[-0.491, 0.242, 0.]).normalised
 r = 1e-3 * np.array([-10., -12., 8.]) # onbaord precision is 1mm
-rq = np.quaternion(0, r[0], r[1], r[2])
+rq = Quaternion(scalar=0., vector=r)
 
-rIMU = (qTrue * rq * qTrue.inverse()).vec
+rIMU = (qTrue * rq * qTrue.inverse).vector
 
 
 omegaRaw = Signal(crop['timeS'], crop[[f'omegaUnfiltered[{i}]' for i in range(4)]])
@@ -134,7 +138,7 @@ plt.rcParams.update({
     "axes.formatter.limits": [-2, 4]
 })
 
-log = IndiflightLog("Documentation/Papers/Data/IMAV2024_ExperimentData/LOG00472.BFL", (1100, 1900))
+log = IndiflightLog(path.join(absPath, "IMAV2024_ExperimentData", "LOG00472.BFL"), (1368, 1820))
 log.resetTime()
 crop = log.data
 timeMs = log.data['timeMs'] + 1100 - 1368
