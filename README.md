@@ -14,6 +14,11 @@ submodules and instructions
 - blackbox
 - racebian
 
+## Reproduction of paper results
+
+See `LogAnalysis/IROS2024` and `LogAnalysis/IMAV2024`.
+
+
 ## Simulation 
 
 see `Simulation/README.md`

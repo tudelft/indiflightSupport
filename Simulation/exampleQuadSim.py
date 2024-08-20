@@ -158,4 +158,9 @@ if __name__=="__main__":
                     sil.mockup.sendKeyboard('3')
                 start_trajectory = True
 
+        if sim.t > 10. and sil is not None:
+            sil.mockup.sendKeyboard('h')
+            # test recovery mode
+            # sil.sendMocap = lambda *args: None
+
         sim.tick(dt)

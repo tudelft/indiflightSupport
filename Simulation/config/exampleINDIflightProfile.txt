@@ -34,6 +34,7 @@ set blackbox_disable_pos = OFF
 set blackbox_disable_ekf = ON
 set blackbox_disable_learner = OFF
 set blackbox_high_resolution = ON
+set blackbox_sample_rate = 1/4
 set dshot_bidir = ON
 set motor_pwm_protocol = DSHOT600
 set motor_poles = 12
