@@ -12,7 +12,7 @@ from hashlib import md5
 logger = logging.getLogger(__name__)
 
 plt.rcParams.update({
-    "text.usetex": True,
+#    "text.usetex": True,
 #    "font.family": "Helvetica",
     "font.family": "sans-serif",
     "font.size": 12,

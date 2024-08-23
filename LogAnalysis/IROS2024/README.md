@@ -38,3 +38,6 @@ Generate plots and tables (they will appear in `LogAnalysis/IROS2024/figures`):
     pip install -r LogAnalysis/indiflightLogTools/requirements.txt
     python3 LogAnalysis/IROS2024/generateFigures.py
     python3 LogAnalysis/IROS2024/generateVideo.py
+
+*NOTE*: the original plots were generated with `"text.usetex": True`, but that requires
+a Latex installation. For portability, this is turned off by default here.

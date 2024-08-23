@@ -134,7 +134,7 @@ from mpl_toolkits.mplot3d import Axes3D
 plt.close('all')
 
 plt.rcParams.update({
-    "text.usetex": True,
+#    "text.usetex": True,  # NB: original plots were generated with latex, but for portability, this is turned off here
 #    "font.family": "Helvetica",
     "font.family": "sans-serif",
     "font.size": 12,
@@ -244,7 +244,7 @@ with open(path.join(outputPath, "simulationExperiment.txt"), "w") as f:
 #%% Time plots excitation
 
 plt.rcParams.update({
-    "text.usetex": True,
+#    "text.usetex": True,  # NB: original plots were generated with latex, but for portability, this is turned off here
 #    "font.family": "Helvetica",
     "font.family": "sans-serif",
     "font.size": 12,

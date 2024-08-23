@@ -5,7 +5,7 @@ from matplotlib.gridspec import GridSpec
 import logging
 
 plt.rcParams.update({
-    "text.usetex": True,
+#    "text.usetex": True,
 #    "font.family": "Helvetica",
     "font.family": "sans-serif",
     "font.size": 12,

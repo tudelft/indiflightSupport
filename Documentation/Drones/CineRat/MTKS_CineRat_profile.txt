@@ -142,6 +142,7 @@ feature TELEMETRY
 # serial
 serial 0 64 115200 57600 0 115200
 serial 1 262144 115200 57600 0 115200
+#serial 3 2 115200 115200 0 115200 # GPS
 serial 5 0 115200 57600 0 115200
 serial 6 524288 115200 57600 0 115200
 
@@ -152,6 +153,7 @@ aux 2 55 0 1700 2100 0 0
 aux 3 57 6 1300 1700 0 0
 aux 4 58 3 1300 1700 0 0
 aux 5 60 3 1700 2100 0 0
+#aux 5 13 7 1700 2100 0 0 ## beeper instead of NN
 aux 6 36 2 1700 2100 0 0
 aux 7 56 6 1700 2100 0 0
 
@@ -162,7 +164,7 @@ beeper -DISARMING
 beeper -ARMING
 beeper -ARMING_GPS_FIX
 beeper -GPS_STATUS
-beeper -RX_SET
+#beeper -RX_SET
 beeper -ACC_CALIBRATION
 beeper -ACC_CALIBRATION_FAIL
 beeper -DISARM_REPEAT
@@ -216,6 +218,10 @@ set gyro_1_sensor_align = CW180
 set gyro_1_align_pitch = 0
 set gyro_1_align_yaw = 1800
 set rpm_filter_min_hz = 60
+set gps_provider = UBLOX
+set gps_auto_baud = ON
+set gps_update_rate_hz = 15
+set gps_ublox_use_galileo = ON
 
 # ekf (these are the defaults)
 set ekf_use_attitude_estimate = 0

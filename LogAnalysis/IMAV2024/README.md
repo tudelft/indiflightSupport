@@ -13,3 +13,6 @@ Install dependencies:
 Generate plots (they will appear in `LogAnalysis/IMAV2024/figures`):
 
     python3 LogAnalysis/IMAV2024/generateFigures.py
+
+*NOTE*: the original plots were generated with `"text.usetex": True`, but that requires
+a Latex installation. For portability, this is turned off by default here.
