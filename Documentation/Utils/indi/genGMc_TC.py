@@ -57,8 +57,8 @@ length = 53e-3
 diagonal = np.hypot(width, length)
 
 
-#m = 0.040 # allup mass in kg
-m = 0.070 # allup mass in kg, with PI
+m = 0.040 # allup mass in kg
+#m = 0.070 # allup mass in kg, with PI
 direc = [1, -1, -1, 1] # motor rotation directions (positive -> right hand along prop thrust vector), sequence FL, FR, RR, RL
 
 
@@ -75,12 +75,12 @@ Pz = None
 Raxle = 5 * 0.5e-3 # motor axle radius (to calculate location of rotation point)
 
 # Option 2: direct
-rg_over_diag_xx = 0.263
-rg_over_diag_yy = 0.272
-rg_over_diag_zz = 0.291
-Ixx = 2*inertiaFromGyrationRadius(m, rg_over_diag_xx * diagonal)
-Iyy = 2*inertiaFromGyrationRadius(m, rg_over_diag_yy * diagonal)
-Izz = 2*inertiaFromGyrationRadius(m, rg_over_diag_zz * diagonal)
+rg_over_diag_xx = 0.20 # guesswork...
+rg_over_diag_yy = 0.27
+rg_over_diag_zz = 0.28
+Ixx = 1.5* inertiaFromGyrationRadius(m, rg_over_diag_xx * diagonal)
+Iyy = 1.5* inertiaFromGyrationRadius(m, rg_over_diag_yy * diagonal)
+Izz = 1.5* inertiaFromGyrationRadius(m, rg_over_diag_zz * diagonal)
 
 
 #%% prop and motor inertia
@@ -100,10 +100,10 @@ Dpinch = 40. / 25.4 # prop diameter in inch
 motorNumber = 803
 
 
-#%% propeller/ESC/motor performance at 4S battery (see prop.py)
+#%% propeller/ESC/motor performance at 2S battery (see prop.py)
 
-tau = 0.035 # spinup/spindown time constant
-Tmax = 0.47 # 
+tau = 0.025 # spinup/spindown time constant
+Tmax = 0.4 # https://brushlessmotorsparade.com/brushless-motor/racerstar-br0703b-racing-edition-15000kv
 k = Tmax / (75000. / 60. * 2 * np.pi)**2 # constant in T = k omega^2 -- shameless guess
 #k = 2.66e-7 # black 3inch pitch prop
 #Tmax = 4.5 # max thrust black prop
