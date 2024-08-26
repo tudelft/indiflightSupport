@@ -1,5 +1,23 @@
 #!/bin/bash
 
+# Download logs from an indiflight flight controller via RPI companion computer
+#
+# Copyright 2024 Till Blaha (Delft University of Technology)
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+
 function help_and_exit {
     echo "$0 [--no-reset] device_on_remote local_path"
     echo "One-way sync from device to local path. !! This script deletes local files that are not on the remote anymore !!"
@@ -42,7 +60,7 @@ if [[ $? -gt 0 ]]; then
     sleep 1
 
     # use MSP protocol over TCP (command 68, one Byte of value 0x03)
-    timeout 3 $(dirname "$0")/sendMSPoverTCP.py --host 10.0.0.1 --port 5761 68 B 3
+    timeout 3 /usr/bin/env python3 $(dirname "$0")/sendMSPoverTCP.py --host 10.0.0.1 --port 5761 68 B 3
     if [[ $? -gt 0 ]]; then
         echo "Failed. exiting. restart into MSC manually through the configurator"
         exit 1

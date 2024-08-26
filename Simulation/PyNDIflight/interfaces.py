@@ -1,5 +1,23 @@
+# Glue code for Visualization, Software/Hardware-in-the-loop
+#
+# Copyright 2024 Till Blaha (Delft University of Technology)
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import numpy as np
+import socket
+import struct
 
 #%% serve the visualization js app
 
@@ -65,10 +83,7 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.WARNING)
 
 
-#%% mocap server
-
-import socket
-import struct
+#%% emulate mocap (Motion Capture) server
 
 class Mocap:
     # emulate motion capture system and send data via UDP
@@ -123,9 +138,6 @@ class IndiflightSITLWrapper():
 
 
 #%% hardware in the loop interface
-
-import serial
-import struct
 
 class IndiflightHIL:
     # serial interface with an INDIflight controller compiled with HIL_BUILD

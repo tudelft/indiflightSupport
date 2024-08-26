@@ -1,11 +1,29 @@
 #!/bin/bash
 
-# example command to run this in a new terminal
-#   alacritty -o "window.startup_mode=Maximized" -e ./dashboard.sh 1003 
+# Partitions a maximized terminal using tmux and launches relevant tools
 #
+# Copyright 2024 Till Blaha (Delft University of Technology)
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
 
 # Watch out! Stop all commands before closing the terminal, catching that still
 # doesnt work
+
+# example command to run this in a new terminal
+#   alacritty -o "window.startup_mode=Maximized" -e ./dashboard.sh 1003 
+#
 
 echo_help_and_exit() {
     echo "usage: $0 <rigid_body_id> [--test] [--help/-h]"
