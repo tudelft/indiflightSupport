@@ -107,29 +107,48 @@ if __name__=="__main__":
     N = args.num
     uavs = []
     for j in tqdm(range(N)):
-        n_rotors = 4
-        throw_height = 4.
-        throw_rotation = 10.*random(3) - 5.
-        throw_direction = 4.*random(2) - 2.
+        ableToHover = False
+        while not ableToHover:
+            n_rotors = 4
+            throw_height = 4.
+            throw_rotation = 10.*random(3) - 5.
+            throw_direction = 4.*random(2) - 2.
 
-        offset = np.pi/3. * random(n_rotors)
-        phi = random(n_rotors) * np.pi/3  +  np.arange(0, 2.*np.pi, np.pi/2.)
-        R = random(n_rotors) * 0.1 + 0.05
-        X = R * np.stack(( np.cos(phi), np.sin(phi), np.zeros(n_rotors) ))
-        X[2, :] = -0.02
+            offset = np.pi/3. * random(n_rotors)
+            phi = random(n_rotors) * np.pi/3  +  np.arange(0, 2.*np.pi, np.pi/2.)
+            R = random(n_rotors) * 0.1 + 0.05
+            X = R * np.stack(( np.cos(phi), np.sin(phi), np.zeros(n_rotors) ))
+            X[2, :] = -0.02
 
-        kappas = random(n_rotors) * 0.5 + 0.25
-        taus = random(n_rotors) * 0.02 + 0.015
-        cms = random(n_rotors) * 0.01 + 0.01
+            kappas = random(n_rotors) * 0.5 + 0.25
+            taus = random(n_rotors) * 0.02 + 0.015
+            cms = random(n_rotors) * 0.01 + 0.01
 
-        dirs = ["lh", "rh", "lh", "rh"] if randint(0,2) else ["rh", "lh", "rh", "lh"]
+            dirs = ["lh", "rh", "lh", "rh"] if randint(0,2) else ["rh", "lh", "rh", "lh"]
 
-        mc = MultiRotor()
-        uavs.append(mc)
-        mc.setInertia(m=.45, I=np.diag([0.75e-3, 0.75e-3, 0.75e-3]))
-        perm = permutation(range(n_rotors))
-        for i in perm:
-            mc.addRotor(Rotor(r=X[:, i], Tmax=5., kESC=kappas[i], tau=taus[i], Izz=5e-7, cm=cms[i], dir=dirs[i]))
+            mc = MultiRotor()
+            uavs.append(mc)
+            mc.setInertia(m=.45, I=np.diag([0.75e-3, 0.75e-3, 0.75e-3]))
+            perm = permutation(range(n_rotors))
+            for i in perm:
+                mc.addRotor(Rotor(r=X[:, i], Tmax=5., kESC=kappas[i], tau=taus[i], Izz=5e-7, cm=cms[i], dir=dirs[i]))
+
+            G1, _, _ = mc.calculateG1G2()
+            Qr, Rr = np.linalg.qr(G1[3:, :].T, 'complete')
+            Nr = Qr[:, -1] # rotational nullspace
+            Nrmin = min(Nr)
+            Nrmax = max(Nr)
+            if Nrmax <= 0:
+                Nr = -Nr
+
+            if min(Nr) < 0:
+                print(f"generated craft has no rotational nullspace within actuator limits and is thus unable to hover. Regenerating...")
+                continue
+            elif max(Nr) == 0. or (G1[2, :] @ (Nr / max(Nr)) > -1.2*9.81): # require at least 1.2 thrust to weight
+                print(f"generated craft does not have enough thrust-to-weight to hover without rotation. Regenerating...")
+                continue
+
+            ableToHover = True
 
         # initial conditions
         mc.setPose(x=[0., 0., -0.1], q=[1., 0., 0., 0.])

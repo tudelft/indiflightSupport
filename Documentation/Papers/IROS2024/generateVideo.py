@@ -15,17 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with this program. If not, see <https://www.gnu.org/licenses/>.
 
-
-import sys
-from os import path, makedirs
-absPath = path.dirname(__file__)
-sys.path.append(path.join(absPath, '..'))
-sys.path.append(path.join(absPath, '..', '..', 'Simulation'))
-
-outputPath = path.join(absPath, "figures")
-makedirs(outputPath, exist_ok=True)
-
-from indiflightLogTools import IndiflightLog, Signal, imuOffsetCorrection
+#%% plotting setup
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -52,6 +42,31 @@ plt.rcParams.update({
 
 plt.rcParams['axes.prop_cycle'] = cycler('linestyle', ['-', '--', ':', '-.'])
 
+#%% path setup
+import sys
+from os import path, makedirs
+absPath = path.dirname(__file__)
+repoRootPath = path.join(absPath, '..', '..', '..')
+sys.path.append(repoRootPath)
+sys.path.append(path.join(repoRootPath, 'Simulation'))
+
+outputPath = path.join(absPath, "figures")
+makedirs(outputPath, exist_ok=True)
+
+from argparse import ArgumentParser
+parser = ArgumentParser()
+parser.add_argument("dataset", type=str, default=None, help="Path to the throw-to-hover dataset")
+args = parser.parse_args()
+
+experimentDataPath = path.join(args.dataset, "IROS2024_ExperimentData")
+videoDataPath      = path.join(args.dataset, "IROS2024_VideoShootData")
+simulationDataPath = path.join(args.dataset, "IROS2024_SimulationData")
+
+
+#%% start
+
+from LogAnalysis.indiflightLogTools import IndiflightLog, Signal, imuOffsetCorrection
+
 identTime = (1.285, 1.285+0.475)
 recoveryTime = (1.285+0.475, 1.285+2.000)
 videos = [
@@ -60,7 +75,7 @@ videos = [
 ]
 
 for video in videos:
-    log = IndiflightLog(path.join(absPath, "IROS2024_VideoShootData", "LOG00342.BFL"))
+    log = IndiflightLog(path.join(videoDataPath, "LOG00342.BFL"))
     crop, timeS = log.crop(video['time'][0], video['time'][1])
     timeMs = timeS * 1e3
 

@@ -15,29 +15,42 @@
 # You should have received a copy of the GNU General Public License along
 # with this program. If not, see <https://www.gnu.org/licenses/>.
 
+from tqdm import tqdm
+import pandas as pd
+import numpy as np
+from glob import glob
+import pickle
 
+#%% path setup
 import sys
 from os import path, makedirs
 absPath = path.dirname(__file__)
-sys.path.append(path.join(absPath, '..'))
-sys.path.append(path.join(absPath, '..', '..', 'Simulation'))
+repoRootPath = path.join(absPath, '..', '..', '..')
+sys.path.append(repoRootPath)
+sys.path.append(path.join(repoRootPath, 'Simulation'))
 
 outputPath = path.join(absPath, "figures")
 makedirs(outputPath, exist_ok=True)
 
-from indiflightLogTools import IndiflightLog, imuOffsetCorrection, Signal
+from argparse import ArgumentParser
+parser = ArgumentParser()
+parser.add_argument("dataset", type=str, default=None, help="Path to the throw-to-hover dataset")
+args = parser.parse_args()
 
-from tqdm import tqdm
-from glob import glob
-import pandas as pd
-import numpy as np
-import pickle
+experimentDataPath = path.join(args.dataset, "IROS2024_ExperimentData")
+videoDataPath      = path.join(args.dataset, "IROS2024_VideoShootData")
+simulationDataPath = path.join(args.dataset, "IROS2024_SimulationData")
+
+
+#%% start
+
+from LogAnalysis.indiflightLogTools import IndiflightLog, imuOffsetCorrection, Signal
 
 # G1/G2
 rowNames = ['x', 'y', 'z', 'p', 'q', 'r']
 
 def analyseLogs(logPath, calcInitConds = False):
-    searchPath = path.join(absPath, logPath, "*.BFL")
+    searchPath = path.join(logPath, "*.BFL")
     files = sorted(glob(searchPath)) # sorting?!
     if len(files) == 0:
         raise ValueError(f"Path {searchPath} contains no .BFL files")
@@ -65,6 +78,7 @@ def analyseLogs(logPath, calcInitConds = False):
         for motor in range(4):
             a, b, w0, tau = lastRow[[f'motor_{motor}_rls_x[{i}]' for i in range(4)]]
             a = a if a > 0 else 0xFFFF + a # integer overflow in the data... not nice
+            #b = b if b > 0 else 0xFFFF + b # integer overflow in the data... not nice
             wm = a+b
             lam = a / wm
             parameterRow[f'motor_{motor}_wm'] = wm
@@ -92,9 +106,6 @@ def analyseLogs(logPath, calcInitConds = False):
 
     return df
 
-experimentDataPath = "IROS2024_ExperimentData/"
-videoDataPath = "IROS2024_VideoShootData/"
-simulationDataPath = "IROS2024_SimulationData/"
 
 df = analyseLogs(experimentDataPath, calcInitConds=True)
 
@@ -202,7 +213,7 @@ fig.savefig(path.join(outputPath, 'InitialRotation.pdf'), format='pdf')
 #%% Simulation results
 
 # craft data
-searchPath = path.join(absPath, simulationDataPath, "*.pickle")
+searchPath = path.join(simulationDataPath, "*.pickle")
 pkls = sorted(glob(searchPath))
 
 # simulation logs
@@ -285,7 +296,14 @@ plt.rcParams.update({
     'lines.linewidth': 1,
 })
 
-log = IndiflightLog(path.join(absPath, experimentDataPath, "LOG00271.BFL"))
+log = IndiflightLog(path.join(experimentDataPath, "LOG00271.BFL"))
+log.data['gyroADC[1]'] *= -1. # data file was with old FLU frame
+log.data['gyroADC[2]'] *= -1. # data file was with old FLU frame
+log.data['gyroADCafterRpm[1]'] *= -1. # data file was with old FLU frame
+log.data['gyroADCafterRpm[2]'] *= -1.
+log.data['accUnfiltered[1]'] *= -1. # data file was with old FLU frame
+log.data['accUnfiltered[2]'] *= -1.
+
 timeMs = log.data['timeMs'] - 1435
 boolarr = (timeMs > 0) & (timeMs < 457)
 timeMs = timeMs[boolarr]
@@ -520,51 +538,3 @@ for motor in range(4):
     frls.suptitle(f"Online Estimation for Motor Model {motor+1}")
 
     frls.savefig(path.join(outputPath, f"Motor_estimation_{motor+1}.pdf"), format='pdf')
-
-# %% Plot trajectories
-
-ft = plt.figure(figsize=(6.7, 5))
-ax = ft.add_subplot(111, projection='3d')
-
-throwFiles = [
-    path.join(absPath, "IROS2024_ExperimentData", "LOG00230.BFL"),
-    path.join(absPath, "IROS2024_ExperimentData", "LOG00231.BFL"),
-    path.join(absPath, "IROS2024_ExperimentData", "LOG00232.BFL"),
-    ]
-times = [7629, 5377, 5063]
-throwLogs = []
-for file, time in zip(throwFiles, times):
-    log = IndiflightLog(file)
-    #startIdx = log.flags[log.flags['enable'].apply(lambda x: 0 in x)].index[0]
-    startTime = time + 1700
-    duration = 5000
-
-    timeMs = log.data['timeMs'] - startTime
-    boolarr = (timeMs > 0) & (timeMs < duration)
-    timeMs = timeMs[boolarr]
-    throwLogs.append(log.data[boolarr])
-
-#startTime = 1000
-#endTime = 5000
-
-#for i, log in enumerate(logs[8:]):
-    #if i == 2:
-    #    continue
-    #timeMs = log.data['timeMs'] - 1000
-    #boolarr = (timeMs > 0) & (timeMs < 4000)
-    #timeMs = timeMs[boolarr]
-    #crop = log.data[boolarr]
-
-for i, log in enumerate(throwLogs):
-    x,y,z = log[[f'extPos[{i}]' for i in range(3)]].to_numpy().T
-    ax.plot(y,x,-z, linestyle="-")
-    ax.plot(y,x,0, linestyle="--")
-    for k in range(200, len(x)-100, 100):
-        ax.quiver(y[k], x[k], -z[k], y[k+100]-y[k], x[k+100]-x[k], -z[k+100]+z[k], lw=1.0, arrow_length_ratio=20, length=0.01)
-        #q = ax.quiver(y[k], x[k], 0, y[k+100]-y[k], x[k+100]-x[k], 0)
-
-ax.set_xlabel("East [m]")
-ax.set_ylabel("North [m]")
-ax.set_zlabel("Up [m]")
-ax.view_init(elev=16, azim=-14)
-ft.savefig(path.join(outputPath, 'Trajectories.pdf'), format='pdf')
