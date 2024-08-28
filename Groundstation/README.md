@@ -9,6 +9,8 @@ Supported only for Ubuntu 22.04 (and only on x86 if you're using motion capture 
 
 ## Quickstart (Ubuntu 22.04)
 
+Steps 1 through 3 are better explained in the [wiki](https://github.com/tudelft/indiflightSupport/wiki/CineRat----04-Software-Installation-and-Setup#Raspberry-Pi-installation)
+
 1. Download Racebian 0.5.0 <https://surfdrive.surf.nl/files/index.php/s/kndkZOelKWptZtV>
 2. Flash to companion computer by inserting its SD card. Modify the command for your path and sd-card number:
 ```
@@ -23,7 +25,10 @@ More info on `racebian`, see <https://github.com/tudelft/racebian>.
 
 More info on the intended hardware configuration, see [../Documentation/Drones/CineRat](../Documentation/Drones/CineRat)
 
-## Building the Tools
+
+
+
+## Alternative: Building the Tools yourself
 
 ### Relay program
 
