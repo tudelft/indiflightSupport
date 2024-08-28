@@ -1,4 +1,5 @@
 build*/
+*build/
 
 # python specific
 __pycache__/

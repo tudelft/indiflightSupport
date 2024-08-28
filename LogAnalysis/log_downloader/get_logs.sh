@@ -30,6 +30,10 @@ if [[ $1 == "--no-reset" ]]; then
     shift
 fi
 
+if [[ $1 == "--help" ]] || [[ $1 == "-h" ]]; then
+    help_and_exit
+fi
+
 if [ $# -ne 2 ]; then
     echo "incorrect number of arguments"
     help_and_exit

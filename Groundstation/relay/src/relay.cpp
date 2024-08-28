@@ -1,6 +1,6 @@
 // Copyright 2024 Erin Lucassen (Delft University of Technology)
 //                Robin Ferede (Delft University of Technology)
-//                Stavrow Behnam (Delft University of Technology)
+//                Stavrow Bahnam (Delft University of Technology)
 //                Till Blaha (Delft University of Technology)
 //
 // This program is free software: you can redistribute it and/or modify it

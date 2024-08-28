@@ -1,0 +1,3974 @@
+[
+    {
+        "graphConfig": [
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "posSp[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "posSp[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "posSp[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Position Setpoint"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "pos[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "pos[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "pos[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Position Estimate"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "velSp[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "velSp[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "velSp[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Velocity Setpoint"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "vel[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "vel[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "vel[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Velocity Estimate"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "accSp[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "accSp[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "accSp[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Acceleration Setpoint"
+            }
+        ],
+        "title": "Position"
+    },
+    {
+        "graphConfig": [
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 0.25
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 0.25,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroADC[0]",
+                        "smoothing": 3000
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 0.25
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 0.25,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroADC[1]",
+                        "smoothing": 3000
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 0.25
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 0.25,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroADC[2]",
+                        "smoothing": 3000
+                    }
+                ],
+                "height": 1,
+                "label": "Gyro"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 0.5,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 0.5,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": true,
+                        "lineWidth": 1,
+                        "name": "alpha[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 0.5,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 0.5,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": true,
+                        "lineWidth": 1,
+                        "name": "alpha[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 0.5,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 0.5,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": true,
+                        "lineWidth": 1,
+                        "name": "alpha[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "dGyro"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Omega"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega_dot[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega_dot[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega_dot[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega_dot[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Motor dOmega"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 0.25
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 0.25,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "rcCommand[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 0.25
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 0.25,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "rcCommand[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 0.25
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 0.25,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "rcCommand[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "rcCommand[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "RC Command"
+            }
+        ],
+        "title": "Overview"
+    },
+    {
+        "graphConfig": [
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "imu_rls_x[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "imu_rls_x[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "imu_rls_x[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "IMU learning"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "hoverAttitude[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "hoverAttitude[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "hoverAttitude[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "hoverAttitude[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Hover Attitude"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_x_rls_x[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_y_rls_x[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_z_rls_x[0]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "G1_xyz"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_p_rls_x[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_p_rls_x[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_p_rls_x[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_p_rls_x[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "G1_p"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "motor_0_rls_lambda",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "motor_1_rls_lambda",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "motor_2_rls_lambda",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "motor_3_rls_lambda",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#80b1d3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_x_rls_lambda",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fdb462",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_y_rls_lambda",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#b3de69",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_z_rls_lambda",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fccde5",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_p_rls_lambda",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#d9d9d9",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_q_rls_lambda",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bc80bd",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_r_rls_lambda",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Learning Rates"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_x_rls_e_var",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_y_rls_e_var",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_z_rls_e_var",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_p_rls_e_var",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#80b1d3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_q_rls_e_var",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fdb462",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "fx_r_rls_e_var",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Error Variances"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "learnerGains[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "learnerGains[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "learnerGains[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "learnerGains[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Gains"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "learnerTimings[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "learnerTimings[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "learnerTimings[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "learnerTimings[3]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#80b1d3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "learnerTimings[4]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fdb462",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "learnerTimings[5]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#b3de69",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "learnerTimings[6]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Timings"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[3]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#80b1d3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[4]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fdb462",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[5]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#b3de69",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[6]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fccde5",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[7]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Motors Commands"
+            }
+        ],
+        "title": "Learning"
+    },
+    {
+        "graphConfig": [
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 0.5,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 0.5,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "motor[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 0.5,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 0.5,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "motor[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 0.5,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 0.5,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "motor[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 0.5,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 0.5,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "motor[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Output Command"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 0.5,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 0.5,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u_state[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 0.5,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 0.5,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u_state[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 0.5,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 0.5,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u_state[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 0.5,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 0.5,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u_state[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Thrust State"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Thrust Command"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Omega"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "spfSp[all]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "spfSp"
+            }
+        ],
+        "title": "SpfZ"
+    },
+    {
+        "graphConfig": [
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "accADCafterRpm[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "accADCafterRpm[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "accADCafterRpm[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Acceleration only RPM filtered"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "accSmooth[0]",
+                        "smoothing": 3000
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "accSmooth[1]",
+                        "smoothing": 3000
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "accSmooth[2]",
+                        "smoothing": 3000
+                    }
+                ],
+                "height": 1,
+                "label": "Accelerometers"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroADCafterRpm[0]",
+                        "smoothing": 3000
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroADCafterRpm[1]",
+                        "smoothing": 3000
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroADCafterRpm[2]",
+                        "smoothing": 3000
+                    }
+                ],
+                "height": 1,
+                "label": "Rates only RPM filtered"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "alpha[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "alpha[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "alpha[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "dGyro"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[3]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#80b1d3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[4]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fdb462",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[5]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#b3de69",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[6]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fccde5",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[7]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Motor Speeds"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omegaUnfiltered[all]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Motor Speed Unfiltered"
+            }
+        ],
+        "title": "Accel"
+    },
+    {
+        "graphConfig": [
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "dv[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "dv[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "dv[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Delta Pseudocontrol Translations"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 2,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 2,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "dv[3]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#80b1d3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 2,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 2,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "dv[4]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fdb462",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 2,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 2,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "dv[5]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Delta Pseudocontrol Rotations"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "u command"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 5000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "motor[0]",
+                        "smoothing": 5000
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 5000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "motor[1]",
+                        "smoothing": 5000
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 5000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "motor[2]",
+                        "smoothing": 5000
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 5000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "motor[3]",
+                        "smoothing": 5000
+                    }
+                ],
+                "height": 1,
+                "label": "Motors command"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u_state[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u_state[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u_state[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "u_state[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "u state"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omegaUnfiltered[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omegaUnfiltered[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omegaUnfiltered[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omegaUnfiltered[3]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#80b1d3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omegaUnfiltered[4]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fdb462",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omegaUnfiltered[5]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#b3de69",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omegaUnfiltered[6]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fccde5",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omegaUnfiltered[7]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Rotor Speed Unfiltered"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Rotor Speed"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega_dot[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega_dot[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega_dot[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega_dot[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Rotor Rate"
+            }
+        ],
+        "title": "Alloc"
+    },
+    {
+        "graphConfig": [
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "extPos[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "extPos[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "extPos[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Position Measurement"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "pos[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "pos[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "pos[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Position Estimate"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "ekf_pos[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "ekf_pos[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "ekf_pos[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "EKF position"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "extVel[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "extVel[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "extVel[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Velocity Measurement"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "vel[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "vel[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "vel[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Velocity Estimate"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "ekf_vel[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "ekf_vel[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "ekf_vel[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "EKF velocity"
+            }
+        ],
+        "title": "PosFiltering"
+    },
+    {
+        "graphConfig": [
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "accSp[all]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Acceleration Setpoint"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "quatSp[all]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Attitude Setpoint"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "quat[all]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Attitude Estimate"
+            }
+        ],
+        "title": "AccControl"
+    },
+    {
+        "graphConfig": [
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "quatSp[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "quatSp[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "quatSp[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "quatSp[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Attitude Setpoint"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "quat[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "quat[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "quat[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "quat[3]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Attitude"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroSp[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroSp[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroSp[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Rate Setpoint"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 0.25
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 0.25,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroADC[0]",
+                        "smoothing": 3000
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 0.25
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 0.25,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroADC[1]",
+                        "smoothing": 3000
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 0.25
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 0.25,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroADC[2]",
+                        "smoothing": 3000
+                    }
+                ],
+                "height": 1,
+                "label": "Rate Measurement"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "extAtt[all]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "EKF Attitude"
+            },
+            {
+                "fields": [],
+                "height": 1,
+                "label": "Hover Attitude"
+            },
+            {
+                "fields": [],
+                "height": 1,
+                "label": "IMU location"
+            }
+        ],
+        "title": "Attitude"
+    },
+    {
+        "graphConfig": [
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroSp[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroSp[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroSp[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Rate Sp"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 0.25
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 0.25,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroADC[0]",
+                        "smoothing": 3000
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 0.25
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 0.25,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroADC[1]",
+                        "smoothing": 3000
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 0.25
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 0.25,
+                            "smoothing": 3000
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "gyroADC[2]",
+                        "smoothing": 3000
+                    }
+                ],
+                "height": 1,
+                "label": "Rate"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "alphaSp[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "alphaSp[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "alphaSp[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "dRate Setpoint"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "alpha[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "alpha[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "alpha[2]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "dRate"
+            },
+            {
+                "fields": [
+                    {
+                        "color": "#fb8072",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[0]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#8dd3c7",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[1]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#ffffb3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[2]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#bebada",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[3]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#80b1d3",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[4]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fdb462",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[5]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#b3de69",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[6]",
+                        "smoothing": 0
+                    },
+                    {
+                        "color": "#fccde5",
+                        "commonScale": true,
+                        "curve": {
+                            "outputRange": 1,
+                            "power": 1
+                        },
+                        "default": {
+                            "outputRange": 1,
+                            "power": 1,
+                            "smoothing": 0
+                        },
+                        "grid": false,
+                        "lineWidth": 1,
+                        "name": "omega[7]",
+                        "smoothing": 0
+                    }
+                ],
+                "height": 1,
+                "label": "Omega"
+            }
+        ],
+        "title": "Rate"
+    }
+]
