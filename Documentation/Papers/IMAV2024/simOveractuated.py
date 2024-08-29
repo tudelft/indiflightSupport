@@ -88,21 +88,22 @@ if __name__=="__main__":
 
     #%% Generate craft
     mc = MultiRotor()
-    # approx model of CineRat 3inch race drone
+    # NOTE: number of rotors should match the settings learner_num_act in IndiflightProfile.txt
+    # NOTE: max 6 actuators
     mc.setInertia(m=0.41, I=0.75*np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
-    mc.addRotor(Rotor(r=[-0.05, +0.05, -0.05], Tmax=4.5,                               dir='lh', axis=[0.,  0., -1.]))
-    mc.addRotor(Rotor(r=[+0.05, +0.05, -0.05], Tmax=4.5,                               dir='rh', axis=[0.,  0., -1.]))
-    mc.addRotor(Rotor(r=[-0.05, -0.05, -0.05], Tmax=4.5,                               dir='rh', axis=[0., -1., -1.]))
-    mc.addRotor(Rotor(r=[+0.05, -0.05, -0.05], Tmax=4.5,                               dir='lh', axis=[0., -1., -1.]))
-    mc.addRotor(Rotor(r=[-0.05, -0.05, +0.05], Tmax=4.5, kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[0., -1.,  0.]))
-    mc.addRotor(Rotor(r=[+0.05, -0.05, +0.05], Tmax=4.5, kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[0., -1.,  0.]))
+    mc.addRotor(Rotor(r=[-0.05, +0.05, -0.05], Tmax=4.5, dir='lh', axis=[0.,  0., -1.]))
+    mc.addRotor(Rotor(r=[+0.05, +0.05, -0.05], Tmax=4.5, dir='rh', axis=[0.,  0., -1.]))
+    mc.addRotor(Rotor(r=[-0.05, -0.05, +0.05], Tmax=4.5, dir='lh', axis=[0., -1.,  0.]))
+    mc.addRotor(Rotor(r=[+0.05, -0.05, +0.05], Tmax=4.5, dir='rh', axis=[0., -1.,  0.]))
+    mc.addRotor(Rotor(r=[-0.05, -0.05, -0.05], Tmax=4.5, dir='rh', axis=[0., -1., -1.]))
+    mc.addRotor(Rotor(r=[+0.05, -0.05, -0.05], Tmax=4.5, dir='lh', axis=[0., -1., -1.]))
 
     # check if even able to hover
     hoverable = True
     G1, _, _ = mc.calculateG1G2()
     Qr, Rr = np.linalg.qr(G1[3:, :].T, 'complete')
-    if (np.abs(np.diag(Rr)) < 1e-3).any():
-        print(f"WARNING: generated craft has no control over some rotation axis or axes.")
+    if (len(mc.rotors) < 4) or (np.abs(np.diag(Rr)) < 1e-3).any():
+        print(f"\nWARNING: generated craft has no control over some rotation axis or axes.")
         hoverable = False
     else:
         Nr = Qr[:, 3:] # rotational nullspace
@@ -110,8 +111,8 @@ if __name__=="__main__":
         v, V = np.linalg.eig(A)
         # calculate most effeicient hover allocation with 1.1 thrust to weight margin
         ustar = ( 1.1 * 9.81 / np.sqrt(max(v)) ) * (Nr @ V[:, np.argmax(v)])
-        if ((ustar < 0.) & (ustar > 1.)).any() or ((-ustar < 0.) & (-ustar > 1.)).any():
-            print(f"WARNING: generated craft does not have enough thrust-to-weight to hover without rotation.")
+        if not ( ((ustar >= 0.) & (ustar <= 1.)).all() or ((ustar >= 1.) & (ustar <= 0.)).all()):
+            print(f"\nWARNING: generated craft does not have enough thrust-to-weight to hover without rotation. Double check rotation directions")
             hoverable = False
 
     if not hoverable:
@@ -120,8 +121,8 @@ if __name__=="__main__":
 
     #%% craft interfaces
     #imu = IMU(mc, r=[0., 0., 0.], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
-    #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
-    imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
+    imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
+    #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
 
     mocap = Mocap(mc, args.mocap_host, args.mocap_port) if args.mocap else None
     hil = IndiflightHIL(mc, imu, device=args.hil, baud=args.hil_baud) if args.hil else None
@@ -173,6 +174,7 @@ if __name__=="__main__":
     T = 1000. # seconds
     dt_rt = None if args.no_real_time else dt
     start_trajectory = False
+    heading = False
     for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):
         if not args.throw and sim.t > 1.:
             sil.mockup.arm() if sil else None
@@ -185,9 +187,8 @@ if __name__=="__main__":
                     sil.mockup.sendKeyboard('3')
                 start_trajectory = True
 
-        if sim.t > 20. and sil is not None:
+        if not heading and sim.t > 20. and sil is not None:
+            heading = True
             sil.mockup.sendKeyboard('h')
-            # test recovery mode
-            # sil.sendMocap = lambda *args: None
 
         sim.tick(dt)

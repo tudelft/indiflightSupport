@@ -101,7 +101,7 @@ set learner_zeta_attitude = 80
 set learner_zeta_velocity = 70
 set learner_zeta_position = 90
 # new stuff
-set learner_roll_misalignment = -64
+set learner_roll_misalignment = -64 # only relevant on catapult mode, not throwing
 set learner_pitch_misalignment = 24
 set learner_yaw_misalignment = -15
 set learner_randomize_misalignment = 0
@@ -162,7 +162,7 @@ set indi_manual_use_coordinated_yaw = 1
 # --- indi config ---
 set indi_use_increment = 1
 set indi_use_rpm_dot_feedback = 1
-set indi_act_num = 6
+set indi_act_num = 4
 set indi_sync_lowpass_hz = 15
 
 # fx, fy, fz, roll, pitch, yaw
@@ -208,7 +208,7 @@ indiprofile 2
 
 # these values are slightly more conservative than indiprofile 0
 
-set indi_act_num = 6
+set indi_act_num = 4
 # set indi_attitude_gains = 1552,1552,1552
 # set indi_rate_gains = 174,174,174
 set indi_attitude_max_tilt_rate = 500
