@@ -1,0 +1,35 @@
+########## TARGET CONFIG
+TARGET = MOCKUP
+EXTRA_FLAGS = -Wno-double-promotion -Wno-misleading-indentation
+EXTRA_FLAGS += -DUSE_IMU_CALC -DUSE_ACC -DUSE_FAKE_ACC -DUSE_GYRO -DUSE_FAKE_GYRO -DUSE_BLACKBOX
+
+########## FURTHER OPTIONS
+# Developer options
+#EXTRA_FLAGS += -DUSE_BENCHMARK -DUSE_STACK_CHECK
+
+# indi config:
+EXTRA_FLAGS += -DUSE_INDI
+
+# telemetry config:
+EXTRA_FLAGS += -DUSE_TELEMETRY -DUSE_TELEMETRY_PI -DPI_STATS -DPI_USE_PRINT_MSGS 
+
+# position controller config
+EXTRA_FLAGS += -DUSE_GPS              # display global position
+EXTRA_FLAGS += -DUSE_LOCAL_POSITION   # enable local position and controller
+
+#EXTRA_FLAGS += -DUSE_LOCAL_POSITION_GPS # get local pos from gps, or...
+EXTRA_FLAGS += -DUSE_LOCAL_POSITION_PI  # ...from pi telemetry
+
+#EXTRA_FLAGS += -DUSE_POS_CTL -DUSE_GPS_PI
+
+#EXTRA_FLAGS += -DUSE_EKF  # requires USE_LOCAL_POSITION_PI
+
+# higher level controllers / est
+EXTRA_FLAGS += -DUSE_TRAJECTORY_TRACKER
+
+# DANGEROUS modes!!
+#EXTRA_FLAGS += -DUSE_ACCEL_RPM_FILTER   # defunc
+EXTRA_FLAGS += -DUSE_THROW_TO_ARM -DUSE_THROWING_WITHOUT_POSITION
+EXTRA_FLAGS += -DUSE_CATAPULT
+EXTRA_FLAGS += -DUSE_LEARNER
+#EXTRA_FLAGS += -DUSE_NN_CONTROL

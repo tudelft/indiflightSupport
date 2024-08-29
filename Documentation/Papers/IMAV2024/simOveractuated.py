@@ -90,15 +90,32 @@ if __name__=="__main__":
     mc = MultiRotor()
     # approx model of CineRat 3inch race drone
     mc.setInertia(m=0.41, I=0.75*np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
-    mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=4.5, dir='lh')) # RR
-    mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=4.5, dir='rh')) # FR
-    mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=4.5, dir='rh')) # RL
-    mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=4.5, dir='lh')) # FL
-    # some additional rotors
-    #mc.addRotor(Rotor(r=[+0.0, -0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[0, -1., -1.]))
-    #mc.addRotor(Rotor(r=[+0.0, +0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[0, 1., -1.]))
-    #mc.addRotor(Rotor(r=[-0.1, +0.0, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[-1, 0., -1.]))
-    #mc.addRotor(Rotor(r=[+0.1, +0.0, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[1, 0., -1.]))
+    mc.addRotor(Rotor(r=[-0.05, +0.05, -0.05], Tmax=4.5,                               dir='lh', axis=[0.,  0., -1.]))
+    mc.addRotor(Rotor(r=[+0.05, +0.05, -0.05], Tmax=4.5,                               dir='rh', axis=[0.,  0., -1.]))
+    mc.addRotor(Rotor(r=[-0.05, -0.05, -0.05], Tmax=4.5,                               dir='rh', axis=[0., -1., -1.]))
+    mc.addRotor(Rotor(r=[+0.05, -0.05, -0.05], Tmax=4.5,                               dir='lh', axis=[0., -1., -1.]))
+    mc.addRotor(Rotor(r=[-0.05, -0.05, +0.05], Tmax=4.5, kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[0., -1.,  0.]))
+    mc.addRotor(Rotor(r=[+0.05, -0.05, +0.05], Tmax=4.5, kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[0., -1.,  0.]))
+
+    # check if even able to hover
+    hoverable = True
+    G1, _, _ = mc.calculateG1G2()
+    Qr, Rr = np.linalg.qr(G1[3:, :].T, 'complete')
+    if (np.abs(np.diag(Rr)) < 1e-3).any():
+        print(f"WARNING: generated craft has no control over some rotation axis or axes.")
+        hoverable = False
+    else:
+        Nr = Qr[:, 3:] # rotational nullspace
+        A = Nr.T @ G1[:3, :].T @ G1[:3, :] @ Nr
+        v, V = np.linalg.eig(A)
+        # calculate most effeicient hover allocation with 1.1 thrust to weight margin
+        ustar = ( 1.1 * 9.81 / np.sqrt(max(v)) ) * (Nr @ V[:, np.argmax(v)])
+        if ((ustar < 0.) & (ustar > 1.)).any() or ((-ustar < 0.) & (-ustar > 1.)).any():
+            print(f"WARNING: generated craft does not have enough thrust-to-weight to hover without rotation.")
+            hoverable = False
+
+    if not hoverable:
+        input("Press Enter to continue anyway")
 
 
     #%% craft interfaces
@@ -160,15 +177,15 @@ if __name__=="__main__":
         if not args.throw and sim.t > 1.:
             sil.mockup.arm() if sil else None
 
-        if not start_trajectory and sim.t > 5. and sil is not None:
+        if not start_trajectory and sim.t > 10. and sil is not None:
             # start trajectory tracking at 8*0.5 = 4m/s target speed
             sil.mockup.sendKeyboard('1')
-            if sim.t > 7.:
+            if sim.t > 15.:
                 for _ in range(8):
                     sil.mockup.sendKeyboard('3')
                 start_trajectory = True
 
-        if sim.t > 10. and sil is not None:
+        if sim.t > 20. and sil is not None:
             sil.mockup.sendKeyboard('h')
             # test recovery mode
             # sil.sendMocap = lambda *args: None

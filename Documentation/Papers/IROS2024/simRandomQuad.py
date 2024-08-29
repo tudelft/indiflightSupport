@@ -51,6 +51,7 @@ def runOneSim(mc, imu, args):
     sil.mockup.setLogging( args.sil_log )
 
     # set setpoints, flight modes and switch positions
+    sil.sendMocap()
     sil.mockup.sendPositionSetpoint( [0., 0., -1.5], 0. )
     sil.mockup.enableFlightMode(flightModeFlags.ANGLE_MODE
                                 | flightModeFlags.POSITION_MODE
@@ -114,7 +115,6 @@ if __name__=="__main__":
             throw_rotation = 10.*random(3) - 5.
             throw_direction = 4.*random(2) - 2.
 
-            offset = np.pi/3. * random(n_rotors)
             phi = random(n_rotors) * np.pi/3  +  np.arange(0, 2.*np.pi, np.pi/2.)
             R = random(n_rotors) * 0.1 + 0.05
             X = R * np.stack(( np.cos(phi), np.sin(phi), np.zeros(n_rotors) ))
