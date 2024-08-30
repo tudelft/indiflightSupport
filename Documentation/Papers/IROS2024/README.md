@@ -47,7 +47,8 @@ Install dependencies:
     pip install -r LogAnalysis/indiflightLogTools/requirements.txt
     pip install -r Simulation/requirements.txt
 
-Download the dataset <LINK> on some location on your machine. If you want, substitute the simulation data with the output of your own simulations above
+Download the dataset <http://doi.org/10.4121/0530be90-cc6c-4029-9774-670657882906> on some location on your machine.
+If you want, substitute the simulation data with the output of your own simulations above
 
 Generate plots and tables (they will appear in `LogAnalysis/IROS2024/figures`):
 

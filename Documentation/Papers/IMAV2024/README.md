@@ -40,7 +40,7 @@ Install dependencies:
     pip install -r LogAnalysis/indiflightLogTools/requirements.txt
     pip install sympy
 
-Download the dataset <LINK> on some location on your machine.
+Download the dataset <http://doi.org/10.4121/0530be90-cc6c-4029-9774-670657882906> on some location on your machine.
 
 Generate plots (they will appear in `Documentation/Papers/IMAV2024/figures`):
 
