@@ -27,7 +27,8 @@ from hashlib import md5
 
 logger = logging.getLogger(__name__)
 
-plt.rcParams.update({
+local_rc = plt.rcParams.copy()
+local_rc.update({
 #    "text.usetex": True,
 #    "font.family": "Helvetica",
     "font.family": "sans-serif",
@@ -417,112 +418,114 @@ class IndiflightLog(object):
         self.data['timeUs'] -= self.data['timeUs'].iloc[0]
 
     def plot(self):
-        # plot some overview stuff
-        f, axs = plt.subplots(4, 4, figsize=(12,9), sharex='all', sharey='row')
-        axs[2, 3].axis('off')
-        axs[3, 3].axis('off')
+        with plt.rc_context(rc=local_rc):
+            # plot some overview stuff
+            f, axs = plt.subplots(4, 4, figsize=(12,9), sharex='all', sharey='row')
+            axs[2, 3].axis('off')
+            axs[3, 3].axis('off')
 
-        for i in range(4):
-            line1, = axs[0, i].plot(self.data['timeMs'], self.data[f'omega[{i}]'], label=f'onboard rpm omega[{i}]')
+            for i in range(4):
+                line1, = axs[0, i].plot(self.data['timeMs'], self.data[f'omega[{i}]'], label=f'onboard rpm omega[{i}]')
 
-            yyax = axs[0, i].twinx()
-            line2, = yyax.plot(self.data['timeMs'], self.data[f'u[{i}]'], label=f'command u[{i}]', color='orange')
-            yyax.tick_params('y', colors='orange')
-            yyax.set_ylim(bottom=-0.1, top=1.1)
+                yyax = axs[0, i].twinx()
+                line2, = yyax.plot(self.data['timeMs'], self.data[f'u[{i}]'], label=f'command u[{i}]', color='orange')
+                yyax.tick_params('y', colors='orange')
+                yyax.set_ylim(bottom=-0.1, top=1.1)
 
-            lines = [line1, line2]
-            labels = [line.get_label() for line in lines]
+                lines = [line1, line2]
+                labels = [line.get_label() for line in lines]
 
-            axs[0, i].legend(lines, labels)
-            axs[0, i].set_ylim(bottom=-0.1, top=1.1)
-            if (i==0):
-                axs[0, i].set_ylabel("Motor command/output [-], [rad/s]")
+                axs[0, i].legend(lines, labels)
+                axs[0, i].set_ylim(bottom=-0.1, top=1.1)
+                if (i==0):
+                    axs[0, i].set_ylabel("Motor command/output [-], [rad/s]")
 
-        for i in range(4):
-            axs[1, i].plot(self.data['timeMs'], self.data[f'omega_dot[{i}]'], label=f'onboard drpm omega_dot[{i}]')
-            axs[1, i].legend()
-            if (i==0):
-                axs[1, i].set_ylabel("Motor acceleration [rad/s/s]")
-            if (i==3):
-                axs[1, i].set_xlabel("Time [ms]")
+            for i in range(4):
+                axs[1, i].plot(self.data['timeMs'], self.data[f'omega_dot[{i}]'], label=f'onboard drpm omega_dot[{i}]')
+                axs[1, i].legend()
+                if (i==0):
+                    axs[1, i].set_ylabel("Motor acceleration [rad/s/s]")
+                if (i==3):
+                    axs[1, i].set_xlabel("Time [ms]")
 
 
-        for i in range(3):
-            axs[2, i].plot(self.data['timeMs'], self.data[f'alpha[{i}]'], label=f'onboard angular accel alpha[{i}]')
-            axs[2, i].legend()
-            if (i==0):
-                axs[2, i].set_ylabel("Angular acceleration [rad/s/s]")
+            for i in range(3):
+                axs[2, i].plot(self.data['timeMs'], self.data[f'alpha[{i}]'], label=f'onboard angular accel alpha[{i}]')
+                axs[2, i].legend()
+                if (i==0):
+                    axs[2, i].set_ylabel("Angular acceleration [rad/s/s]")
 
-        for i in range(3):
-            axs[3, i].plot(self.data['timeMs'], self.data[f'accSmooth[{i}]'], label=f'onboard linear accSmooth[{i}]')
-            axs[3, i].legend()
-            axs[3, i].set_xlabel("Time [ms]")
-            if (i==0):
-                axs[3, i].set_ylabel("Specific force [N/kg]")
+            for i in range(3):
+                axs[3, i].plot(self.data['timeMs'], self.data[f'accSmooth[{i}]'], label=f'onboard linear accSmooth[{i}]')
+                axs[3, i].legend()
+                axs[3, i].set_xlabel("Time [ms]")
+                if (i==0):
+                    axs[3, i].set_ylabel("Specific force [N/kg]")
 
-        # Maximize the window on Linux
-        mgr = plt.get_current_fig_manager()
-        mgr.resize(1920, 1080)
+            # Maximize the window on Linux
+            mgr = plt.get_current_fig_manager()
+            mgr.resize(1920, 1080)
 
-        f.show()
-        return f
+            f.show()
+            return f
 
     def compare(self, other, other_offset=0, self_name='A', other_name='B'):
         a = self_name
         b = other_name
 
-        f, axs = plt.subplots(4, 4, figsize=(12,9), sharex='all', sharey='row')
-        f.suptitle(f"Log comparison -- {a} vs {b}")
-        axs[2, 3].axis('off')
-        axs[3, 3].axis('off')
+        with plt.rc_context(rc=local_rc):
+            f, axs = plt.subplots(4, 4, figsize=(12,9), sharex='all', sharey='row')
+            f.suptitle(f"Log comparison -- {a} vs {b}")
+            axs[2, 3].axis('off')
+            axs[3, 3].axis('off')
 
-        otherTimeMs = other.data['timeMs'] - other_offset;
+            otherTimeMs = other.data['timeMs'] - other_offset;
 
-        for i in range(4):
-            line1, = axs[0, i].plot(self.data['timeMs'], self.data[f'omega[{i}]'], label=f'{a}: onboard rpm omega[{i}]')
-            line1b, = axs[0, i].plot(otherTimeMs, other.data[f'omega[{i}]'], linestyle='--', label=f'{b}: onboard rpm omega[{i}]')
+            for i in range(4):
+                line1, = axs[0, i].plot(self.data['timeMs'], self.data[f'omega[{i}]'], label=f'{a}: onboard rpm omega[{i}]')
+                line1b, = axs[0, i].plot(otherTimeMs, other.data[f'omega[{i}]'], linestyle='--', label=f'{b}: onboard rpm omega[{i}]')
 
-            yyax = axs[0, i].twinx()
-            line2, = yyax.plot(self.data['timeMs'], self.data[f'u[{i}]'], label=f'{a}: command u[{i}]', color='green')
-            line2b, = yyax.plot(otherTimeMs, other.data[f'u[{i}]'], linestyle='--', label=f'{b}: command u[{i}]', color='black')
-            yyax.tick_params('y', colors='green')
-            yyax.set_ylim(bottom=0)
+                yyax = axs[0, i].twinx()
+                line2, = yyax.plot(self.data['timeMs'], self.data[f'u[{i}]'], label=f'{a}: command u[{i}]', color='green')
+                line2b, = yyax.plot(otherTimeMs, other.data[f'u[{i}]'], linestyle='--', label=f'{b}: command u[{i}]', color='black')
+                yyax.tick_params('y', colors='green')
+                yyax.set_ylim(bottom=0)
 
-            lines = [line1, line1b, line2, line2b]
-            labels = [line.get_label() for line in lines]
+                lines = [line1, line1b, line2, line2b]
+                labels = [line.get_label() for line in lines]
 
-            axs[0, i].legend(lines, labels)
-            axs[0, i].set_ylim(bottom=0)
-            if (i==0):
-                axs[0, i].set_ylabel("Motor command/output [-], [rad/s]")
+                axs[0, i].legend(lines, labels)
+                axs[0, i].set_ylim(bottom=0)
+                if (i==0):
+                    axs[0, i].set_ylabel("Motor command/output [-], [rad/s]")
 
-        for i in range(4):
-            axs[1, i].plot(self.data['timeMs'], self.data[f'omega_dot[{i}]'], label=f'{a}: onboard drpm omega_dot[{i}]')
-            axs[1, i].plot(otherTimeMs, other.data[f'omega_dot[{i}]'], linestyle='--', label=f'{b}: onboard drpm omega_dot[{i}]')
-            axs[1, i].legend()
-            if (i==0):
-                axs[1, i].set_ylabel("Motor acceleration [rad/s/s]")
-            if (i==3):
-                axs[1, i].set_xlabel("Time [ms]")
+            for i in range(4):
+                axs[1, i].plot(self.data['timeMs'], self.data[f'omega_dot[{i}]'], label=f'{a}: onboard drpm omega_dot[{i}]')
+                axs[1, i].plot(otherTimeMs, other.data[f'omega_dot[{i}]'], linestyle='--', label=f'{b}: onboard drpm omega_dot[{i}]')
+                axs[1, i].legend()
+                if (i==0):
+                    axs[1, i].set_ylabel("Motor acceleration [rad/s/s]")
+                if (i==3):
+                    axs[1, i].set_xlabel("Time [ms]")
 
-        for i in range(3):
-            axs[2, i].plot(self.data['timeMs'], self.data[f'alpha[{i}]'], label=f'{a}: onboard angular accel alpha[{i}]')
-            axs[2, i].plot(otherTimeMs, other.data[f'alpha[{i}]'], linestyle='--', label=f'{b}: onboard angular accel alpha[{i}]')
-            axs[2, i].legend()
-            if (i==0):
-                axs[2, i].set_ylabel("Angular acceleration [rad/s/s]")
+            for i in range(3):
+                axs[2, i].plot(self.data['timeMs'], self.data[f'alpha[{i}]'], label=f'{a}: onboard angular accel alpha[{i}]')
+                axs[2, i].plot(otherTimeMs, other.data[f'alpha[{i}]'], linestyle='--', label=f'{b}: onboard angular accel alpha[{i}]')
+                axs[2, i].legend()
+                if (i==0):
+                    axs[2, i].set_ylabel("Angular acceleration [rad/s/s]")
 
-        for i in range(3):
-            axs[3, i].plot(self.data['timeMs'], self.data[f'accSmooth[{i}]'], label=f'{a}: onboard linear accSmooth[{i}]')
-            axs[3, i].plot(otherTimeMs, other.data[f'accSmooth[{i}]'], linestyle='--', label=f'{b}: onboard linear accSmooth[{i}]')
-            axs[3, i].legend()
-            axs[3, i].set_xlabel("Time [ms]")
-            if (i==0):
-                axs[3, i].set_ylabel("Specific force [N/kg]")
+            for i in range(3):
+                axs[3, i].plot(self.data['timeMs'], self.data[f'accSmooth[{i}]'], label=f'{a}: onboard linear accSmooth[{i}]')
+                axs[3, i].plot(otherTimeMs, other.data[f'accSmooth[{i}]'], linestyle='--', label=f'{b}: onboard linear accSmooth[{i}]')
+                axs[3, i].legend()
+                axs[3, i].set_xlabel("Time [ms]")
+                if (i==0):
+                    axs[3, i].set_ylabel("Specific force [N/kg]")
 
-        # Maximize the window on Linux
-        mgr = plt.get_current_fig_manager()
-        mgr.resize(1920, 1080)
+            # Maximize the window on Linux
+            mgr = plt.get_current_fig_manager()
+            mgr.resize(1920, 1080)
 
-        f.show()
-        return f
+            f.show()
+            return f

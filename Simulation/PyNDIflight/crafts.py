@@ -192,6 +192,24 @@ class MultiRotor:
         G2_scaler = np.array([0.5 * r.wmax**2 / (0.5*r.tau) for r in self.rotors])
         return G1, G2, G2_scaler
 
+    def checkHover(self):
+        G1, _, _ = self.calculateG1G2()
+        Qr, Rr = np.linalg.qr(G1[3:, :].T, 'complete')
+        if (len(self.rotors) < 4) or (np.abs(np.diag(Rr)) < 1e-3).any():
+            print(f"\nWARNING: generated craft has no control over some rotation axis or axes.")
+            return False
+        else:
+            Nr = Qr[:, 3:] # rotational nullspace
+            A = Nr.T @ G1[:3, :].T @ G1[:3, :] @ Nr
+            v, V = np.linalg.eig(A)
+            # calculate most effeicient hover allocation with 1.1 thrust to weight margin
+            ustar = ( 1.1 * 9.81 / np.sqrt(max(v)) ) * (Nr @ V[:, np.argmax(v)])
+            if not ( ((ustar >= 0.) & (ustar <= 1.)).all() or ((ustar >= -1.) & (ustar <= 0.)).all()):
+                print(f"\nWARNING: generated craft does not have enough thrust-to-weight to hover without rotation. Double check rotation directions")
+                return False
+
+        return True
+
     def tick(self, dt):
         F = np.zeros(3, dtype=np.float32)
         M = np.zeros(3, dtype=np.float32)

@@ -22,14 +22,14 @@ Build container (this also compiles the correct version of `indiflight`)
         --build-arg COMMIT=85e336c1e                                            \
         --build-arg BUILD_CONFIG=Documentation/Papers/IROS2024/IndiflightConfig.mk
 
-Run container (`--num 1000` was used in the paper, but takes long to sim and to analyze)
+Run container with the python simulation configuration (`--num 1000` was used in the paper, but takes long to sim and to analyze)
 
     docker run -it -p 5000:5000                                                \
         -v ./Documentation/Papers/IROS2024/simRandomQuad.py:/sim.py            \
         -v ./Documentation/Papers/IROS2024/IndiflightProfile.txt:/profile.txt  \
         pyndiflight-iros2024 --sil-log --no-real-time --num 20
 
-Copy logs
+Copy logs from most recently run container:
 
     docker cp $(docker ps -alq):/logs/. ./logs-simulation
 

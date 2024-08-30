@@ -88,34 +88,39 @@ if __name__=="__main__":
 
     #%% Generate craft
     mc = MultiRotor()
+    mc.setInertia(m=0.41, I=0.75*np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
     # NOTE: number of rotors should match the settings learner_num_act in IndiflightProfile.txt
     # NOTE: max 6 actuators
-    mc.setInertia(m=0.41, I=0.75*np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
-    mc.addRotor(Rotor(r=[-0.05, +0.05, -0.05], Tmax=4.5, dir='lh', axis=[0.,  0., -1.]))
-    mc.addRotor(Rotor(r=[+0.05, +0.05, -0.05], Tmax=4.5, dir='rh', axis=[0.,  0., -1.]))
-    mc.addRotor(Rotor(r=[-0.05, -0.05, +0.05], Tmax=4.5, dir='lh', axis=[0., -1.,  0.]))
-    mc.addRotor(Rotor(r=[+0.05, -0.05, +0.05], Tmax=4.5, dir='rh', axis=[0., -1.,  0.]))
-    mc.addRotor(Rotor(r=[-0.05, -0.05, -0.05], Tmax=4.5, dir='rh', axis=[0., -1., -1.]))
-    mc.addRotor(Rotor(r=[+0.05, -0.05, -0.05], Tmax=4.5, dir='lh', axis=[0., -1., -1.]))
+
+    # Fully actuated hexacopter, but rotated 45 degrees
+    R = 0.13
+    alpha = 20. * np.pi/180.  # degrees tilt, do NOT set 0
+    offset = 45. * np.pi/180. # rotate rotor contellation in roll with respect to IMU
+    N = 6
+
+    phi = np.linspace(2/12*np.pi, 2*np.pi-2/12*np.pi, N, endpoint=True)
+    X = R * np.vstack([np.cos(phi), np.sin(phi), np.zeros(6)])
+    D = np.vstack([-np.tan(alpha)*np.sin(phi), np.tan(alpha)*np.cos(phi), -1.*np.ones(6)])
+    D[:2, 0] *= -1
+    D[:2, 2] *= -1
+    D[:2, 4] *= -1
+
+    from scipy.spatial.transform import Rotation
+    rot = Rotation.from_rotvec([offset, 0, 0], degrees=False)
+    X = rot.apply(X.T).T
+    D = rot.apply(D.T).T
+
+    mc.addRotor(Rotor(r=X[:, 0], Tmax=4.5, dir='lh', axis=D[:, 0]))
+    mc.addRotor(Rotor(r=X[:, 1], Tmax=4.5, dir='rh', axis=D[:, 1]))
+    mc.addRotor(Rotor(r=X[:, 2], Tmax=4.5, dir='lh', axis=D[:, 2]))
+    mc.addRotor(Rotor(r=X[:, 3], Tmax=4.5, dir='rh', axis=D[:, 3]))
+    mc.addRotor(Rotor(r=X[:, 4], Tmax=4.5, dir='lh', axis=D[:, 4]))
+    mc.addRotor(Rotor(r=X[:, 5], Tmax=4.5, dir='rh', axis=D[:, 5]))
 
     # check if even able to hover
-    hoverable = True
-    G1, _, _ = mc.calculateG1G2()
-    Qr, Rr = np.linalg.qr(G1[3:, :].T, 'complete')
-    if (len(mc.rotors) < 4) or (np.abs(np.diag(Rr)) < 1e-3).any():
-        print(f"\nWARNING: generated craft has no control over some rotation axis or axes.")
-        hoverable = False
-    else:
-        Nr = Qr[:, 3:] # rotational nullspace
-        A = Nr.T @ G1[:3, :].T @ G1[:3, :] @ Nr
-        v, V = np.linalg.eig(A)
-        # calculate most effeicient hover allocation with 1.1 thrust to weight margin
-        ustar = ( 1.1 * 9.81 / np.sqrt(max(v)) ) * (Nr @ V[:, np.argmax(v)])
-        if not ( ((ustar >= 0.) & (ustar <= 1.)).all() or ((ustar >= 1.) & (ustar <= 0.)).all()):
-            print(f"\nWARNING: generated craft does not have enough thrust-to-weight to hover without rotation. Double check rotation directions")
-            hoverable = False
-
-    if not hoverable:
+    if not mc.checkHover():
+        # import pdb
+        # pdb.set_trace()
         input("Press Enter to continue anyway")
 
 
@@ -166,17 +171,17 @@ if __name__=="__main__":
         mc.throw(height=4.,
                  wB=[2., -4., 3.], # approx body rotation in rad/s
                  vHorz=[1., -2.], # final speed in x-y-plane in m/s
-                 at_time=1.)
+                 at_time=5.)
 
 
     #%% run loop
     dt = 0.0005 # 2kHz
-    T = 1000. # seconds
+    T = 40. # seconds
     dt_rt = None if args.no_real_time else dt
     start_trajectory = False
     heading = False
     for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):
-        if not args.throw and sim.t > 1.:
+        if not args.throw and sim.t > 5.:
             sil.mockup.arm() if sil else None
 
         if not start_trajectory and sim.t > 10. and sil is not None:

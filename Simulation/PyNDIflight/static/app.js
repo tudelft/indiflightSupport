@@ -147,9 +147,9 @@ scene.background = new THREE.Color(0xffffff);
 // camera, such that North East Down makes sense
 const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.up.set( 0, 0, -1 ); // for orbit controls to make sense
-camera.position.x = -4;
-camera.position.y = 3;
-camera.position.z = -1.5;
+camera.position.x = -10;
+camera.position.y = 8;
+camera.position.z = -5.0;
 camera.setRotationFromEuler( new THREE.Euler(-110*3.1415/180, 0, 55 * 3.1415/180, 'ZYX'))
 
 window.onresize = function() {

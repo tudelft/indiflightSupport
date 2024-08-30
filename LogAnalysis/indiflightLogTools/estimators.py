@@ -21,7 +21,8 @@ from matplotlib import pyplot as plt
 from matplotlib.gridspec import GridSpec
 import logging
 
-plt.rcParams.update({
+local_rc = plt.rcParams.copy()
+local_rc.update({
 #    "text.usetex": True,
 #    "font.family": "Helvetica",
     "font.family": "sans-serif",
@@ -331,123 +332,124 @@ class RLS(object):
         else:
             timeLabel = "Time [ms]"
 
-        f = plt.figure()
+        with plt.rc_context(rc=local_rc):
+            f = plt.figure()
 
-        left=0.04
-        bottom=0.06
-        right=0.975
-        top=0.925
-        hspace=0.15
-        wspace=0.25
-        rWidth = (right - left + 0*0.3*wspace) * 1 / (1 + len(parGroups)) + left
-        rHeight = (top - bottom) * 2 / (2 + len(yGroups)) + bottom
+            left=0.04
+            bottom=0.06
+            right=0.975
+            top=0.925
+            hspace=0.15
+            wspace=0.25
+            rWidth = (right - left + 0*0.3*wspace) * 1 / (1 + len(parGroups)) + left
+            rHeight = (top - bottom) * 2 / (2 + len(yGroups)) + bottom
 
-        faceGs = GridSpec(2, 2,
-                           width_ratios=(rWidth, 1 - rWidth),
-                           height_ratios=(rHeight, 1 - rHeight),
-                           )
-        faceGs.update(left=0., bottom=0., right=1.0, top=0.95, hspace=0, wspace=0)
+            faceGs = GridSpec(2, 2,
+                               width_ratios=(rWidth, 1 - rWidth),
+                               height_ratios=(rHeight, 1 - rHeight),
+                               )
+            faceGs.update(left=0., bottom=0., right=1.0, top=0.95, hspace=0, wspace=0)
 
-        outerGs = GridSpec(2, 2,
-                           width_ratios=(1, len(parGroups)),
-                           height_ratios=(2, len(yGroups)),
-                           )
-        outerGs.update(left=left, bottom=bottom, right=right, top=top, hspace=hspace, wspace=wspace)
+            outerGs = GridSpec(2, 2,
+                               width_ratios=(1, len(parGroups)),
+                               height_ratios=(2, len(yGroups)),
+                               )
+            outerGs.update(left=left, bottom=bottom, right=right, top=top, hspace=hspace, wspace=wspace)
 
-        colors = ['white', 'gray', 'blue', 'green']
-        for i, col in enumerate(colors):
-            grayAx = f.add_subplot(faceGs[i])
-            grayAx.grid(False)
-            grayAx.set_facecolor(col)
-            grayAx.patch.set_alpha(0.3)
-            grayAx.tick_params(axis='both',which='both',bottom=0,left=0,
-                              labelbottom=0, labelleft=0)
+            colors = ['white', 'gray', 'blue', 'green']
+            for i, col in enumerate(colors):
+                grayAx = f.add_subplot(faceGs[i])
+                grayAx.grid(False)
+                grayAx.set_facecolor(col)
+                grayAx.patch.set_alpha(0.3)
+                grayAx.tick_params(axis='both',which='both',bottom=0,left=0,
+                                  labelbottom=0, labelleft=0)
 
-        parGs = outerGs[0, 1].subgridspec(2, len(parGroups))
-        regGs = outerGs[1, 1].subgridspec(len(yGroups), len(parGroups))
-        yGs   = outerGs[1, 0].subgridspec(len(yGroups), 1)
+            parGs = outerGs[0, 1].subgridspec(2, len(parGroups))
+            regGs = outerGs[1, 1].subgridspec(len(yGroups), len(parGroups))
+            yGs   = outerGs[1, 0].subgridspec(len(yGroups), 1)
 
-        parAxs = []
-        varAxs = []
-        yAxs = []
-        regAxs = []
-        for i in range(len(parGroups)):
-            parAx = f.add_subplot(parGs[0, i]); parAxs.append(parAx)
+            parAxs = []
+            varAxs = []
+            yAxs = []
+            regAxs = []
+            for i in range(len(parGroups)):
+                parAx = f.add_subplot(parGs[0, i]); parAxs.append(parAx)
 
-            varAx = f.add_subplot(parGs[1, i]); varAxs.append(varAx)
-            varAx.sharex(parAxs[0])
-            varAx.set_yscale('log')
+                varAx = f.add_subplot(parGs[1, i]); varAxs.append(varAx)
+                varAx.sharex(parAxs[0])
+                varAx.set_yscale('log')
 
-            if i > 0:
-                varAx.sharey(varAxs[0])
-                parAx.sharex(parAxs[0])
-            else:
-                parAx.set_ylabel("Parameter(s)")
-                varAx.set_ylabel("Variance(s)")
+                if i > 0:
+                    varAx.sharey(varAxs[0])
+                    parAx.sharex(parAxs[0])
+                else:
+                    parAx.set_ylabel("Parameter(s)")
+                    varAx.set_ylabel("Variance(s)")
 
-        for i in range(len(yGroups)):
-            yAx = f.add_subplot(yGs[i, 0]); yAxs.append(yAx)
-            yAx.sharex(parAxs[0])
+            for i in range(len(yGroups)):
+                yAx = f.add_subplot(yGs[i, 0]); yAxs.append(yAx)
+                yAx.sharex(parAxs[0])
 
-            regAxsRow = []
-            for j in range(len(parGroups)):
-                regAx = f.add_subplot(regGs[i, j]); regAxsRow.append(regAx)
-                if j == 0:
-                    regAx.set_ylabel("Regressor(s)")
-                regAx.sharex(parAxs[0])
-                if (i > 0) and sharey:
-                    regAx.sharey(regAxs[0][j])
-            regAxs.append(regAxsRow)
+                regAxsRow = []
+                for j in range(len(parGroups)):
+                    regAx = f.add_subplot(regGs[i, j]); regAxsRow.append(regAx)
+                    if j == 0:
+                        regAx.set_ylabel("Regressor(s)")
+                    regAx.sharex(parAxs[0])
+                    if (i > 0) and sharey:
+                        regAx.sharey(regAxs[0][j])
+                regAxs.append(regAxsRow)
 
-        x = np.array(self.x_hist)
-        P = np.array(self.P_hist)
-        A = np.array(self.A_hist)
-        y = np.array(self.y_hist)
+            x = np.array(self.x_hist)
+            P = np.array(self.P_hist)
+            A = np.array(self.A_hist)
+            y = np.array(self.y_hist)
 
-        for parIdxs, parAx, varAx in zip(parGroups, parAxs, varAxs):
-            maxy = 0.
-            miny = 0.
-            for i in parIdxs:
-                maxy = max(maxy, x[-1, i])
-                miny = min(miny, x[-1, i])
-                parAx.plot(timeMs, x[:, i], label=self.parNames[i])
-                varAx.plot(timeMs, P[:, i, i], label=f"var({self.parNames[i]})")
-            if zoomy:
-                diffy = maxy - miny
-                maxy += diffy * 1.
-                miny -= diffy * 1.
-                parAx.set_ylim(bottom=miny, top=maxy)
-            parAx.legend()
-            varAx.legend()
+            for parIdxs, parAx, varAx in zip(parGroups, parAxs, varAxs):
+                maxy = 0.
+                miny = 0.
+                for i in parIdxs:
+                    maxy = max(maxy, x[-1, i])
+                    miny = min(miny, x[-1, i])
+                    parAx.plot(timeMs, x[:, i], label=self.parNames[i])
+                    varAx.plot(timeMs, P[:, i, i], label=f"var({self.parNames[i]})")
+                if zoomy:
+                    diffy = maxy - miny
+                    maxy += diffy * 1.
+                    miny -= diffy * 1.
+                    parAx.set_ylim(bottom=miny, top=maxy)
+                parAx.legend()
+                varAx.legend()
 
-        yLastTheta = self.predictNew(A)
-        yRealTime = self.predictRealTime()
-        printLegend = True
-        for yIdxs, yAx in zip(yGroups, yAxs):
-            for i in yIdxs:
-                yAx.plot(timeMs, y[:, i], label="Target")
-                yAx.plot(timeMs, yLastTheta[:, i], label="A posteriori")
-                yAx.plot(timeMs, yRealTime[:, i], label="Real Time")
-            yAx.set_ylabel("Output "+self.yNames[i])
-            if printLegend:
-                legend_ypos = 0.38 / yAx.get_position().height #FIXME: this doesnt work
-                yAx.legend(loc='upper center', bbox_to_anchor=(0.5, legend_ypos))
-                printLegend = False
-
-        for yIdxs, regAxRow in zip(yGroups, regAxs):
-            for parIdxs, regAx in zip(parGroups, regAxRow):
+            yLastTheta = self.predictNew(A)
+            yRealTime = self.predictRealTime()
+            printLegend = True
+            for yIdxs, yAx in zip(yGroups, yAxs):
                 for i in yIdxs:
-                    for j in parIdxs:
-                        regAx.plot(timeMs, A[:, i, j], label=self.regNames[i][j])
-                regAx.legend()
+                    yAx.plot(timeMs, y[:, i], label="Target")
+                    yAx.plot(timeMs, yLastTheta[:, i], label="A posteriori")
+                    yAx.plot(timeMs, yRealTime[:, i], label="Real Time")
+                yAx.set_ylabel("Output "+self.yNames[i])
+                if printLegend:
+                    legend_ypos = 0.38 / yAx.get_position().height #FIXME: this doesnt work
+                    yAx.legend(loc='upper center', bbox_to_anchor=(0.5, legend_ypos))
+                    printLegend = False
 
-        f.suptitle(f"{self.name} -- Regressors, Parameters and Variance", fontsize=18)
+            for yIdxs, regAxRow in zip(yGroups, regAxs):
+                for parIdxs, regAx in zip(parGroups, regAxRow):
+                    for i in yIdxs:
+                        for j in parIdxs:
+                            regAx.plot(timeMs, A[:, i, j], label=self.regNames[i][j])
+                    regAx.legend()
 
-        yAxs[-1].set_xlabel(timeLabel)
-        for regAx in regAxs[-1]:
-            regAx.set_xlabel(timeLabel)
+            f.suptitle(f"{self.name} -- Regressors, Parameters and Variance", fontsize=18)
 
-        return f
+            yAxs[-1].set_xlabel(timeLabel)
+            for regAx in regAxs[-1]:
+                regAx.set_xlabel(timeLabel)
+
+            return f
 
     def plotGains(self):
         # k and e

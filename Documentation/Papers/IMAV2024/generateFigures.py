@@ -24,9 +24,23 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 from cycler import cycler
 
+backupCycle = plt.rcParams['axes.prop_cycle']
+plt.rcParams['axes.prop_cycle'] = cycler(
+    linestyle=['-', '--', '-.', ':', '-', '--', '-.', ':'],
+    color=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f'],
+    )
+
 plt.rcParams.update({
-    "xtick.labelsize": 10,
-    "ytick.labelsize": 10,
+    "text.usetex": True,
+    "font.family": "sans-serif",
+    "axes.grid": True,
+    "axes.grid.which": 'both',
+    "grid.linestyle": '--',
+    "grid.alpha": 0.7,
+    "axes.labelsize": 11,
+    "axes.titlesize": 16,
+    "xtick.labelsize": 11,
+    "ytick.labelsize": 11,
     "legend.loc": 'upper right',
     "legend.fontsize": 9,
     "legend.columnspacing": 1.5,
@@ -40,10 +54,6 @@ plt.rcParams.update({
     'lines.linewidth': 1,
     "axes.formatter.limits": [-2, 3]
 })
-
-backupCycle = plt.rcParams['axes.prop_cycle']
-plt.rcParams['axes.prop_cycle'] = cycler('linestyle', ['-', '--', ':', '-.'])
-
 
 #%% paths setup
 import sys
@@ -66,6 +76,7 @@ args = parser.parse_args()
 
 from LogAnalysis.indiflightLogTools import IndiflightLog, Signal, imuOffsetCorrection
 log = IndiflightLog(path.join(args.dataset, "IMAV2024_ExperimentData", "LOG00472_throwAndFly.BFL"), (1368, 1820))
+logSim = IndiflightLog(path.join(args.dataset, "IMAV2024_SimulationData", "LOG00001.BFL"), (5170, 5770))
 throwsFile = path.join(args.dataset, "IMAV2024_ExperimentData", "LOG00403_pitchRollYaw_throwAndCatch.BFL")
 
 
@@ -131,17 +142,21 @@ for plotid, axis in enumerate(AXES):
                        crop[[f'fx_{axis}_rls_x[{motor}]' for motor in range(4)]])
     axs[2+plotid].set_ylim(bottom=-2e-6, top=2e-6)
     axs[2+plotid].set_ylabel(f"$G_{{1,{axis}}}$")
+    axs[2+plotid].set_xticklabels({})
 #axs[2].legend([f"Motor {i}" for i in range(1,5)], ncol=2, loc="upper left")
 
 axs[5].plot(timeMs,
+            (np.ones_like(timeMs) * np.array([qTrue.w, qTrue.x, qTrue.y, qTrue.z])[:, np.newaxis]).T,
+            linewidth=1.,
+            #linestyle="-",
+            color='black')
+axs[5].set_prop_cycle(None) # reset property cycle
+lines = axs[5].plot(timeMs,
             crop[[f'hoverAttitude[{i}]' for i in range(4)]],
             linewidth=1.5)
-axs[5].plot(timeMs,
-            (np.ones_like(timeMs) * np.array([qTrue.w, qTrue.x, qTrue.y, qTrue.z])[:, np.newaxis]).T,
-            linewidth=1.)
 axs[5].set_ylabel("Thrust Frame $q^T_U$")
 axs[5].set_ylim(bottom=-1.1, top=+1.1)
-axs[5].legend([
+axs[5].legend(lines, [
     "$q_w$",
     "$q_x$",
     "$q_y$",
@@ -154,6 +169,90 @@ axs[-1].set_xlabel("Time [ms]")
 f.savefig(path.join(outputPath, "hoverAttitude.pdf"), format="pdf")
 #plt.show()
 
+
+#%% analyse simulation data
+logSim.resetTime()
+crop = logSim.data
+timeMs = logSim.data['timeMs']
+
+qTrue = Quaternion(scalar=0.924, vector=[+0.383, 0., 0.]).normalised
+r = 1e-3 * np.array([-10., -12., 8.]) # onbaord precision is 1mm
+rIMU = r # in this case IMU was aligned. qTrue refers to the hover direction
+
+omegaRaw = Signal(crop['timeS'], crop[[f'omegaUnfiltered[{i}]' for i in range(6)]])
+gyroRaw = Signal(crop['timeS'], crop[[f'gyroADCafterRpm[{i}]' for i in range(3)]])
+spfRaw = Signal(crop['timeS'], crop[[f'accADCafterRpm[{i}]' for i in range(3)]])
+#spfRawFilt = spfRaw.filter('lowpass', 2, 20.)
+spfRawFilt = Signal(crop['timeS'], crop[[f'accSmooth[{i}]' for i in range(3)]])
+spfRawCor = Signal(crop['timeS'], imuOffsetCorrection(spfRaw.y.copy(), gyroRaw.y, gyroRaw.dot().y, rIMU))
+spfRawCorFilt = spfRawCor.filter('lowpass', 2, 20.)
+
+f = plt.figure(figsize=(8.0, 7.0))
+gs = GridSpec(4, 2, figure=f)
+axs = []
+axs.append(f.add_subplot(gs[:2, 0]))
+axs.append(f.add_subplot(gs[2:, 0]))
+axs.append(f.add_subplot(gs[0, 1]))
+axs.append(f.add_subplot(gs[1, 1]))
+axs.append(f.add_subplot(gs[2, 1]))
+axs.append(f.add_subplot(gs[3, 1]))
+axs02 = axs[0].twinx()
+axs02.grid(False)
+for motor in range(6):
+    axs[0].plot(timeMs,
+        crop[f'motor[{motor}]'],
+        linewidth=1.5,
+        label=f'Motor {motor+1}')
+    axs02.plot(timeMs,
+               omegaRaw.y[:, motor],
+               linewidth=0.75)
+
+axs[0].set_ylabel("Input $u$ [-]")
+axs02.set_ylabel("Speed $\omega$ [rad/s]")
+axs02.set_ylim(bottom=0., top=5e3)
+axs[0].set_ylim(bottom=0., top=1.)
+axs[0].legend(ncol=3, loc="upper right")
+
+#axs[1].plot(timeMs, spfRawFilt.y, linestyle="--")
+AXES = ['x', 'y', 'z']
+axs[1].plot(timeMs, spfRawCor.y)#, linestyle="--")
+#axs[1].plot(timeMs, spfRawCorFilt.y)#, linestyle="-") # aliasing!
+#axs[1].plot(timeMs, spfRawFilt.y)#, linestyle="--")
+axs[1].set_ylabel("Specific Force $f$")
+#axs[1].legend(['x', 'y', 'z', 'x Filt', 'y Filt', 'z Filt'], ncol=2, loc="upper left")
+axs[1].legend(['x', 'y', 'z'], ncol=3, loc="lower left")
+axs[1].set_xlabel("Time [ms]")
+
+
+for plotid, axis in enumerate(AXES):
+    axs[2+plotid].plot(timeMs, 
+                       crop[[f'fx_{axis}_rls_x[{motor}]' for motor in range(6)]])
+    axs[2+plotid].set_ylim(bottom=-1e-6, top=1e-6)
+    axs[2+plotid].set_ylabel(f"$G_{{1,{axis}}}$")
+    axs[2+plotid].set_xticklabels({})
+#axs[2].legend([f"Motor {i}" for i in range(1,5)], ncol=2, loc="upper left")
+
+axs[5].plot(timeMs,
+            (np.ones_like(timeMs) * np.array([qTrue.w, qTrue.x, qTrue.y, qTrue.z])[:, np.newaxis]).T,
+            linewidth=1.,
+            color='black')
+axs[5].set_prop_cycle(None) # reset property cycle
+lines = axs[5].plot(timeMs,
+            crop[[f'hoverAttitude[{i}]' for i in range(4)]],
+            linewidth=1.5)
+axs[5].set_ylabel("Thrust Frame $q^T_U$")
+axs[5].set_ylim(bottom=-1.1, top=+1.1)
+axs[5].legend(lines, [
+    "$q_w$",
+    "$q_x$",
+    "$q_y$",
+    "$q_z$"
+    ], ncol=4, loc="lower left")
+
+axs[-1].set_xlabel("Time [ms]")
+
+f.savefig(path.join(outputPath, "hoverAttitudeSimulated.pdf"), format="pdf")
+#plt.show()
 
 #%% execution time plot
 
@@ -170,10 +269,10 @@ plt.rcParams.update({
     "axes.formatter.limits": [-2, 4]
 })
 
-#log = IndiflightLog(path.join(absPath, "IMAV2024_ExperimentData", "LOG00472.BFL"), (1368, 1820))
+log = IndiflightLog(path.join(args.dataset, "IMAV2024_ExperimentData", "LOG00472_throwAndFly.BFL"), (1050, 1950))
 log.resetTime()
 crop = log.data
-timeMs = log.data['timeMs'] + 1100 - 1368
+timeMs = log.data['timeMs'] - 318
 
 plt.rcParams['axes.prop_cycle'] = backupCycle
 
@@ -327,15 +426,6 @@ q = 0.95
 crit = chi2.ppf(q, DOF)
 
 # Plot the ellipsoid --> chatGPT
-import cycler
-#plt.rcParams['axes.prop_cycle'] = cycler.cycler(
-#    color=[
-#        '#333333',
-#        '#777777',
-#        '#cccccc',
-#        ],
-#    )
-#mpl.rcParams['hatch.linewidth'] = 0.1
 
 fig = plt.figure(figsize=(6,5))
 fig.subplots_adjust(left=0., bottom=0., right=0.92, top=1.)
