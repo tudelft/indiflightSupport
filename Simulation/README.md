@@ -48,12 +48,10 @@ pyndiflight                                                       # Container ta
 NB: logs are not persistent (unless you mount another volume to `:/logs`)
 
 
-### Dev setup using Docker
+### Development setup using Docker
 
 This variant uses a local copy of the `indiflight` source code, which is build
-at container runtime. Furthermore it launches the simulation with `gdbserver`,
-so the `indiflight` c-code can be debugged from within VSCode (or any other 
-debugger than can connect to a `gdbserver`).
+at container runtime.
 
 #### Step 1 -- Build indiflight docker builder
 
@@ -65,6 +63,10 @@ and build the builder container as indicated in its `README.md`.
 **NOTE**: Run all following commands from the root folder of this repo.
 
     docker build . -t pyndiflight-local -f ./Simulation/sil-local.Dockerfile
+
+If you want to debug the indiflight code using GDB, you can use this instead:
+
+    docker build . -t pyndiflight-local-gdb -f ./Simulation/sil-local-gdb.Dockerfile
 
 (rebuild it only when `indiflight` build container or `PyNDIflight` simulation
 code changes)
@@ -85,13 +87,18 @@ Explanation of arguments:
 
 ```
 -it                                                               # ensure proper printing of status bar
--p 5000:5000 -p 3333:3333                                         # Map ports for visualisation and gdb
+-p 5000:5000 -p 3333:3333                                         # Map ports for visualisation and, if used gdbserver
 -v ./Simulation/exampleQuadSim.py:/sim.py                         # Map simulation script into container
 -v ./Simulation/config/exampleINDIflightProfile.txt:/profile.txt  # Map runtime config into container
 -v <path/to/indiflight>:/indiflight                               # Map indiflight into the container
 pyndiflight-local                                                 # Container tag (see build command)
 --throw --learn --sil-log                                         # see ./exampleQuadSim.py --help
 ```
+
+To debug INDIflight, replace `pyndiflight-local` with `pyndiflight-local-gdb`.
+This will launch a `gdbserver` that you can connect to, e.g. from VSCode. In
+the `indiflight` repo, there is a `launch.json` configuration that can be 
+started from within VSCode. 
 
 #### Step 4 -- Connect to the debug server from VSCode
 

@@ -22,6 +22,7 @@ from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter, ArgumentType
 import threading
 import os
 import sys
+import pickle
 
 from PyNDIflight.crafts import MultiRotor, Rotor, IMU
 from PyNDIflight.interfaces import Mocap, IndiflightHIL, IndiflightSITLWrapper, visApp, visData
@@ -122,6 +123,19 @@ if __name__=="__main__":
         # import pdb
         # pdb.set_trace()
         input("Press Enter to continue anyway")
+
+    os.makedirs('./logs', exist_ok=True)
+    with open(f'./logs/copter_00001.pickle', 'wb') as file:
+        G1, G2, Gs = mc.calculateG1G2()
+        pickle.dump({
+            'G1': G1,
+            'G2': G2,
+            'Gs': Gs,
+            'kappas': np.array([r.k for r in mc.rotors]),
+            'taus': np.array([r.tau for r in mc.rotors]),
+            'cms': np.array([r.cm for r in mc.rotors]),
+            'wmax': np.array([r.wmax for r in mc.rotors])
+        }, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
     #%% craft interfaces

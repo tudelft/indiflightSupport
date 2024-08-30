@@ -31,7 +31,7 @@ plt.rcParams['axes.prop_cycle'] = cycler(
     )
 
 plt.rcParams.update({
-    "text.usetex": True,
+    #"text.usetex": True,
     "font.family": "sans-serif",
     "axes.grid": True,
     "axes.grid.which": 'both',
