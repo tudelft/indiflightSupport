@@ -1,5 +1,13 @@
 # PyNDIflight -- Simulation environment for Indiflight
 
+This README is indended to simulate your own crafts with INDIflight.
+
+Additionally, this simulation environment was also used to generate the benchmark data linked below, which was also used in two conference papers. 
+To reproduce these, the [README](README.md#References) of this repo for details.
+
+[![Dataset](http://img.shields.io/badge/Dataset-10.4121/0530be90--cc6c--4029--9774--670657882906-yellow?logo=doi)](http://doi.org/10.4121/0530be90-cc6c-4029-9774-670657882906) T. M. Blaha, E. J. J. Smeur, and B. D. W. Remes "Flight Data of A Quadrotor Launched in the Air while Learning its own Flight Model and Controller" 2024. 4TU.ResearchData repository.
+
+
 ## (partial) Software in the Loop simulation
 
 This variant runs part of the Indiflight code on your local workstation, with 
@@ -16,7 +24,7 @@ Run all commands from the root directory of this repo.
 #### Step 1 -- Build the container:
 
     docker build . -t pyndiflight -f Simulation/sil-githash.Dockerfile \
-        --build-arg COMMIT=baae5515e \
+        --build-arg COMMIT=85e336c1e \
         --build-arg BUILD_CONFIG=./Simulation/config/mockupConfig.mk
 
 - downloads an `indiflight` commit

@@ -20,12 +20,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 [![Github](https://img.shields.io/badge/Github-indiflight_support-blue?logo=github)](https://github.com/tudelft/indiflightSupport)
 [![Github](https://img.shields.io/badge/Github-indiflight-blue?logo=github)](https://github.com/tudelft/indiflight)
 
-
 This mono-repo contains all supporting applications and documentation for 
-the [Indiflight](https://github.com/tudelft/indiflight) project. Also, all code and instructions to reproduce the results from 2 related conference papers are found here:
+the [Indiflight](https://github.com/tudelft/indiflight) project.
 
-1. [![Paper](http://img.shields.io/badge/Paper-arXiv.2405.11723-B3181B?logo=arXiv)](https://arxiv.org/abs/2406.11723) [Documentation/Papers/IROS2024/README.md](Documentation/Papers/IROS2024/README.md)<br>T. M. Blaha, E. J. J. Smeur, and B. D. W. Remes, “Control of Unknown Quadrotors from a Single Throw,” 2024. Accepted at IROS 2024
-2. [![Paper](http://img.shields.io/badge/Paper-in_this_repo-B3181B)](LogAnalysis/IMAV2024/IMAV2024_Fly_with_uncertain_motors_and_IMU_draftSubmission.pdf) [Documentation/Papers/IMAV2024/README.md](Documentation/Papers/IMAV2024/README.md)<br>T. M. Blaha, E. J. J. Smeur, B. D. W. Remes and C. C. de Visser “Flying a Quadrotor with Unknown Actuators and Sensor Configuration,” 2024. Accepted at IMAV 2024
+Also, all code and instructions to reproduce the results from 2 related
+conference papers, and the simulation data in the reslated dataset are found
+here. See the [#References](#References) section of this README.
 
 
 ## Description
@@ -57,7 +57,10 @@ See the individual `README.md`s for more details.
 
 ## History
 
-* 2024-08-27 0.0.1 First Release
+| Data       | Version              | Notes                                             |
+|------------|----------------------|---------------------------------------------------|
+| 2024-08-27 | 0.0.1                | First Release                                     |
+| 2024-09-02 | 0.0.2/iros_imav_2024 | Improved README for reproduction of these papers. |
 
 
 ## Authors
@@ -70,6 +73,23 @@ t.m.blaha - @ - tudelft.nl
 )
 * Robin Ferede [@robinferede](https://github.com/robinferede) (Delft University of Technology)
 * Stavrow Bahnam   [@sbahnam](https://github.com/sbahnam) (Delft University of Technology)
+
+
+## References
+
+1. [![Paper](http://img.shields.io/badge/Paper-arXiv.2405.11723-B3181B?logo=arXiv)](https://arxiv.org/abs/2406.11723) [Documentation/Papers/IROS2024/README.md](Documentation/Papers/IROS2024/README.md)<br>T. M. Blaha, E. J. J. Smeur, and B. D. W. Remes, “Control of Unknown Quadrotors from a Single Throw,” 2024. Accepted at IROS 2024
+2. [![Paper](http://img.shields.io/badge/Paper-in_this_repo-B3181B)](LogAnalysis/IMAV2024/IMAV2024_Fly_with_uncertain_motors_and_IMU_draftSubmission.pdf) [Documentation/Papers/IMAV2024/README.md](Documentation/Papers/IMAV2024/README.md)<br>T. M. Blaha, E. J. J. Smeur, B. D. W. Remes and C. C. de Visser “Flying a Quadrotor with Unknown Actuators and Sensor Configuration,” 2024. Accepted at IMAV 2024
+3. [![Dataset](http://img.shields.io/badge/Dataset-10.4121/0530be90--cc6c--4029--9774--670657882906-yellow?logo=doi)](http://doi.org/10.4121/0530be90-cc6c-4029-9774-670657882906)<br>T. M. Blaha, E. J. J. Smeur, and B. D. W. Remes "Flight Data of A Quadrotor Launched in the Air while Learning its own Flight Model and Controller" 2024. 4TU.ResearchData repository.
+
+For reproduction of the dataset, and the figures in the papers, checkout the [iros_imav_2024](https://github.com/tudelft/indiflightSupport/tree/iros_imav_2024) tag of this repo and visit the [Documentation/Papers](Documentation/Papers/) directory.
+
+## Citation
+
+A snapshot of this repository in the state used to generate the data in the 
+above mentioned papers can be found here:
+
+[![Code Snapshot](http://img.shields.io/badge/Dataset-10.4121/a5fa60a7--805c--4e13--a65e--1c65454eaa53-yellow?logo=doi)](http://doi.org/10.4121/a5fa60a7-805c-4e13-a65e-1c65454eaa53)<br>T. M. Blaha "Multirotor HIL/SIL Simulation and additional tools for INDIflight" 2024. 4TU.ResearchData repository.
+
 
 ## License
 
@@ -86,9 +106,6 @@ Henri Werij, Dean of the Faculty of Aerospace Engineering
 
 © 2024, The Indiflight Support Authors
 
-## Citation
-
-TBD
 
 ## Related Projects
 
