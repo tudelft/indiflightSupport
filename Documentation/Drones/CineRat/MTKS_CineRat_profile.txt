@@ -385,14 +385,14 @@ indiprofile 2
 set indi_act_num = 4
 # set indi_attitude_gains = 1552,1552,1552
 # set indi_rate_gains = 174,174,174
-set indi_attitude_max_tilt_rate = 500
+set indi_attitude_max_tilt_rate = 700
 set indi_attitude_max_yaw_rate = 300
 set indi_manual_use_coordinated_yaw = 1
 set indi_manual_max_upwards_accel = 20
 # set indi_act_time_constant_ms = 22,21,21,21,25,25,25,25
 # set indi_act_max_rpm = 32757,28254,34458,35347,40000,40000,40000,40000
 # set indi_act_hover_rpm = 16378,14127,17229,17673,20000,20000,20000,20000
-set indi_act_limit = 100,100,100,100,100,100,100,100
+set indi_act_limit = 55,55,55,55,100,100,100,100
 
 # -- roll -56, pitch 81, yaw 170
 set indi_act_g1_fx = -1037, -1037, -1037, -1037
@@ -416,9 +416,9 @@ positionprofile 0
 set position_horizontal_p = 30
 set position_horizontal_i = 2
 set position_horizontal_d = 30
-set position_max_horizontal_speed = 2000
-set position_max_horizontal_accel = 10000
-set position_max_tilt = 180
+set position_max_horizontal_speed = 200
+set position_max_horizontal_accel = 700
+set position_max_tilt = 45
 set position_vertical_p = 50
 set position_vertical_i = 5
 set position_vertical_d = 40
@@ -443,9 +443,9 @@ positionprofile 2
 # set position_horizontal_p = 63
 # set position_horizontal_i = 4
 # set position_horizontal_d = 45
-set position_max_horizontal_speed = 500
-set position_max_horizontal_accel = 500
-set position_max_tilt = 40
+set position_max_horizontal_speed = 200
+set position_max_horizontal_accel = 700
+set position_max_tilt = 45
 # set position_vertical_p = 63
 # set position_vertical_i = 4
 # set position_vertical_d = 45
