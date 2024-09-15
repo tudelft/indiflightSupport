@@ -7,14 +7,14 @@ from scipy.spatial.transform import Rotation as R
 
 #%% toplevel
 
-f = 10.
+f = 100.
 dt = 1. / f
 T = 10.
 N = int(f*T + 0.5)
-accNoise = 0 * 0.5
-velNoise = 0 * 0.3
-#rot = np.array([200., -100., -50.]) / 180. * np.pi
-rot = np.array([0., 0., 0.]) / 180. * np.pi
+accNoise = 1.
+velNoise = 1 * 0.3
+rot = np.array([200., -100., -50.]) / 180. * np.pi
+#rot = np.array([0., 0., 0.]) / 180. * np.pi
 G = 9.81
 
 #%% generate data
@@ -88,26 +88,33 @@ acc_noise = acc_hist + np.random.normal(0, accNoise, (N+1, 3))
 vNED_noise = vNED_hist + np.random.normal(0, velNoise, (N+1, 3))
 for i in range(N):
     aqMeas = quaternion.rotate_vectors(qMeas_hist[i], acc_hist[i])
-    PsiEst = xkk[2]
+    xiEst = xkk[2]
     xk1k = xkk + dt * np.array([
-        [np.cos(PsiEst), +np.sin(PsiEst)],
-        [-np.sin(PsiEst),  np.cos(PsiEst)],
+        [np.cos(xiEst), +np.sin(xiEst)],
+        [-np.sin(xiEst),  np.cos(xiEst)],
         [0., 0.],
     ]) @ aqMeas[:2]
+
+    # kalman gain and Pkk estimation is completely meaningless for the very
+    # nonlinear influence of PsiEst, so we handle this separately
+
     #xk1k[:2] += 0.01 * ( np.random.random() - 0.5 )
     F = np.eye(3)
-    F[0, 2] = dt * ( -aqMeas[0] * np.sin(PsiEst) + aqMeas[1] * np.cos(PsiEst) )
-    F[1, 2] = dt * ( -aqMeas[0] * np.cos(PsiEst) - aqMeas[1] * np.sin(PsiEst) )
+    #F[0, 2] = dt * ( -aqMeas[0] * np.sin(xiEst) + aqMeas[1] * np.cos(xiEst) )
+    #F[1, 2] = dt * ( -aqMeas[0] * np.cos(xiEst) - aqMeas[1] * np.sin(xiEst) )
     H = np.eye(2, 3)
-    Q = np.diag([1., 1., 1.])
-    Rk = 1. * np.diag([1., 1.])
+    Q = np.diag([1., 1., 0.1])
+    Rk = 10. * np.diag([1., 1.])
 
     Pk1k = F @ Pkk @ F.T + Q
     z = vNED_noise[i][:2]
-    y = z - H @ xk1k
+    zhat = H @ xk1k
+    y = z - zhat
     S = H @ Pk1k @ H.T + Rk
     K = Pk1k @ H.T @ np.linalg.inv(S)
     xkk = xk1k + K @ y
+    deltaXi = np.arctan2(z[1], z[0]) - np.arctan2(zhat[1], zhat[0])
+    xkk[2] -= 0.1*np.linalg.norm(y)**2*deltaXi
     Pkk = Pk1k - K @ H @ Pk1k
 
     y_hist[i+1] = y.copy()
@@ -121,16 +128,23 @@ plt.close()
 f, axs = plt.subplots(5, 1)
 axs[0].plot(np.linspace(0, T, N+1), acc_noise[:, :2])
 axs[0].plot(np.linspace(0, T, N+1), acc_hist[:, :2])
+axs[0].set_ylabel("Acceleration")
 
 axs[1].plot(np.linspace(0, T, N+1), vNED_noise[:, :2])
 axs[1].plot(np.linspace(0, T, N+1), vNED_hist[:, :2])
+axs[1].set_ylabel("Velocity")
 
 #axs[2].plot(np.linspace(0, T, N+1), vNED_hist[:, :2])
 axs[2].plot(np.linspace(0, T, N+1), yaw_0*np.ones(N+1))
 axs[2].plot(np.linspace(0, T, N+1), xkk_hist[:, :])
+axs[2].set_ylabel("State and yaw GT")
 
 axs[3].plot(np.linspace(0, T, N+1), y_hist)
+axs[3].set_ylabel("Innovation")
 
 axs[4].plot(np.linspace(0, T, N+1), np.array([np.diag(P) for P in Pkk_hist]))
+axs[4].set_yscale('log')
+axs[4].set_ylabel("Covariance")
+axs[4].set_xlabel("time [s]")
 
 f.show()

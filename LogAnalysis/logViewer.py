@@ -1,4 +1,5 @@
 from dash import Dash, dcc, html, Input, Output
+from plotly.colors import DEFAULT_PLOTLY_COLORS as COLORS
 import plotly.graph_objs as go
 from plotly_resampler import FigureResampler
 import numpy as np
@@ -75,10 +76,10 @@ if __name__=="__main__":
     fig = FigureResampler(go.Figure(layout=theLayout))
     fig.register_update_graph_callback(app, "shared-x-graph")
     for i in range(3):
-        fig.add_trace(go.Scattergl(mode='lines', name="Gyro", xaxis="x", yaxis=f"y1"),
+        fig.add_trace(go.Scattergl(mode='lines', line={'color': COLORS[i]}, name="Gyro", xaxis="x", yaxis=f"y1"),
             hf_x=time_ms, hf_y=log.data[f"gyroADCafterRpm[{i}]"])
     for i in range(3):
-        fig.add_trace(go.Scattergl(mode='lines', name="Acc", xaxis="x", yaxis=f"y2"),
+        fig.add_trace(go.Scattergl(mode='lines', line={'color': COLORS[i]}, name="Acc", xaxis="x", yaxis=f"y2"),
             hf_x=time_ms, hf_y=log.data[f"accADCafterRpm[{i}]"])
 
     newTab.children.append(

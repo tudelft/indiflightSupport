@@ -226,7 +226,7 @@ class MultiRotor:
             down = self.vI[2] > 0.
             F += (1000 if down else 1000)  * self.m * quatRotate( qInv, np.array([0., 0., -1.], dtype=np.float32) * self.xI )
             F += (100  if down else 1) * self.m * quatRotate( qInv, -self.vI )
-            M += 1000 * self.I @ ( np.sign(qInv[0]) * qInv[1:] )
+            M[:2] += 1000 * (self.I @ ( np.sign(qInv[0]) * qInv[1:] ))[:2]
             M += 100 * self.I @ -self.wB
 
         # throw timekeeping and add external force and moment

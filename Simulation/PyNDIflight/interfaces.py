@@ -139,6 +139,8 @@ class IndiflightSITLWrapper():
 
 #%% hardware in the loop interface
 
+import serial
+
 class IndiflightHIL:
     # serial interface with an INDIflight controller compiled with HIL_BUILD
     HIL_TO_DEGS = 0.1

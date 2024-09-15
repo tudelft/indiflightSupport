@@ -133,7 +133,8 @@ if __name__=="__main__":
 
 
     #%% initial conditions
-    mc.setPose(x=[0., 0., -0.1], q=[1., 0., 0., 0.])
+    a = 0. * np.pi / 180.
+    mc.setPose(x=[0., 0., -0.1], q=[np.cos(0.5*a), 0., 0., np.sin(0.5*a)])
     mc.setTwist(v=[0., 0., 0.], w=[0., 0., 0.])
 
     sim = Sim(mc, imu, mocap, hil, sil)
@@ -148,7 +149,7 @@ if __name__=="__main__":
         mc.throw(height=4.,
                  wB=[2., -4., 3.], # approx body rotation in rad/s
                  vHorz=[1., -2.], # final speed in x-y-plane in m/s
-                 at_time=1.)
+                 at_time=5.)
 
 
     #%% run loop
