@@ -141,7 +141,7 @@ feature TELEMETRY
 
 # serial
 #serial 0 64 115200 57600 0 115200 # RC
-#serial 3 2 115200 115200 0 115200 # GPS
+serial 3 2 115200 115200 0 115200 # GPS
 serial 1 262144 115200 57600 0 115200
 serial 4 0 115200 57600 0 115200
 serial 5 64 115200 57600 0 115200 # RC
@@ -226,6 +226,7 @@ set gps_provider = UBLOX
 set gps_auto_baud = ON
 set gps_update_rate_hz = 15
 set gps_ublox_use_galileo = ON
+set gps_set_home_point_once = ON
 
 # ekf (these are the defaults)
 set ekf_use_attitude_estimate = 1
