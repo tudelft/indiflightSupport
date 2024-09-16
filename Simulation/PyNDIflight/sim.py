@@ -48,7 +48,7 @@ class Sim():
         if not (self.i % 20): # 100 Hz
             visData.update(self.uav)
         if not (self.i % 100): # 20 Hz
-            self.mocap.update() if self.mocap else None
+            self.mocap.update(self.t+dt) if self.mocap else None
             self.sil.sendMocap() if self.sil else None
 
         self.t += dt

@@ -106,7 +106,7 @@ if __name__=="__main__":
     #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
     imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
 
-    mocap = Mocap(mc, args.mocap_host, args.mocap_port) if args.mocap else None
+    mocap = Mocap(mc, args.mocap_host, args.mocap_port, delay=0.15) if args.mocap else None
     hil = IndiflightHIL(mc, imu, device=args.hil, baud=args.hil_baud) if args.hil else None
     sil = IndiflightSITLWrapper(mc, imu, args.sil, N=len(mc.rotors)) if args.sil else None
 
@@ -149,7 +149,7 @@ if __name__=="__main__":
         mc.throw(height=4.,
                  wB=[2., -4., 3.], # approx body rotation in rad/s
                  vHorz=[1., -2.], # final speed in x-y-plane in m/s
-                 at_time=5.)
+                 at_time=8.)
 
 
     #%% run loop

@@ -236,7 +236,7 @@ set ekf_proc_noise_acc       = 500000, 500000, 500000
 set ekf_proc_noise_gyro      = 100000, 100000, 100000
 set ekf_proc_noise_acc_bias  = 20, 20, 20
 set ekf_proc_noise_gyro_bias = 10, 10, 10
-set ekf_meas_noise_position  = 5000, 5000, 40000
+set ekf_meas_noise_position  = 10000, 10000, 40000
 set ekf_meas_noise_quat      = 50000, 50000, 50000, 50000
 set ekf_meas_delay = 0
 
@@ -273,7 +273,7 @@ set learner_fx_lowpass_hz = 20
 set learner_motor_lowpass_hz = 40
 set learner_zeta_rate = 90
 set learner_zeta_attitude = 80
-set learner_zeta_velocity = 70
+set learner_zeta_velocity = 90
 set learner_zeta_position = 90
 # new stuff
 set learner_roll_misalignment = -64

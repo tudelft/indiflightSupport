@@ -85,30 +85,49 @@ log.setLevel(logging.WARNING)
 
 #%% emulate mocap (Motion Capture) server
 
+from collections import deque
+
 class Mocap:
     # emulate motion capture system and send data via UDP
-    def __init__(self, uav, ip="127.0.0.1", port=5005):
+    def __init__(self, uav, ip="127.0.0.1", port=5005, delay=0.):
         self.uav = uav
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.addr = (ip, port)
         self.fmt = '<I Qfff ffff QIfff fff'
+        self.ts = deque(maxlen=20)
+        self.xs = deque(maxlen=20) # 20 / 20Hz = 1. sec max delay
+        self.vs = deque(maxlen=20) # 20 / 20Hz = 1. sec max delay
+        self.qs = deque(maxlen=20) # 20 / 20Hz = 1. sec max delay
+        self.ws = deque(maxlen=20) # 20 / 20Hz = 1. sec max delay
         self.x = np.zeros(3, dtype=np.float32)
         self.v = np.zeros(3, dtype=np.float32)
         self.q = np.zeros(4, dtype=np.float32)
         self.q[0] = 1.
         self.w = np.zeros(3, dtype=np.float32)
+        self.delay = delay
 
-    def update(self):
-        self.x[:] = self.uav.xI
-        self.v[:] = self.uav.vI
+    def update(self, time):
+        self.ts.append(time)
+        self.xs.append(self.uav.xI.copy())
+        self.vs.append(self.uav.vI.copy())
         self.q[3] = self.uav.q[0] # also reverse order...
         self.q[0] = self.uav.q[1]
         self.q[1] = self.uav.q[2]
         self.q[2] = self.uav.q[3]
+        self.qs.append(self.q.copy())
         self.w[0] = 666.
+        self.ws.append(self.w.copy())
 
-        msg_packed = struct.pack(self.fmt, 0, 0, *self.x, *self.q, 0, 0, *self.v, *self.w)
-        self.sock.sendto(msg_packed, self.addr)
+        # grab last elements smaller than time - delay
+        idx = np.array(self.ts).searchsorted(time - self.delay)
+        if idx >= 0 and idx < 20:
+            msg_packed = struct.pack(self.fmt, 0, 0, 
+                *self.xs[idx],
+                *self.qs[idx], 0, 0, 
+                *self.vs[idx],
+                *self.ws[idx])
+
+            self.sock.sendto(msg_packed, self.addr)
 
 
 #%% software in the loop interface
