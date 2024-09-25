@@ -104,27 +104,28 @@ class IndiflightLog(object):
                 case 27: return "3D"
                 case 28: return "FPVANGLEMIX"
                 case 29: return "BLACKBOXERASE"
-                case 30: return "CAMERA1"
-                case 31: return "CAMERA2"
-                case 32: return "CAMERA3"
-                case 33: return "FLIPOVERAFTERCRASH"
-                case 34: return "PREARM"
-                case 35: return "THROWTOARM"
-                case 36: return "BEEPGPSCOUNT"
-                case 37: return "VTXPITMODE"
-                case 38: return "PARALYZE"
-                case 39: return "USER1"
-                case 40: return "USER2"
-                case 41: return "USER3"
-                case 42: return "USER4"
-                case 43: return "PIDAUDIO"
-                case 44: return "ACROTRAINER"
-                case 45: return "VTXCONTROLDISABLE"
-                case 46: return "LAUNCHCONTROL"
-                case 47: return "MSPOVERRIDE"
-                case 48: return "STICKCOMMANDDISABLE"
-                case 49: return "BEEPERMUTE"
-                case 50: return "READY"
+                case 30: return "RESETHOME"
+                case 31: return "CAMERA1"
+                case 32: return "CAMERA2"
+                case 33: return "CAMERA3"
+                case 34: return "FLIPOVERAFTERCRASH"
+                case 35: return "PREARM"
+                case 36: return "THROWTOARM"
+                case 37: return "BEEPGPSCOUNT"
+                case 38: return "VTXPITMODE"
+                case 39: return "PARALYZE"
+                case 40: return "USER1"
+                case 41: return "USER2"
+                case 42: return "USER3"
+                case 43: return "USER4"
+                case 44: return "PIDAUDIO"
+                case 45: return "ACROTRAINER"
+                case 46: return "VTXCONTROLDISABLE"
+                case 47: return "LAUNCHCONTROL"
+                case 48: return "MSPOVERRIDE"
+                case 49: return "STICKCOMMANDDISABLE"
+                case 50: return "BEEPERMUTE"
+                case 51: return "READY"
 
         try:
             return [single(bit) for bit in bits]
@@ -290,7 +291,7 @@ class IndiflightLog(object):
             elif re.match(r'^motor\[[0-9]+\]$', col):
                 data[col] -= self.DSHOT_MIN
                 data[col] /= (self.DSHOT_MAX - self.DSHOT_MIN)
-            elif col.startswith('quat'):
+            elif col.startswith('quat') or col.startswith('extQuat') or col.startswith('ekf_quat'):
                 data[col] /= self.UNIT_FLOAT_TO_SIGNED16VB
             elif col.startswith('alpha'):
                 data[col] /= self.RADIANS_TO_DECADEGREES
