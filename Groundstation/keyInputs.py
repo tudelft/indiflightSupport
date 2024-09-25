@@ -59,6 +59,9 @@ def main(stdscr, sock, host, port):
     stdscr.addstr("Press keys to see their HID codes. Press ESC to exit.\n")
     info = '''
 0 = go to center
+p = go to above nn_init
+t = takeoff
+s = set waypoint here
 1 = initTrajectoryTracker
 2 = decrease speed by 0.5 m/s
 3 = increase speed by 0.5 m/s
