@@ -232,8 +232,6 @@ set beeper_inversion = ON
 set beeper_od = OFF
 set beeper_frequency = 2500
 set simplified_gyro_filter_multiplier = 40
-set ekf_use_attitude_estimate = 1
-set ekf_use_position_estimate = 1
 set nn_rate_denom = 2
 set sdio_use_4bit_width = ON
 set sdio_device = 1
@@ -255,6 +253,21 @@ set gyro_2_spibus = 4
 set gyro_2_sensor_align = CW180
 set gyro_2_align_yaw = 1800
 set rpm_filter_min_hz = 60
+
+
+### NEW QUATERNIN EKF CONFIG
+# ekf (good for optitrack with quaternion information)
+set ekf_use_attitude_estimate = 1
+set ekf_use_position_estimate = 1
+set ekf_use_quat = 1
+set ekf_proc_noise_acc       = 500000, 500000, 500000
+set ekf_proc_noise_gyro      = 100000, 100000, 100000
+set ekf_proc_noise_acc_bias  = 10, 10, 10
+set ekf_proc_noise_gyro_bias = 5, 5, 5
+set ekf_meas_noise_position  = 1000, 1000, 1000
+set ekf_meas_noise_quat      = 50000, 50000, 50000, 50000
+set ekf_meas_delay = 0
+
 
 profile 0
 
