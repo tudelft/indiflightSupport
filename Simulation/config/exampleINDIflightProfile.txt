@@ -31,7 +31,7 @@ set blackbox_disable_rssi = ON
 set blackbox_disable_debug = ON
 set blackbox_disable_indi = OFF
 set blackbox_disable_pos = OFF
-set blackbox_disable_ekf = ON
+set blackbox_disable_ekf = OFF
 set blackbox_disable_learner = OFF
 set blackbox_high_resolution = ON
 set blackbox_sample_rate = 1/4
@@ -57,14 +57,17 @@ set gyro_1_align_yaw = 1800
 set rpm_filter_min_hz = 60
 
 # ekf (these are the defaults)
-#set ekf_use_attitude_estimate = 0
-#set ekf_use_position_estimate = 0
-#set ekf_use_angles = 1, 1, 1
-#set ekf_proc_noise_acc = 5000, 5000, 5000
-#set ekf_proc_noise_gyro = 1000, 1000, 1000
-#set ekf_meas_noise_position = 10, 10, 10
-#set ekf_meas_noise_angles = 100, 100, 100
-#set ekf_meas_delay = 0
+# ekf (good for optitrack with quaternion information)
+set ekf_use_attitude_estimate = 1
+set ekf_use_position_estimate = 1
+set ekf_use_quat = 1
+set ekf_proc_noise_acc       = 500000, 500000, 500000
+set ekf_proc_noise_gyro      = 100000, 100000, 100000
+set ekf_proc_noise_acc_bias  = 0, 0, 0
+set ekf_proc_noise_gyro_bias = 0, 0, 0
+set ekf_meas_noise_position  = 1000, 1000, 1000
+set ekf_meas_noise_quat      = 50000, 50000, 50000, 50000
+set ekf_meas_delay = 0
 
 set catapult_target_altitude = 350
 set catapult_target_x_ned = 0
