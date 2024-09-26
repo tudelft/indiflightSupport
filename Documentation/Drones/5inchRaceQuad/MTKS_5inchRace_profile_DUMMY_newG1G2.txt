@@ -1,0 +1,360 @@
+defaults nosave
+
+###WARNING: NO CUSTOM DEFAULTS FOUND###
+
+# version
+# Indiflight / STM32H743 (SH74) 5.0.0 Sep 24 2024 / 20:29:34 (069b4c5d6) MSP API: 1.45
+###ERROR IN diff: NO CONFIG FOUND###
+# start the command batch
+batch start
+
+# reset configuration to default settings
+defaults nosave
+
+board_name MATEKH743
+manufacturer_id MTKS
+mcu_id 004e00283133510f32373636
+signature 
+
+# resources
+resource BEEPER 1 A15
+resource MOTOR 1 B00
+resource MOTOR 2 B01
+resource MOTOR 3 A00
+resource MOTOR 4 A01
+resource MOTOR 5 A02
+resource MOTOR 6 A03
+resource MOTOR 7 D12
+resource MOTOR 8 D13
+resource LED_STRIP 1 A08
+resource SERIAL_TX 1 A09
+resource SERIAL_TX 2 D05
+resource SERIAL_TX 3 D08
+resource SERIAL_TX 4 B09
+resource SERIAL_TX 6 C06
+resource SERIAL_TX 7 E08
+resource SERIAL_TX 8 E01
+resource SERIAL_RX 1 A10
+resource SERIAL_RX 2 D06
+resource SERIAL_RX 3 D09
+resource SERIAL_RX 4 B08
+resource SERIAL_RX 6 C07
+resource SERIAL_RX 7 E07
+resource SERIAL_RX 8 E00
+resource I2C_SCL 1 B06
+resource I2C_SCL 2 B10
+resource I2C_SDA 1 B07
+resource I2C_SDA 2 B11
+resource LED 1 E03
+resource LED 2 E04
+resource SPI_SCK 1 A05
+resource SPI_SCK 2 B13
+resource SPI_SCK 3 B03
+resource SPI_SCK 4 E12
+resource SPI_MISO 1 A06
+resource SPI_MISO 2 B14
+resource SPI_MISO 3 B04
+resource SPI_MISO 4 E13
+resource SPI_MOSI 1 D07
+resource SPI_MOSI 2 B15
+resource SPI_MOSI 3 B05
+resource SPI_MOSI 4 E14
+resource ADC_BATT 1 C00
+resource ADC_RSSI 1 C05
+resource ADC_CURR 1 C01
+resource ADC_EXT 1 C04
+resource SDIO_CK 1 C12
+resource SDIO_CMD 1 D02
+resource SDIO_D0 1 C08
+resource SDIO_D1 1 C09
+resource SDIO_D2 1 C10
+resource SDIO_D3 1 C11
+resource PINIO 1 D10
+resource PINIO 2 D11
+resource OSD_CS 1 B12
+resource GYRO_EXTI 1 B02
+resource GYRO_EXTI 2 E15
+resource GYRO_CS 1 C15
+resource GYRO_CS 2 E11
+
+# timer
+timer B00 AF2
+# pin B00: TIM3 CH3 (AF2)
+timer B01 AF2
+# pin B01: TIM3 CH4 (AF2)
+timer A00 AF2
+# pin A00: TIM5 CH1 (AF2)
+timer A01 AF2
+# pin A01: TIM5 CH2 (AF2)
+timer A02 AF2
+# pin A02: TIM5 CH3 (AF2)
+timer A03 AF2
+# pin A03: TIM5 CH4 (AF2)
+timer D12 AF2
+# pin D12: TIM4 CH1 (AF2)
+timer D13 AF2
+# pin D13: TIM4 CH2 (AF2)
+timer D14 AF2
+# pin D14: TIM4 CH3 (AF2)
+timer D15 AF2
+# pin D15: TIM4 CH4 (AF2)
+timer E05 AF4
+# pin E05: TIM15 CH1 (AF4)
+timer E06 AF4
+# pin E06: TIM15 CH2 (AF4)
+timer A08 AF1
+# pin A08: TIM1 CH1 (AF1)
+timer A15 AF1
+# pin A15: TIM2 CH1 (AF1)
+timer C07 AF3
+# pin C07: TIM8 CH2 (AF3)
+timer C06 AF3
+# pin C06: TIM8 CH1 (AF3)
+timer B08 AF1
+# pin B08: TIM16 CH1 (AF1)
+timer B09 AF1
+# pin B09: TIM17 CH1 (AF1)
+
+# dma
+dma ADC 1 8
+# ADC 1: DMA2 Stream 0 Request 9
+dma ADC 3 9
+# ADC 3: DMA2 Stream 1 Request 115
+dma TIMUP 1 0
+# TIMUP 1: DMA1 Stream 0 Request 15
+dma TIMUP 2 0
+# TIMUP 2: DMA1 Stream 0 Request 22
+dma TIMUP 3 2
+# TIMUP 3: DMA1 Stream 2 Request 27
+dma TIMUP 4 1
+# TIMUP 4: DMA1 Stream 1 Request 32
+dma TIMUP 5 0
+# TIMUP 5: DMA1 Stream 0 Request 59
+dma TIMUP 8 0
+# TIMUP 8: DMA1 Stream 0 Request 51
+dma pin B00 0
+# pin B00: DMA1 Stream 0 Request 25
+dma pin B01 1
+# pin B01: DMA1 Stream 1 Request 26
+dma pin A00 2
+# pin A00: DMA1 Stream 2 Request 55
+dma pin A01 3
+# pin A01: DMA1 Stream 3 Request 56
+dma pin A02 4
+# pin A02: DMA1 Stream 4 Request 57
+dma pin A03 5
+# pin A03: DMA1 Stream 5 Request 58
+dma pin D12 6
+# pin D12: DMA1 Stream 6 Request 29
+dma pin D13 7
+# pin D13: DMA1 Stream 7 Request 30
+dma pin D14 12
+# pin D14: DMA2 Stream 4 Request 31
+dma pin E05 0
+# pin E05: DMA1 Stream 0 Request 105
+dma pin A08 14
+# pin A08: DMA2 Stream 6 Request 11
+dma pin A15 0
+# pin A15: DMA1 Stream 0 Request 18
+dma pin C07 0
+# pin C07: DMA1 Stream 0 Request 48
+dma pin C06 0
+# pin C06: DMA1 Stream 0 Request 47
+dma pin B08 0
+# pin B08: DMA1 Stream 0 Request 109
+dma pin B09 0
+# pin B09: DMA1 Stream 0 Request 111
+
+# feature
+feature TELEMETRY
+feature OSD
+
+# serial
+serial 1 262144 115200 57600 0 115200
+serial 7 64 115200 57600 0 115200
+
+# beeper
+beeper -GYRO_CALIBRATED
+beeper -RX_LOST_LANDING
+beeper -DISARMING
+beeper -ARMING
+beeper -ARMING_GPS_FIX
+beeper -GPS_STATUS
+beeper -RX_SET
+beeper -ACC_CALIBRATION
+beeper -ACC_CALIBRATION_FAIL
+beeper -DISARM_REPEAT
+beeper -ARMED
+beeper -SYSTEM_INIT
+beeper -ON_USB
+beeper -BLACKBOX_ERASE
+beeper -CRASH_FLIP
+beeper -CAM_CONNECTION_OPEN
+beeper -CAM_CONNECTION_CLOSE
+beeper -RC_SMOOTHING_INIT_FAIL
+
+# map
+map TAER1234
+
+# aux
+aux 0 0 4 900 1300 0 0
+aux 1 1 5 1300 1700 0 0
+aux 2 27 0 1700 2100 0 0
+aux 3 55 5 900 1300 0 0
+aux 4 60 1 900 1300 0 0
+aux 5 36 2 1700 2100 0 0
+
+# master
+set gyro_lpf1_static_hz = 100
+set gyro_lpf2_static_hz = 0
+set dyn_notch_count = 0
+set dyn_notch_q = 500
+set gyro_lpf1_dyn_min_hz = 0
+set gyro_lpf1_dyn_max_hz = 250
+set acc_calibration = 0,0,0,1
+set serialrx_provider = SBUS
+set blackbox_sample_rate = 1/2
+set blackbox_device = SDCARD
+set blackbox_disable_pids = ON
+set blackbox_disable_setpoint = ON
+set blackbox_disable_rssi = ON
+set blackbox_disable_debug = ON
+set blackbox_high_resolution = ON
+set dshot_bidir = ON
+set motor_pwm_protocol = DSHOT600
+set motor_output_reordering = 1,0,3,2,4,5,6,7
+set failsafe_delay = 5
+set failsafe_switch_mode = KILL
+set current_meter = ADC
+set battery_meter = ADC
+set ibata_scale = 280
+set beeper_inversion = ON
+set beeper_od = OFF
+set beeper_frequency = 2500
+set simplified_gyro_filter_multiplier = 40
+set nn_rate_denom = 2
+set sdio_use_4bit_width = ON
+set sdio_device = 1
+set osd_rssi_pos = 2080
+set osd_ah_sbar_pos = 2286
+set osd_ah_pos = 2158
+set osd_mah_drawn_pos = 2432
+set osd_avg_cell_voltage_pos = 2456
+set osd_rtc_date_time_pos = 2091
+set osd_log_status_pos = 2444
+set osd_canvas_width = 30
+set osd_canvas_height = 13
+set max7456_spi_bus = 2
+set pinio_box = 40,41,255,255
+set gyro_1_spibus = 1
+set gyro_1_sensor_align = CW180
+set gyro_1_align_yaw = 1800
+set gyro_2_spibus = 4
+set gyro_2_sensor_align = CW180
+set gyro_2_align_yaw = 1800
+set rpm_filter_min_hz = 60
+
+
+### NEW QUATERNIN EKF CONFIG
+# ekf (good for optitrack with quaternion information)
+set ekf_use_attitude_estimate = 1
+set ekf_use_position_estimate = 1
+set ekf_use_quat = 1
+set ekf_proc_noise_acc       = 500000, 500000, 500000
+set ekf_proc_noise_gyro      = 100000, 100000, 100000
+set ekf_proc_noise_acc_bias  = 10, 10, 10
+set ekf_proc_noise_gyro_bias = 5, 5, 5
+set ekf_meas_noise_position  = 1000, 1000, 1000
+set ekf_meas_noise_quat      = 50000, 50000, 50000, 50000
+set ekf_meas_delay = 0
+
+
+profile 0
+
+# profile 0
+set dterm_lpf1_static_hz = 0
+set dterm_lpf2_static_hz = 0
+set yaw_lowpass_hz = 0
+set thrust_linear = 55
+set simplified_dterm_filter = OFF
+
+profile 1
+
+profile 2
+
+profile 3
+
+rateprofile 0
+
+rateprofile 1
+
+rateprofile 2
+
+rateprofile 3
+
+indiprofile 0
+
+# indiprofile 0  # from Robin identification code, g1 yaw may be wonky
+set indi_attitude_gains = 2000,2000,2000
+set indi_attitude_max_yaw_rate = 500
+set indi_act_time_constant_ms = 30,30,30,30,25,25,25,25
+set indi_act_max_rpm = 20000,20000,20000,20000,40000,40000,40000,40000
+set indi_act_hover_rpm = 8000,8000,8000,8000,20000,20000,20000,20000
+set indi_act_nonlinearity = 40,40,40,40,50,50,50,50
+set indi_act_g1_fz = -2170,-2170,-2170,-2170,0,0,0,0
+set indi_act_g1_roll = -6189,-5833,5900,5945,0,0,0,0
+set indi_act_g1_pitch = -3900,5174,-4503,4257,0,0,0,0
+set indi_act_g1_yaw = -1646,1646,1646,-1646,0,0,0,0
+set indi_act_g2_yaw = -187,187,187,-187,0,0,0,0
+
+indiprofile 1
+
+indiprofile 2
+
+# indiprofile 2
+set indi_attitude_max_tilt_rate = 500
+set indi_attitude_max_yaw_rate = 300
+set indi_manual_max_upwards_accel = 20
+set indi_act_limit = 60,60,60,60,100,100,100,100
+
+positionprofile 0
+
+# positionprofile 0
+set position_horizontal_p = 70
+set position_horizontal_i = 5
+set position_horizontal_d = 50
+set position_max_horizontal_speed = 2000
+set position_max_horizontal_accel = 15000
+set position_max_tilt = 60
+set position_vertical_p = 50
+set position_vertical_i = 5
+set position_vertical_d = 40
+set position_max_upwards_speed = 500
+set position_max_downwards_speed = 500
+set position_max_upwards_accel = 3000
+set position_max_downwards_accel = 800
+set position_yaw_p = 50
+set position_use_thrust_attenuation = 0
+
+positionprofile 1
+
+positionprofile 2
+
+# positionprofile 2
+set position_max_horizontal_speed = 500
+set position_max_tilt = 40
+set position_max_upwards_accel = 2000
+
+# restore original profile selection
+profile 0
+
+# restore original rateprofile selection
+rateprofile 0
+
+# restore original indi profile selection
+indiprofile 0
+
+# restore original position profile selection
+positionprofile 0
+
+# save configuration
