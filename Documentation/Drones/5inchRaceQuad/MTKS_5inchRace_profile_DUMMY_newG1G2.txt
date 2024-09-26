@@ -321,9 +321,9 @@ set indi_act_limit = 60,60,60,60,100,100,100,100
 positionprofile 0
 
 # positionprofile 0
-set position_horizontal_p = 70
-set position_horizontal_i = 5
-set position_horizontal_d = 50
+set position_horizontal_p = 30
+set position_horizontal_i = 2
+set position_horizontal_d = 30
 set position_max_horizontal_speed = 2000
 set position_max_horizontal_accel = 15000
 set position_max_tilt = 60
