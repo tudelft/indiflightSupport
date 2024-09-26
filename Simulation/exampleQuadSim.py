@@ -165,12 +165,13 @@ if __name__=="__main__":
             # start trajectory tracking at 8*0.5 = 4m/s target speed
             sil.mockup.sendKeyboard('1')
             if sim.t > 7.:
-                for _ in range(8):
+                for _ in range(4):
                     sil.mockup.sendKeyboard('3')
                 start_trajectory = True
 
-        if not heading and sim.t > 10. and sil is not None:
+        if not heading and sim.t > 7. and sil is not None:
             sil.mockup.sendKeyboard('h')
+            heading = True
             # test recovery mode
             # sil.sendMocap = lambda *args: None
 
