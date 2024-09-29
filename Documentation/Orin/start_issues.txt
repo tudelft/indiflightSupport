@@ -1,0 +1,41 @@
+
+# The following things I did, but didnt have a big or even measurable effect on cold-to-wifi boot time
+
+1. Disable dnsmasq, because another dnsmasq is provided within NetworkManager, it's a clusterfck
+```
+sudo systemctl disable dnsmasq
+```
+2. Switch from Hotspot to connecting to another Access Point (change the autostart option in `/etc/NetworkManager/something/something`
+3. Set the 5 second UEFI timeout to 0 in the UEFI boot menu. This saved 5 seconds.
+4. Disable the system console `sudo systemctl disable getty@tty1.service`
+5. Disable the system console in the kernel commandline (remove `console=ttyTCU0,115200` from entries in /boot/extlinux/extlinux.conf)
+	- this felt like it saved some time, but probably not much
+
+Currently, cold-to-home-screen takes around 45 seconds, cold-to-wifi takes 100.
+
+
+# Compile new Wifi-drivers.
+
+I saw we have similar behaviour to `https://forums.developer.nvidia.com/t/jetpack-6-wifi-slow-startup-with-backport-iwlwifi-dkms/297967/8` with the same drivers. The solution in that thread was to backport a later version of either the kernel or the drivers. I dont know how to compile kernels for the jetson (even though that sounds like the cleaner solution), so drivers it is:
+
+The steps verbatim from `dandelion1124`'s answer (although i chose `backports-5.15.153-1.tar.xz`, a newer backport):
+
+> At first, I download backports-5.15.81-1.tar.xz from https://backports.wiki.kernel.org/index.php/Releases 28.
+> I installed backports-iwlwifi from source code.
+
+```
+tar Jxfv backports-5.15.81-1.tar.xz
+cd backports-5.15.81-1
+make defconfig-iwlwifi
+make -j8
+sudo make install
+```
+
+> I add the following line to /etc/modprobe.d/iwlwifi.conf.
+
+```
+options iwlwifi 11n_disable=1
+```
+
+> And, I reboot OS.
+

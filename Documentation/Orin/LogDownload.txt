@@ -1,0 +1,11 @@
+we need to have absolute hygiene about mounting/unmounting stuff.
+
+1. disable automounting when in ubuntu's desktop environment. Connected disks will still be shown in the file manager, but you have to click before they mount, which seems a good compromise.
+```
+gsettings set org.gnome.desktop.media-handling automount false
+```
+2. make it possible for the user to run sudo commands without providing a password. Add a file `/etc/sudoers.d/mounting` with contents:
+```
+droneracing ALL=(ALL:ALL) NOPASSWD: ALL
+```
+

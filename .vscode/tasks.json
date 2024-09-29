@@ -5,7 +5,6 @@
             "label": "getLogs",
             "command": "${workspaceFolder}/LogAnalysis/log_downloader/get_logs.sh",
             "args": [
-                "/dev/sda1",
                 "${input:mirrorDestination}"
             ],
             "type": "shell",

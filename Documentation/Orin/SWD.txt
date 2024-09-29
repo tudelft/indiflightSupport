@@ -1,0 +1,81 @@
+# Debugging and flashing over SWD
+
+## raspberry pi pico  or  Raspberry Pi Debug Probe
+
+1. Download debugprobe_on_pico.uf2 onto a laptop from https://github.com/raspberrypi/debugprobe/releases/tag/debugprobe-v2.0.1
+2. Push the "bootsel" button on the pico while plugging it into the laptop
+3. Drag-and-Drop the debugprobe_on_pico.uf2 into the raspberry-pi folder that comes up after plugging it in
+4. disconnect the raspberry pi from usb
+5. wire up the Raspberry Pi Pico
+```
+Ground to Ground on the FC
+GP2 to SWDCLK (C), use white wire and MAXIMUM AWG24. And POSITIVELY NO DUPONT SHITTY WIRES
+GP3 to SWDIO (D), use yellow wire and MAXIMUM AWG24. And POSITIVELY NO DUPONT SHITTY WIRES
+```
+6. plug the raspberry pi pico into the ORIN with a micro-USB to USBC cable
+
+## Orin configuration
+
+1. on the orin, install `sudo apt install openocd`
+2. `mkdir /opt/openocd`
+3. create basic `openocd` configuration file in `/opt/openocd/openocd.cfg` (sorry for the unusual location, not gonna change it though). Most of these settings come from the raspberry pi pico manual, appendix A
+```
+source [find interface/cmsis-dap.cfg]
+adapter speed 5000
+transport select swd
+set WORKAREASIZE 0x2000
+source /opt/openocd/chip.cfg
+reset_config none
+```
+4. create an additional config file  `/opt/openocd/openocd_debug.cfg` that starts a gdb debugging server:
+```
+source /opt/openocd/helpers.tcl
+CDLiveWatchSetup
+init
+targets
+reset halt # TODO: maybe not reset halt?
+```
+5. create the file `/opt/openocd/helpers.tcl` which enables the Cortex Live Watch stuff in VSCode
+```
+# Copyright 2017-2023 Marcel Ball
+# see github.com/Marus/cortex-debug/blob/master/support/openocd-helpers.tcl
+
+proc CDLiveWatchSetup {} {
+    try {
+        foreach tgt [target names] {
+            set nConn [$tgt cget -gdb-max-connections]
+            if { $nConn > 0 } {
+                incr nConn
+                $tgt configure -gdb-max-connections $nConn
+                puts "[info script]: Info: Setting gdb-max-connections for target '$tgt' to $nConn"
+            }
+        }
+    } on error {} {
+        puts stderr "[info script]: Error: Failed to increase gdb-max-connections for current target. Live variables will not work"
+    }
+}
+```
+6. create a symbolic link to the correct chip config: `sudo ln -sf /usr/share/openocd/scripts/target/stm32h7x.cfg /opt/openocd/chip.cfg`
+7. create a systemd service that allows us to easily start and restart the debugging. Create file `/lib/systemd/system/openocd.service`:
+```
+[Unit]
+Description=OpenOCD daemon wrapper
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/openocd -f /opt/openocd/openocd.cfg -f /opt/openocd/openocd_debug.cfg
+
+[Install]
+WantedBy=multi-user.target
+```
+8. `sudo systemctl daemon-reload`
+9. `sudo systemctl enable openocd.service`
+10. `sudo reboot`
+11. Test by installing gdb-multiarch on a local laptop. Run it and type `target extended-remote <IP_OF_THE_ORIN>:3333`. FC should halt, and gdb should warn that it has no executable to load. thats perfect! To get FC running again, reset it (see next section)
+
+## To reset the FC with almost no questions asked, run
+
+openocd -f /opt/openocd/openocd.cfg -c 'init; reset; exit'
+

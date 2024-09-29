@@ -1,0 +1,80 @@
+sudo apt install ser2net
+
+## UDEV mapping
+
+1. unplug FC
+2. add a UDEV rule, so we know all flight controller serial ports are at `/dev/mapped/fc`
+   to do this, create the file /etc/udev/rules.d/99-map-fc.rules, with a single line:
+```
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", SYMLINK+="mapped/fc"
+```
+3. create directory `/dev/mapped` used `sudo mkdir /dev/mapped`
+4. reload the udev rules with `sudo udevadm control --reload-rules` and trigger then with `sudo udevadm trigger`. Alternatively, reboot
+5. replug FC
+
+
+## Configure ser2net
+
+1. save default config `sudo cp /etc/ser2net.yaml /etc/ser2net.default.yaml`
+2. modify `/etc/ser2net.yaml` to read
+```
+%YAML 1.1
+---
+# This is a ser2net configuration file, tailored to be rather
+# simple.
+#
+# Find detailed documentation in ser2net.yaml(5)
+# A fully featured configuration file is in
+# /usr/share/doc/ser2net/examples/ser2net.yaml.gz
+# 
+# If you find your configuration more useful than this very simple
+# one, please submit it as a bugreport
+
+define: &banner \r\nser2net port \p device \d [\B] (Debian GNU/Linux)\r\n\r\n
+
+connection: &con00
+    accepter: tcp,5761
+    enable: on
+    options:
+      kickolduser: true
+      accepter-retry-time: 5
+      connector-retry-time: 5
+    connector: serialdev,/dev/mapped/fc,115200n81,local
+```
+
+## create and enable service that runs at boot-time
+
+1. create file `/lib/systemd/system/ser2net.service` with contents:
+```
+[Unit]
+Description=Serial port to network proxy
+Documentation=man:ser2net(8)
+After=network-online.target
+Wants=network-online.target
+ 
+[Service]
+EnvironmentFile=-/etc/default/ser2net
+ExecStart=/usr/sbin/ser2net -n -c $CONFFILE -P /run/ser2net.pid
+# terrible hack, see https://github.com/cminyard/ser2net/issues/60#issuecomment-1077424534
+ExecStartPost=-/bin/sh -c 'systemctl status ser2net|grep -E ^[A-Z]|grep -q "Invalid port name/number" || exit 0; sleep 9; systemctl restart ser2net'
+Type=exec
+#Restart=on-failure
+Restart=always
+ 
+[Install]
+WantedBy=multi-user.target
+```
+
+2. start the service and enable it to be run at boot-time
+```
+sudo systemctl daemon-reload
+sudo systemctl enable ser2net.service
+sudo systemctl start ser2net.service
+```
+
+
+
+
+
+
+

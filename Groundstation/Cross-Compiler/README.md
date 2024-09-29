@@ -38,24 +38,39 @@ docker plugin install vieux/sshfs
 Setup of the image:
 ```bash
 cd cross-compiler
-docker build . -t pi-cross-base -f Dockerfile.cross
-docker build . -t pi-cross -f Dockerfile.cross.custom
-docker volume create rootfs # not sure where this is actually saved on disk... but somewhere
+docker build . -t pi-cross-base -f Dockerfile.pi.cross
+docker build . -t pi-cross -f Dockerfile.pi.cross.custom
+docker volume create pi-rootfs # not sure where this is actually saved on disk... but somewhere
 ```
 
-If you need more dependencies (excluding C libraries! Install those on the pi) in your image, modify or copy & modify the `Dockerfile.cross.custom` file, and rerun the last `docker buildx` command above.
+If you need more dependencies (excluding C libraries! Install those on the pi) in your image, modify or copy & modify the `Dockerfile.pi.cross.custom` file, and rerun the last `docker buildx` command above.
+
+
+## workspace setup
+
+To tell the image where your pi is (needed for syncing the libraries and for
+optional deploying of your application directly on the pi), create a file 
+called `remote.env` in the directory of your cmake application.
+It needs to contain the following info:
+```ini
+# NO SPACES BEFORE AND AFTER THE '='
+# NO quotation marks and no spaces in the variables
+REMOTE_NAME=CurrentlyUnusedFieldCouldBeEmpty
+REMOTE_IP=192.168.1.42
+REMOTE_USER=pi
+REMOTE_PASSWORD=pi
+```
 
 ## Running the build container to build for Raspberry Pi
-
 
 Once setup is complete, this is the magic command:
 ```bash
 sudo sysctl -w net.ipv4.ip_forward=1 # if you previously did make pi-routing-up or make pi-connect, this can be skipped
 cd /path/to/package/root/you/want/to/build
-docker run -v rootfs:/rootfs --mount type=bind,src=./,dst=/package pi-cross --sync
+docker run --env-file remote.env -v pi-rootfs:/rootfs --mount type=bind,src=./,dst=/package pi-cross --sync
 ```
 
-On exit, all build files are in the folder `build-aarch64-linux-gnu`.
+On exit, all build files are in the folder `build-aarch64-linux-gnu`, and you can upload it.
 
 On the first time running the container a lot of environment files are copied from the pi to the (persistent) docker volume we just created (takes roughly 10min on my wifi connection).
 In subsequent builds they will only be updated when something on the pi changes, but checking for updates still takes time (+- 10sec). You can skip this step by ommitting `--sync`.
@@ -70,20 +85,22 @@ put at the _end_ of the command above:
 --sync                          # syncronize the rootfs with the pi. Do this on first command, or if libraries/includes changed in the /lib or /usr dir of the pi. Omitting is much faster, of course.
 --clean-build                   # deletes the entire build-aarch64-linux-gnu folder from the local tree before compilation
 --debug                         # sets -DCMAKE_BUILD_TYPE=Debug
+--cmake-extra                   # pass extra arguments to CMAKE, such as -DOPTION=ON
 --deploy=<DEPLOY_PATH>          # upload the build-aarch64-linux-gnu directory to the pi using rsync after building. Requires project() to be set in CMakeLists.txt and it will be uploaded to <DEPLAY_PATH>/<CMAKE_PROJECT_NAME>/build-aarch64-linux-gnu
 --processes=8                   # passed to make as make -j <processes>. Default is 8.
 ```
+
 
 ## Handy Docker commands
 
 The container can be run interactively (the building is skipped and a shell is opened). Do not use in conjunction with any of the arguments above.
 ```bash
-docker run -it --entrypoint=/bin/bash -v rootfs:/rootfs --mount type=bind,src=./,dst=/package pi-cross
+docker run -it --entrypoint=/bin/bash -v pi-rootfs:/rootfs --mount type=bind,src=./,dst=/package pi-cross
 ```
 
 Pro-tip: add the following alias to your `~/.bashrc` so that you can omit `docker run -v rootfs:/rootfs --mount type=bind,src=./,dst=/package`:
 ```bash
-alias pi-cross='docker run -v rootfs:/rootfs --mount type=bind,src=./,dst=/package pi-cross --processes=30'
+alias pi-cross='docker run --env-file remote.env -v rootfs:/rootfs --mount type=bind,src=./,dst=/package pi-cross --processes=30'
 ```
 
 Remove all existing containers:
@@ -95,3 +112,10 @@ docker rmi [image_hash]         # delete image with image_hash
 docker volume ls                # list volumes
 docker volume rm [volume_name]  # remove volume with volume_name
 ```
+
+
+# Orin cross compile solution
+
+do the exact same, but wherever `pi` appears, substitute it for `orin`. The
+only difference is that we are using Ubuntu 22.04 in the docker and not the 
+Debian bullseye userland, although the 2 are quite similar.

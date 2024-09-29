@@ -1,0 +1,24 @@
+
+1. create file `/usr/local/bin/set_fan_to_max.sh` with contents:
+```
+#!/bin/bash
+jetson_clocks --fan
+```
+2. make executable `sudo chmod +x /usr/local/bin/set_fan_to_max.sh`
+3. create a unit file, because thats fun. `/lib/systemd/system/set_fan_to_max.service`:
+```
+[Unit]
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/set_fan_to_max.sh
+
+[Install]
+WantedBy=default.target
+```
+4. enable it 
+```
+sudo systemctl daemon-reload
+sudo systemctl enable set_fan_to_max.service
+```
+5. reboot

@@ -11,6 +11,7 @@ function help_and_exit {
     echo "  --sync                  --  synchronize the targets /usr folder with the docker volume. Do this on first usage, or if libraries/header of the target change."
     echo "  --clean-build           --  deletes the build-<arch>-<os>-<abi> folder from the local tree before compilation"
     echo "  --debug                 --  sets -DCMAKE_BUILD_TYPE=Debug"
+    echo "  --cmake-extra           --  pass extra arguments to CMAKE, such as -DOPTION=ON"
     echo "  --deploy=<REMOTE_PATH>  --  use rsync to push the build to <REMOTE_PATH>/<CMAKE_PROJECT_NAME>/build-<arch>-<os>-<abi> on the target"
     echo "  --processes=<N>         --  number of worker threads. Equivalent to -j N. Default 8"
     echo
@@ -21,14 +22,16 @@ function help_and_exit {
 #deploy=$(echo "$@" | awk -F= '{a[$1]=$2} END {print(a["--deploy"])}')
 # key-value pairs (HOW IS THERE NOT A BUILT IN FOR THIS?)
 processes=8
+CMAKE_EXTRA=
 while test $# != 0
 do
     left=$(echo "$1" | cut -d "=" -f 1)
-    right=$(echo "$1" | cut -d "=" -f 2)
+    right=$(echo "$1" | cut -d "=" -f 2-)
     case "$left" in
     --sync) sync=t ;;
     --clean-build) clean_build=t ;;
     --debug) debug=t ;;
+    --cmake-extra) CMAKE_EXTRA+=" $right" ;;
     --deploy) deploy=$right ;;
     --processes) processes=$right ;;
     --help) help_and_exit ;;
@@ -116,7 +119,6 @@ cd /package/build-$GNU_HOST
 
 
 # handle build options, then build
-CMAKE_EXTRA=
 if [ "$debug" == t ]
 then
     CMAKE_EXTRA+=" -DCMAKE_BUILD_TYPE=Debug"
