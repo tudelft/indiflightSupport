@@ -156,7 +156,10 @@ if __name__=="__main__":
     T = 1000. # seconds
     dt_rt = None if args.no_real_time else dt
     start_trajectory = False
-    heading = False
+    atNothing = False
+    atGates = False
+    atRef = False
+
     for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):
         if not args.throw and sim.t > 1.:
             sil.mockup.arm() if sil else None
@@ -169,10 +172,16 @@ if __name__=="__main__":
                     sil.mockup.sendKeyboard('3')
                 start_trajectory = True
 
-        if not heading and sim.t > 7. and sil is not None:
-            sil.mockup.sendKeyboard('h')
-            heading = True
-            # test recovery mode
-            # sil.sendMocap = lambda *args: None
+        if not atNothing and sim.t > 7. and sil is not None:
+            sil.mockup.sendKeyboard('n')
+            atNothing = True
+
+        if not atGates and sim.t > 17. and sil is not None:
+            sil.mockup.sendKeyboard('g')
+            atGates = True
+
+        if not atRef and sim.t > 27. and sil is not None:
+            sil.mockup.sendKeyboard('r')
+            atRef = True
 
         sim.tick(dt)
