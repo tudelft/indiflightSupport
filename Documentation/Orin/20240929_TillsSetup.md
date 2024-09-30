@@ -1,6 +1,6 @@
 # Usability improvements before Abu Dhabi trip
 
-## 1. Start up improvements
+## 1. General improvements
 
 The following things I did, but didnt have a big or even measurable effect on cold-to-wifi boot time
 
@@ -18,6 +18,8 @@ Currently, cold-to-home-screen takes around 45 seconds, cold-to-wifi takes 100.
 
 
 ### Compile new Wifi-drivers.
+
+This improved boot time by around 50 seconds.
 
 I saw we have similar behaviour to `https://forums.developer.nvidia.com/t/jetpack-6-wifi-slow-startup-with-backport-iwlwifi-dkms/297967/8` with the same drivers. The solution in that thread was to backport a later version of either the kernel or the drivers. I dont know how to compile kernels for the jetson (even though that sounds like the cleaner solution), so drivers it is:
 
@@ -43,6 +45,30 @@ options iwlwifi 11n_disable=1
 > And, I reboot OS.
 
 **success**: boot time to wifi is low around 40 seconds
+
+
+### Solve wifi ping issues
+
+The issues were caused by power managed, as always... disable to according to chatGPT. 
+This worked and now ping should be in the 1-3ms range.
+
+In file `/etc/NetworkManager/conf.d/default-wifi-powersave-on.conf` change 3 to a 2 ("disable")
+```
+[connection]
+wifi.powersave = 2
+```
+
+
+### Disable Bluetooth
+
+For good measure...
+
+In file `/etc/bluetooth/main.conf`
+```
+AutoEnable=false
+```
+
+Then reboot
 
 
 
