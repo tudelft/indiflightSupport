@@ -197,12 +197,11 @@ beeper -RC_SMOOTHING_INIT_FAIL
 map TAER1234
 
 # aux
-aux 0 0 4 900 1300 0 0
+aux 0 0 0 900 1300 0 0
 aux 1 1 5 1300 1700 0 0
-aux 2 27 0 1700 2100 0 0
-aux 3 55 5 900 1300 0 0
-aux 4 60 1 900 1300 0 0
-aux 5 36 2 1700 2100 0 0
+aux 2 55 5 900 1300 0 0
+aux 3 60 1 900 1300 0 0
+aux 4 36 2 1700 2100 0 0
 
 # master
 set gyro_lpf1_static_hz = 100
@@ -223,7 +222,7 @@ set blackbox_high_resolution = ON
 set dshot_bidir = ON
 set motor_pwm_protocol = DSHOT600
 set motor_output_reordering = 1,0,3,2,4,5,6,7
-set failsafe_delay = 5
+set failsafe_delay = 10
 set failsafe_switch_mode = KILL
 set current_meter = ADC
 set battery_meter = ADC
