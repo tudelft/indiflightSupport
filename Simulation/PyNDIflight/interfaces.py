@@ -18,6 +18,7 @@
 import numpy as np
 import socket
 import struct
+import serial
 
 #%% serve the visualization js app
 
