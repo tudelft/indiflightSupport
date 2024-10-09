@@ -36,6 +36,7 @@ do
     --processes) processes=$right ;;
     --help) help_and_exit ;;
     -h) help_and_exit ;;
+    *) help_and_exit ;;
     esac
     shift
 done
