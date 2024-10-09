@@ -221,8 +221,13 @@ class MultiRotor:
 
         qInv = self.q.copy()
         qInv[0] *= -1.
+
+        # drag
+        vBody = quatRotate( qInv, self.vI )
+        F += np.sum(self.rotorVelocity) * vBody * np.array([-5e-6, -5e-6, 0.])
+
+        # handle ground contact
         if self.xI[2] > 0.:
-            # handle ground contact
             down = self.vI[2] > 0.
             F += (1000 if down else 1000)  * self.m * quatRotate( qInv, np.array([0., 0., -1.], dtype=np.float32) * self.xI )
             F += (100  if down else 1) * self.m * quatRotate( qInv, -self.vI )

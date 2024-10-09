@@ -47,6 +47,7 @@ def quaternionDerivative(q, w):
 @njit("f4[::1](f4[::1], f4[::1], f4[:, ::1], f4[:, ::1])")
 def angularRateDerivative(w, T, I, Iinv):
     return Iinv @ ( T  -  cross(w, I @ w) )
+    #return Iinv @ ( T )
 
 # torque from motors?
 # Ti  =  ri x Fi  +  Ii omegaMotorDot_Body  +  Omega_Body x Ii omegaMotor_Body
@@ -56,6 +57,7 @@ def rotatingMassTorques(Imotor, spinAxisBody, motorVelocity, motorAcceleration, 
     dLdt_body = Imotor * motorAcceleration * spinAxisBody
 
     return  dLdt_body  +  cross(bodyRates, L)
+    #return  dLdt_body
 
 @njit("f4(f4,f4,f4,f4,f4)")
 def motorModel(u, kESC, wmax, w, tau):

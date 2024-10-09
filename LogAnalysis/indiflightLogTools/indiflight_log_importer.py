@@ -141,9 +141,9 @@ class IndiflightLog(object):
         if not useCache or self.raw is None or self.parameters is None:
             # import raw data using orangebox parser
             logger.info("Parsing logfile")
-            bfl = BFLParser.load(filename)
+            self.bfl = BFLParser.load(filename)
 
-            if bfl.reader.log_count > 1:
+            if self.bfl.reader.log_count > 1:
                 raise NotImplementedError("IndiflightLog not implemented for multiple\
                                            logs per BFL or BBL file. Use bbsplit\
                                            cmd line util")
@@ -151,7 +151,7 @@ class IndiflightLog(object):
             # dump data rows into pandas frame. # TODO: only import until range?
             logger.info("Importing into dataframe")
             try:
-                data = [frame.data for frame in bfl.frames()]
+                data = [frame.data for frame in self.bfl.frames()]
             except (IndexError, TypeError):
                 # work around really annoying issue in orangebox
                 logger.warning("Encountered internal error, trying to append EOF to datafile")
@@ -160,15 +160,15 @@ class IndiflightLog(object):
                     EOF += b'E' + bytes.fromhex("ff") + b'End of log' + bytes.fromhex("00")
                     file.write(EOF)
 
-                bfl = BFLParser.load(filename)
-                data = [frame.data for frame in bfl.frames()]
+                self.bfl = BFLParser.load(filename)
+                data = [frame.data for frame in self.bfl.frames()]
                 logger.warning("Recovered succesfully")
 
-            self.raw = pd.DataFrame(data, columns=bfl.field_names )
+            self.raw = pd.DataFrame(data, columns=self.bfl.field_names )
             self.raw.set_index('loopIteration', inplace=True)
 
             # get parameters
-            self.parameters = bfl.headers
+            self.parameters = self.bfl.headers
 
             # pickle, if requested
             if useCache:

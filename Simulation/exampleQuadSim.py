@@ -90,10 +90,10 @@ if __name__=="__main__":
     mc = MultiRotor()
     # approx model of CineRat 3inch race drone
     mc.setInertia(m=0.41, I=0.75*np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
-    mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=4.5, dir='lh')) # RR
-    mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=4.5, dir='rh')) # FR
-    mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=4.5, dir='rh')) # RL
-    mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=4.5, dir='lh')) # FL
+    mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=7.5, dir='lh')) # RR
+    mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=7.5, dir='rh')) # FR
+    mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=7.5, dir='rh')) # RL
+    mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=7.5, dir='lh')) # FL
     # some additional rotors
     #mc.addRotor(Rotor(r=[+0.0, -0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[0, -1., -1.]))
     #mc.addRotor(Rotor(r=[+0.0, +0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[0, 1., -1.]))
@@ -157,31 +157,38 @@ if __name__=="__main__":
     dt_rt = None if args.no_real_time else dt
     start_trajectory = False
     atNothing = False
+    atVelocity = False
     atGates = False
     atRef = False
 
     for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):
-        if not args.throw and sim.t > 1.:
+        sil.mockup.sendKeyboard('i') # initialize EKF
+
+        if not args.throw and sim.t > 2.:
             sil.mockup.arm() if sil else None
 
         if not start_trajectory and sim.t > 5. and sil is not None:
             # start trajectory tracking at 8*0.5 = 4m/s target speed
             sil.mockup.sendKeyboard('1')
             if sim.t > 7.:
-                for _ in range(4):
+                for _ in range(20):
                     sil.mockup.sendKeyboard('3')
                 start_trajectory = True
 
-        if not atNothing and sim.t > 7. and sil is not None:
-            sil.mockup.sendKeyboard('n')
-            atNothing = True
-
-        if not atGates and sim.t > 17. and sil is not None:
-            sil.mockup.sendKeyboard('g')
-            atGates = True
-
-        if not atRef and sim.t > 27. and sil is not None:
+        if not atRef and sim.t > 7. and sil is not None:
             sil.mockup.sendKeyboard('r')
+            atRef = True
+
+        if not atNothing and sim.t > 17. and sil is not None:
+            sil.mockup.sendKeyboard('n')
+            atRef = True
+
+        if not atVelocity and sim.t > 27. and sil is not None:
+            sil.mockup.sendKeyboard('v')
+            atVelocity = True
+
+        if not atGates and sim.t > 37. and sil is not None:
+            sil.mockup.sendKeyboard('g')
             atRef = True
 
         sim.tick(dt)

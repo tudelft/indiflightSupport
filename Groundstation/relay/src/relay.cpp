@@ -385,7 +385,7 @@ int main(int argc, char** argv) {
             memcpy((uint8_t *)(&pose_der), optitrackBuffer+sizeof(unsigned int)+sizeof(pose_t), sizeof(pose_der_t));
 
             // proceed to send Fake GPS and External Pose
-            piMsgFakeGpsTx.time_us = piMsgImuRx->time_us;
+            piMsgFakeGpsTx.time_us = (uint32_t) pose.timeUs;
             static constexpr double CYBERZOO_LAT = 51.99071002805145;
             static constexpr double CYBERZOO_LON = 4.376727452462819;
             static constexpr double RE = 6378137.;
@@ -400,7 +400,7 @@ int main(int argc, char** argv) {
             piMsgFakeGpsTx.numSat = 8;
             piSendMsg(&piMsgFakeGpsTx, &serialWriter);
 
-            piMsgExternalPoseTx.time_us = piMsgImuRx->time_us;
+            piMsgExternalPoseTx.time_us = (uint32_t) pose.timeUs;
             piMsgExternalPoseTx.ned_x   = pose.x;
             piMsgExternalPoseTx.ned_y   = pose.y;
             piMsgExternalPoseTx.ned_z   = pose.z;
