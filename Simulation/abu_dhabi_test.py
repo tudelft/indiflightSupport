@@ -163,10 +163,7 @@ if __name__=="__main__":
     N = 9
     steps_executed = [False] * N
 
-    for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):
-        if not args.throw and sim.t > 1.:
-            sil.mockup.arm() if sil else None
-            
+    for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):            
         # 1 init ekf
         if not steps_executed[0] and sim.t > 0. and sil is not None:
             sil.mockup.sendKeyboard('i')

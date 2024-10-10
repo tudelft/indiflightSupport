@@ -171,7 +171,7 @@ if __name__=="__main__":
             # start trajectory tracking at 8*0.5 = 4m/s target speed
             sil.mockup.sendKeyboard('1')
             if sim.t > 7.:
-                for _ in range(20):
+                for _ in range(10):
                     sil.mockup.sendKeyboard('3')
                 start_trajectory = True
 
