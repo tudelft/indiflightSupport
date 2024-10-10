@@ -204,7 +204,7 @@ void writeCsvHeader(FILE* file) {
     // time
     fprintf(file, "time_us,");
     // piMsgImu
-    fprintf(file, "imu_time_us, imu_roll, imu_pitch, imu_yaw, imu_x, imu_y, imu_z, omega_0, omega_1, omega_2, omega_3");
+    fprintf(file, "imu_time_us, imu_x, imu_y, imu_z, imu_roll, imu_pitch, imu_yaw, omega_0, omega_1, omega_2, omega_3");
     // piMsgExternalPose
     fprintf(file, "ext_time_us, ext_x, ext_y, ext_z, ext_vx, ext_vy, ext_vz, ext_qw, ext_qx, ext_qy, ext_qz,");
 #ifdef ORIN
@@ -232,8 +232,8 @@ void writeCsvRow(FILE* file) {
         //    piMsgImuRx->yaw, piMsgImuRx->x, piMsgImuRx->y, piMsgImuRx->z);
         fprintf(file, "%u, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f",
             piMsgEkfInputsRx->time_us,
-            gyro[0], gyro[1], gyro[2],
             accel[0], accel[1], accel[2],
+            gyro[0], gyro[1], gyro[2],
             omega[0], omega[1], omega[2], omega[3]
             );
     } else {
@@ -372,12 +372,12 @@ int main(int argc, char** argv) {
                 if (piParse(&piParseStates, piBuffer[i]) == PI_MSG_EKF_INPUTS_ID) {
                     newMessage = true;
 
-                    gyro[0]   = ((float)piMsgEkfInputsRx->p) * (2000.f * M_PI / 180.f) / (1 << 15);
-                    gyro[1]   = ((float)piMsgEkfInputsRx->q) * (2000.f * M_PI / 180.f) / (1 << 15);
-                    gyro[2]   = ((float)piMsgEkfInputsRx->r) * (2000.f * M_PI / 180.f) / (1 << 15);
                     accel[0]  = ((float)piMsgEkfInputsRx->x) * (9.81f / 2048);
                     accel[1]  = ((float)piMsgEkfInputsRx->y) * (9.81f / 2048);
                     accel[2]  = ((float)piMsgEkfInputsRx->z) * (9.81f / 2048);
+                    gyro[0]   = ((float)piMsgEkfInputsRx->p) * (2000.f * M_PI / 180.f) / (1 << 15);
+                    gyro[1]   = ((float)piMsgEkfInputsRx->q) * (2000.f * M_PI / 180.f) / (1 << 15);
+                    gyro[2]   = ((float)piMsgEkfInputsRx->r) * (2000.f * M_PI / 180.f) / (1 << 15);
                     omega[0] = ((float)piMsgEkfInputsRx->omega1);
                     omega[1] = ((float)piMsgEkfInputsRx->omega2);
                     omega[2] = ((float)piMsgEkfInputsRx->omega3);

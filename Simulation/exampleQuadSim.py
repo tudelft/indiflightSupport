@@ -90,10 +90,10 @@ if __name__=="__main__":
     mc = MultiRotor()
     # approx model of CineRat 3inch race drone
     mc.setInertia(m=0.41, I=0.75*np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
-    mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=7.5, dir='lh')) # RR
-    mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=7.5, dir='rh')) # FR
-    mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=7.5, dir='rh')) # RL
-    mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=7.5, dir='lh')) # FL
+    mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=4.5, dir='lh')) # RR
+    mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=4.5, dir='rh')) # FR
+    mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=4.5, dir='rh')) # RL
+    mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=4.5, dir='lh')) # FL
     # some additional rotors
     #mc.addRotor(Rotor(r=[+0.0, -0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[0, -1., -1.]))
     #mc.addRotor(Rotor(r=[+0.0, +0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[0, 1., -1.]))
@@ -185,7 +185,7 @@ if __name__=="__main__":
             atRef = True
 
         if not atNothing and sim.t > 17. and sil is not None:
-            sil.mockup.sendKeyboard('n')
+            sil.mockup.sendKeyboard('g')
             atRef = True
 
         if not atVelocity and sim.t > 27. and sil is not None:
@@ -193,7 +193,7 @@ if __name__=="__main__":
             atVelocity = True
 
         if not atGates and sim.t > 37. and sil is not None:
-            sil.mockup.sendKeyboard('g')
+            sil.mockup.sendKeyboard('n')
             atRef = True
 
         sim.tick(dt)
