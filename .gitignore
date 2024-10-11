@@ -9,3 +9,6 @@ __pycache__/
 #indiflight specific
 eeprom.bin
 logs*/
+
+# data folders
+flight_data
