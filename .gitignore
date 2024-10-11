@@ -9,3 +9,4 @@ __pycache__/
 #indiflight specific
 eeprom.bin
 logs*/
+remote.env
