@@ -798,8 +798,6 @@ def fit_moments_model(data):
     domega_3 = sp.signal.sosfiltfilt(sos, np.gradient(data['omega[2]'])/np.gradient(data['t']))
     domega_4 = sp.signal.sosfiltfilt(sos, np.gradient(data['omega[3]'])/np.gradient(data['t']))
     
-    params = np.load('params/aggressive_cmds2.npz')
-    
     fig, axs = plt.subplots(3, 2, figsize=(10, 10), sharex=True, sharey=True)
     
     X = np.stack([
