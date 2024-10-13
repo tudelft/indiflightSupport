@@ -133,7 +133,7 @@ if __name__=="__main__":
 
 
     #%% initial conditions
-    mc.setPose(x=[0., 0., -0.1], q=[1., 0., 0., 0.])
+    mc.setPose(x=[1.5, -7., -0.1], q=[0.707, 0., 0., 0.707])
     mc.setTwist(v=[0., 0., 0.], w=[0., 0., 0.])
 
     sim = Sim(mc, imu, mocap, hil, sil)
@@ -160,12 +160,17 @@ if __name__=="__main__":
     atVelocity = False
     atGates = False
     atRef = False
+    init = False
 
     for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):
-        sil.mockup.sendKeyboard('i') # initialize EKF
+        if not init and sim.t > 1.:
+            sil.mockup.sendKeyboard('i') # initialize EKF
+            sil.mockup.sendKeyboard('s')
+            init = True
 
-        if not args.throw and sim.t > 2.:
+        if not args.throw and sim.t > 3.:
             sil.mockup.arm() if sil else None
+            sil.mockup.sendKeyboard('t') # takeoff
 
         if not start_trajectory and sim.t > 5. and sil is not None:
             # start trajectory tracking at 8*0.5 = 4m/s target speed

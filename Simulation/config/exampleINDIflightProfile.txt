@@ -62,11 +62,11 @@ set ekf_use_attitude_estimate = 1
 set ekf_use_position_estimate = 1
 set ekf_use_quat = 1
 set ekf_proc_noise_acc       = 500000, 500000, 500000
-set ekf_proc_noise_gyro      = 100000, 100000, 100000
+set ekf_proc_noise_gyro      = 6400, 6400, 6400
 set ekf_proc_noise_acc_bias  = 0, 0, 0
 set ekf_proc_noise_gyro_bias = 0, 0, 0
-set ekf_meas_noise_position  = 1000, 1000, 1000
-set ekf_meas_noise_quat      = 50000, 50000, 50000, 50000
+set ekf_meas_noise_position  = 100000, 100000, 100000
+set ekf_meas_noise_quat      = 1000000, 1000000, 1000000, 1000000
 set ekf_meas_delay = 0
 
 set catapult_target_altitude = 350

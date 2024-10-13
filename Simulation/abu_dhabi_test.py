@@ -107,7 +107,7 @@ if __name__=="__main__":
     #%% craft interfaces
     #imu = IMU(mc, r=[0., 0., 0.], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
     #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
-    imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
+    imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, accBias=[0.1,0., 0.2], gyroStd=0.02, gyroBias=[0.01, 0.0, 0.0])
 
     mocap = Mocap(mc, args.mocap_host, args.mocap_port) if args.mocap else None
     hil = IndiflightHIL(mc, imu, device=args.hil, baud=args.hil_baud) if args.hil else None
@@ -123,7 +123,7 @@ if __name__=="__main__":
 
         sil.sendMocap()
         sil.mockup.sendPositionSetpoint( [0., 0., -1.5], 0. )
-        sil.mockup.enableFlightMode(flightModeFlags.ANGLE_MODE | flightModeFlags.POSITION_MODE)
+        sil.mockup.enableFlightMode(flightModeFlags.ANGLE_MODE)
 
         if args.learn:
             sil.mockup.enableFlightMode(flightModeFlags.LEARNER_MODE)
@@ -136,7 +136,8 @@ if __name__=="__main__":
 
 
     #%% initial conditions
-    mc.setPose(x=[0., 0., -0.1], q=[1., 0., 0., 0.])
+    #mc.setPose(x=[0., 0., -0.1], q=[1., 0., 0., 0.])
+    mc.setPose(x=[1.5, -6.5, -0.1], q=[0.707, 0., 0., 0.707])
     mc.setTwist(v=[0., 0., 0.], w=[0., 0., 0.])
 
     sim = Sim(mc, imu, mocap, hil, sil)
@@ -165,39 +166,40 @@ if __name__=="__main__":
 
     for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):            
         # 1 init ekf
-        if not steps_executed[0] and sim.t > 0. and sil is not None:
+        if not steps_executed[0] and sim.t > 0.5 and sil is not None:
             sil.mockup.sendKeyboard('i')
             steps_executed[0] = True
         # 2 arm
-        if not steps_executed[1] and sim.t > 1. and sil is not None:
+        if not steps_executed[1] and sim.t > 3. and sil is not None:
             sil.mockup.arm()
             steps_executed[1] = True
-        # 3 set wp here
-        if not steps_executed[2] and sim.t > 2. and sil is not None:
+        # 3 set wp here and switch to position
+        if not steps_executed[2] and sim.t > 4. and sil is not None:
             sil.mockup.sendKeyboard('s')
+            sil.mockup.enableFlightMode(flightModeFlags.POSITION_MODE)
             steps_executed[2] = True
         # 4 take off
-        if not steps_executed[3] and sim.t > 3. and sil is not None:
+        if not steps_executed[3] and sim.t > 5. and sil is not None:
             sil.mockup.sendKeyboard('t')
             steps_executed[3] = True
         # 5 go to pos mode
-        if not steps_executed[4] and sim.t > 4. and sil is not None:
+        if not steps_executed[4] and sim.t > 6. and sil is not None:
             sil.mockup.enableFlightMode(flightModeFlags.ANGLE_MODE | flightModeFlags.POSITION_MODE)
             steps_executed[4] = True
         # 6 init nn
-        if not steps_executed[5] and sim.t > 5. and sil is not None:
+        if not steps_executed[5] and sim.t > 7. and sil is not None:
             sil.mockup.sendKeyboard('6')
             steps_executed[5] = True
         # 7 activate nn with switch
-        if not steps_executed[6] and sim.t > 8. and sil is not None:
+        if not steps_executed[6] and sim.t > 10. and sil is not None:
             sil.mockup.lib.nn_activate()
             steps_executed[6] = True     
         # 8 recover mode
-        if not steps_executed[7] and sim.t > 16. and sil is not None:
+        if not steps_executed[7] and sim.t > 18. and sil is not None:
             sil.mockup.lib.nn_deactivate()
             steps_executed[7] = True
         # 9 land
-        if not steps_executed[8] and sim.t > 18. and sil is not None:
+        if not steps_executed[8] and sim.t > 20. and sil is not None:
             sil.mockup.sendKeyboard('5')
             steps_executed[8] = True
         
