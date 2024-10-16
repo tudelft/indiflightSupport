@@ -163,12 +163,12 @@ if __name__=="__main__":
     init = False
 
     for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):
-        if not init and sim.t > 1.:
+        if not init and sim.t > 1. and sil is not None:
             sil.mockup.sendKeyboard('i') # initialize EKF
             sil.mockup.sendKeyboard('s')
             init = True
 
-        if not args.throw and sim.t > 3.:
+        if not args.throw and sim.t > 3. and sil is not None:
             sil.mockup.arm() if sil else None
             sil.mockup.sendKeyboard('t') # takeoff
 
