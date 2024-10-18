@@ -1062,8 +1062,8 @@ set pitch_level_expo = 0
 indiprofile 0
 
 # indiprofile 0
-set indi_attitude_gains = 2000,2000,800
-set indi_rate_gains = 230,230,230
+set indi_attitude_gains = 1500,1500,500
+set indi_rate_gains = 230,230,180
 set indi_attitude_max_tilt_rate = 800
 set indi_attitude_max_yaw_rate = 500
 set indi_max_rate_setpoint = 1800,1800,1800
@@ -1077,7 +1077,7 @@ set indi_act_time_constant_ms = 30,30,30,30,25,25,25,25
 set indi_act_max_rpm = 20000,20000,20000,20000,40000,40000,40000,40000
 set indi_act_hover_rpm = 8000,8000,8000,8000,20000,20000,20000,20000
 set indi_act_nonlinearity = 40,40,40,40,50,50,50,50
-set indi_act_limit = 100,100,100,100,100,100,100,100
+set indi_act_limit = 50,50,50,50,100,100,100,100
 set indi_act_g1_fx = 0,0,0,0,0,0,0,0
 set indi_act_g1_fy = 0,0,0,0,0,0,0,0
 set indi_act_g1_fz = -2170,-2170,-2170,-2170,0,0,0,0
@@ -1095,19 +1095,19 @@ set indi_wls_act_preferred_state = 0,0,0,0,0,0,0,0
 positionprofile 0
 
 # positionprofile 0
-set position_horizontal_p = 30
-set position_horizontal_i = 2
-set position_horizontal_d = 30
-set position_max_horizontal_speed = 2000
-set position_max_horizontal_accel = 15000
-set position_max_tilt = 60
-set position_vertical_p = 50
-set position_vertical_i = 5
-set position_vertical_d = 40
-set position_max_upwards_speed = 500
-set position_max_downwards_speed = 500
-set position_max_upwards_accel = 3000
-set position_max_downwards_accel = 800
+set position_horizontal_p = 15
+set position_horizontal_i = 1
+set position_horizontal_d = 15
+set position_max_horizontal_speed = 100
+set position_max_horizontal_accel = 500
+set position_max_tilt = 30
+set position_vertical_p = 25
+set position_vertical_i = 2
+set position_vertical_d = 15
+set position_max_upwards_speed = 50
+set position_max_downwards_speed = 50
+set position_max_upwards_accel = 500
+set position_max_downwards_accel = 300
 set position_yaw_p = 50
 set position_weathervane_p = 0
 set position_weathervane_min_v = 200
