@@ -155,6 +155,7 @@ if __name__=="__main__":
     dt = 0.0005 # 2kHz
     T = 1000. # seconds
     dt_rt = None if args.no_real_time else dt
+    takeoff = False
     start_trajectory = False
     atNothing = False
     atVelocity = False
@@ -164,18 +165,29 @@ if __name__=="__main__":
 
     for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):
         if not init and sim.t > 1. and sil is not None:
-            sil.mockup.sendKeyboard('i') # initialize EKF
-            sil.mockup.sendKeyboard('s')
+            # sil.mockup.sendKeyboard('i') # initialize EKF
+            # sil.mockup.sendKeyboard('s')
+            sil.mockup.sendKeyboard('n')
+            
             init = True
 
         if not args.throw and sim.t > 3. and sil is not None:
             sil.mockup.arm() if sil else None
-            sil.mockup.sendKeyboard('t') # takeoff
+            
+            
+        if not takeoff and sim.t > 5:
+            # sil.mockup.sendKeyboard('1')
+            # sil.mockup.sendKeyboard('t') # takeoff
+            # for i in range(5):
+            #     sil.mockup.sendKeyboard('l')
+            # sil.mockup.sendKeyboard('1') # init TT
+            takeoff = True
+            
 
-        if not start_trajectory and sim.t > 10. and sil is not None:
-            if sim.t > 11.:
-                sil.mockup.sendKeyboard('x')
-                start_trajectory = True
+        # if not start_trajectory and sim.t > 10. and sil is not None:
+        #     if sim.t > 11.:
+        #         sil.mockup.sendKeyboard('x')
+        #         start_trajectory = True
 
         # if not atRef and sim.t > 7. and sil is not None:
         #     sil.mockup.sendKeyboard('r')

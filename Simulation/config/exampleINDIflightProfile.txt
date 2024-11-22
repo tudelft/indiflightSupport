@@ -158,7 +158,7 @@ set indi_attitude_max_yaw_rate = 500
 set indi_manual_max_upwards_accel = 30
 
 # deg
-set indi_manual_max_tilt = 45
+set indi_manual_max_tilt = 30
 
 set indi_manual_use_coordinated_yaw = 1
 
