@@ -18,11 +18,11 @@
             "program": "${userHome}/.venv/bin/python3",
             //"args": ["--eval-command='run ${workspaceFolder}/mockup.py'"],
             "args": [
-                "${workspaceFolder}/Simulation/exampleQuadSim.py",
+                "${workspaceFolder}/Simulation/exampleTailsitterSim.py",
                 "--sil",
-                "/mnt/data/Work/Tools/indiflight2/obj/main/indiflight_MOCKUP.so",
+                "/mnt/data/Work/Tools/indiflight/obj/main/indiflight_MOCKUP.so",
                 "--sil-profile-txt",
-                "${workspaceFolder}/Simulation/config/exampleINDIflightProfile.txt",
+                "/mnt/data/Work/Tools/indiflight/demoConfig/MTKS_darko_profile.txt",
                 //"--throw",
                 //"--learn",
                 "--sil-log"
@@ -47,12 +47,22 @@
             ]
         },
         {
-            "name": "Python Debugger: Current File with Arguments",
+            "name": "exampleTailsitterSim.py",
             "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
+            "program": "${workspaceFolder}/Simulation/exampleTailsitterSim.py",
+            //"args": ["--eval-command='run ${workspaceFolder}/mockup.py'"],
+            "args": [
+                "--sil",
+                "/mnt/data/Work/Tools/indiflight/obj/main/indiflight_MOCKUP.so",
+                "--sil-profile-txt",
+                "/mnt/data/Work/Tools/indiflight/demoConfig/MTKS_darko_profile.txt",
+                //"--throw",
+                //"--learn",
+                "--sil-log"
+                //"--no-viz",
+            ],
             "console": "integratedTerminal",
-            "args": "${command:pickArgs}"
         }
     ]
 }

@@ -352,7 +352,7 @@ export class tailSitter {
             if (idx >= controls.length)
                 break;
 
-            this.flaps[i].rotation.y = controls[idx]*0.8;
+            this.flaps[i].rotation.y = controls[idx] * 100 * 3.1415 / 180   *  (-1)**(i);
         }
     }
 }

@@ -59,5 +59,6 @@ def rotatingMassTorques(Imotor, spinAxisBody, motorVelocity, motorAcceleration, 
 
 @njit("f4(f4,f4,f4,f4,f4)")
 def motorModel(u, kESC, wmax, w, tau):
+    u = u if u >= 0. else 0.
     wc = wmax * np.sqrt( kESC*u*u + (1 - kESC) * u )
     return ( wc - w ) / tau

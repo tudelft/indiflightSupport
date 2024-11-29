@@ -71,6 +71,37 @@ class Rotor:
         # delta V ~=~ sqrt(T / rho / A)
         self.deltaV = np.sqrt(self.k * self.w*self.w / rho / self.A)
 
+class BlownFlap:
+    def __init__(self,
+                 rotor,
+                 X_cp=[0., 0., 0.1],
+                 rotation_axis=[0., 1., 0.],
+                 lam = 0.4,
+                 dmax = np.array((-1, 1), dtype=np.float32)*45*np.pi/180, # max deflectable angle
+                 ddot_max = 10., # rad/s max speed
+                 tau = 0.03, # sec, time constant
+                 ):
+        self.rotor = rotor
+        self.X  = np.asarray(X_cp, dtype=np.float32)
+        self.ax = np.asarray(rotation_axis, dtype=np.float32)
+        self.ax /= np.linalg.norm(self.ax)
+
+        self.lam = lam
+        self.dmax = np.asarray(dmax, dtype=np.float32)
+        self.ddot_max = ddot_max
+        self.tau = tau
+        self.d = 0.
+
+    def step(self, u, dt):
+        # motor dynamics
+        u *= self.dmax[1] if u >= 0 else -self.dmax[0]
+        self.ddot = np.clip(1 / self.tau * (u - self.d), -self.ddot_max, +self.ddot_max)
+        self.d += dt * self.ddot
+        self.d = np.clip(self.d, self.dmax[0], self.dmax[1])
+
+        self.F = self.d * self.lam * np.cross(-self.rotor.F, self.ax)
+        self.M = np.cross(self.X, self.F)
+
 class Surface:
     def __init__(self,
                  X_cp=[0., 0., 0.1],
@@ -234,7 +265,7 @@ class MultiRotor:
     def addRotor(self, rotor):
         self.rotors.append(rotor)
         self.n = len(self.rotors)
-        self.rotorVelocity = np.zeros(self.n, np.float32)
+        self.actuatorFeedback = np.zeros(self.n, np.float32)
         self.inputs = np.zeros(self.n, np.float32)
 
     def setPose(self, x=[0., 0., 0.], q=[1., 0., 0., 0.]):
@@ -339,7 +370,7 @@ class MultiRotor:
         M = np.zeros(3, dtype=np.float32)
         for i, (u, rotor) in enumerate(zip(self.inputs, self.rotors)):
             rotor.step(u, self.wB, dt)
-            self.rotorVelocity[i] = rotor.w
+            self.actuatorFeedback[i] = rotor.w
             F += rotor.F
             M += rotor.M
 
@@ -424,7 +455,7 @@ class TailSitter:
     def addRotor(self, rotor):
         self.rotors.append(rotor)
         self.nr = len(self.rotors)
-        self.rotorVelocity = np.zeros(self.nr, np.float32)
+        self.actuatorFeedback = np.zeros(self.nr, np.float32)
         self.inputs = np.zeros(self.nr, np.float32)
 
     def setPose(self, x=[0., 0., 0.], q=[1., 0., 0., 0.]):
@@ -452,7 +483,7 @@ class TailSitter:
         M = np.zeros(3, dtype=np.float32)
         for i, rotor in enumerate(self.rotors):
             rotor.step(self.inputs[i], self.wB, dt, vB=self.vB)
-            self.rotorVelocity[i] = rotor.w
+            self.actuatorFeedback[i] = rotor.w
             F += rotor.F
             M += rotor.M
 
@@ -491,6 +522,132 @@ class TailSitter:
         self.vI += dt * vDot
         self.xI += dt * xDot
 
+class TailSitterHover:
+    def __init__(self):
+        self.rotors = []
+        self.nr = 0
+        self.blownFlaps = []
+        self.nf = 0
+        self.m = 1
+        self.I = np.eye(3, dtype=np.float32)
+        self.Iinv = np.eye(3, dtype=np.float32)
+        self.xI = np.array([0., 0., 0.], dtype=np.float32)
+        self.vI = np.array([0., 0., 0.], dtype=np.float32)
+        self.fspB = np.array([0., 0., 0.], dtype=np.float32)
+        self.q = np.array([1., 0., 0., 0.], dtype=np.float32)
+        self.wDotB = np.array([0., 0., 0.], dtype=np.float32)
+        self.wB = np.array([0., 0., 0.], dtype=np.float32)
+
+        self.throw_time = +np.inf
+        self.throw_duration = 0.
+        self.FthrowI = np.array([0., 0., 0.], dtype=np.float32)
+        self.MthrowB = np.array([0., 0., 0.], dtype=np.float32)
+
+    def __repr__(self):
+        qWrong = np.zeros_like(self.q)
+        qWrong[3] = self.q[0]
+        qWrong[:3] = self.q[1:]
+        rot = R.from_quat(qWrong)
+        eulers = rot.as_euler('ZYX', degrees=True)
+        return f"TailSitter( x={self.xI}m, v={self.vI}m/s, roll={eulers[2]}deg, pitch={eulers[1]}deg, yaw={eulers[0]}deg )"
+
+    def throw(self, height=3.5, acc=45., wB=[0., 0., 0.], vHorz=[0., 0.], at_time=0.):
+        force = self.m * ( acc + GRAVITY )
+
+        # solve duration:
+        # 
+        # height = height after powered throw (sT) + altitude gained during coasting (sC)
+        # sT = 0.5*a*t**2
+        # vT = a*t
+        # sC = 0.5*vT**2 / g,  becayse 0.5*vT**2 = g*sC
+        # 
+        # then, solve  height == sT + sC  for time
+        self.throw_time = -at_time
+        self.throw_duration = np.sqrt( 2. * height / (acc * (1. + acc / GRAVITY)) )
+
+        self.FthrowI[:2] = self.m * np.asarray(vHorz) / self.throw_duration
+        self.FthrowI[2] = -force
+        self.MthrowB[:] = self.I @ ( wB / self.throw_duration )
+
+    def setInertia(self, m, I):
+        self.m = m
+        self.I = I.astype(np.float32)
+        self.Iinv = np.linalg.inv(I).astype(np.float32)
+
+    def addRotor(self, rotor):
+        self.rotors.append(rotor)
+        self.nr = len(self.rotors)
+        self.actuatorFeedback = np.zeros(self.nr + self.nf, np.float32)
+        self.inputs = np.zeros(self.nr + self.nf, np.float32)
+
+    def addBlownFlap(self, blownFlap):
+        self.blownFlaps.append(blownFlap)
+        self.nf = len(self.blownFlaps)
+        self.actuatorFeedback = np.zeros(self.nr + self.nf, np.float32)
+        self.inputs = np.zeros(self.nr + self.nf, np.float32)
+
+    def setPose(self, x=[0., 0., 0.], q=[1., 0., 0., 0.]):
+        self.xI[:] = np.asarray(x, dtype=np.float32)
+        self.q[:] = np.asarray(q, dtype=np.float32)
+
+    def setTwist(self, v=[0., 0., 0.], w=[0., 0., 0.]):
+        self.vI[:] = np.asarray(v, dtype=np.float32)
+        self.wB[:] = np.asarray(w, dtype=np.float32)
+
+    def setExternalForceInInertialFrame(self, F):
+        self.FthrowI[:] = F
+
+    def setExternalMomentInBodyFrame(self, M):
+        self.MthrowB[:] = M
+
+    def calculateG1G2(self):
+        raise NotImplementedError("")
+
+    def checkHover(self):
+        raise NotImplementedError("")
+
+    def tick(self, dt):
+        F = np.zeros(3, dtype=np.float32)
+        M = np.zeros(3, dtype=np.float32)
+        for i, rotor in enumerate(self.rotors):
+            rotor.step(self.inputs[i], self.wB, dt)
+            self.actuatorFeedback[i] = rotor.w
+            F += rotor.F
+            M += rotor.M
+
+        for i, blownFlap in enumerate(self.blownFlaps):
+            blownFlap.step(self.inputs[self.nr+i], dt)
+            self.actuatorFeedback[self.nr+i] = blownFlap.d
+            F += blownFlap.F
+            M += blownFlap.M
+
+        qInv = self.q.copy()
+        qInv[0] *= -1.
+        if self.xI[2] > 0.:
+            # handle ground contact
+            down = self.vI[2] > 0.
+            F += (1000 if down else 1000)  * self.m * quatRotate( qInv, np.array([0., 0., -1.], dtype=np.float32) * self.xI )
+            F += (100  if down else 1) * self.m * quatRotate( qInv, -self.vI )
+            M += 1000 * self.I @ ( np.sign(qInv[0]) * qInv[1:] )
+            M += 100 * self.I @ -self.wB
+
+        # throw timekeeping and add external force and moment
+        self.throw_time += dt
+        if self.throw_time > 0. and self.throw_time <= self.throw_duration:
+            F += quatRotate( qInv, self.FthrowI )
+            M += self.MthrowB
+
+        self.wDotB[:] = angularRateDerivative( self.wB, M, self.I, self.Iinv )
+        qDot = quaternionDerivative( self.q, self.wB )
+        self.fspB[:] = F / self.m
+        vDot = quatRotate( self.q, self.fspB )  +  np.array([0., 0., GRAVITY])
+        xDot = self.vI
+
+        self.wB += dt * self.wDotB
+        self.q += dt * qDot
+        self.q /= np.linalg.norm(self.q)
+        self.vI += dt * vDot
+        self.xI += dt * xDot
 
 
 

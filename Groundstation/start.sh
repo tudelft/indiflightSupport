@@ -88,7 +88,8 @@ tmux send-keys -t $session:0.3 "$ON_PI /home/pi/relay/build-aarch64-linux-gnu/re
 
 # start natnet2udp.py in udp mode
 #tmux send-keys -t $session:0.0 "./optitrack_forwarder/build/natnet2udp.py -ac $RB_ID 0 -f 20 -le right -an far -xs right -up z_up -udp $TEST_FLAG" ENTER
-tmux send-keys -t $session:0.0 "./UnifiedOptitrackClients/build/mocap2udp -s $RB_ID --ac 0 -f 20 -i 10.0.0.1 -p 5005 -c NED $TEST_FLAG" ENTER
+#tmux send-keys -t $session:0.0 "./UnifiedOptitrackClients/build/mocap2udp -s $RB_ID --ac 0 -f 20 -i 10.0.0.1 -p 5005 -c NED $TEST_FLAG" ENTER
+tmux send-keys -t $session:0.0 "./UnifiedOptitrackClients/build/client test udp -d 14 -f 20 -c NED -r near_side -n near_side -s 0 -i 10.0.0.1 --test_freq 2" ENTER
 
 # setpoints
 tmux send-keys -t $session:0.1 '/usr/bin/env python3 setpointSender.py --pos 0 0 -1.0 --yaw 0'

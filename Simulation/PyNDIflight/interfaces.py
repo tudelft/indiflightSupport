@@ -60,7 +60,7 @@ def pose():
     pos = list(visData.x.round(4))
     quat = list(visData.q.round(4))
     ctl = list(visData.inputs)
-    arr.append({'id': 0, 'type': 3, 'newCraft': visData.newCraft, 'pos': pos, 'quat': quat, 'ctl': ctl})
+    arr.append({'id': 0, 'type': 2, 'newCraft': visData.newCraft, 'pos': pos, 'quat': quat, 'ctl': ctl})
     return json.dumps(arr)
 
 @visApp.route("/craftdata")
@@ -122,7 +122,8 @@ class IndiflightSITLWrapper():
 
     def sendImuAndMotor(self):
         self.mockup.sendImu( self.imu.gyro, self.imu.acc )
-        self.mockup.sendMotorSpeeds( self.uav.rotorVelocity )
+        self.mockup.sendMotorSpeeds( self.uav.actuatorFeedback[:2] )
+        self.mockup.sendServoAngles( self.uav.actuatorFeedback[2:] )
 
     def sendMocap(self):
         self.mockup.sendMocap( self.uav.xI, self.uav.vI, self.uav.q )
@@ -131,7 +132,7 @@ class IndiflightSITLWrapper():
         inputs = self.mockup.getMotorCommands()
         n = min(len(inputs), len(self.uav.inputs))
         self.uav.inputs[:n] = self.mockup.getMotorCommands()
-        self.uav.inputs = np.clip(self.uav.inputs, 0., 1.)
+        self.uav.inputs = np.clip(self.uav.inputs, -1., 1.)
 
     def tick(self, dt):
         self.mockup.tick( int(dt*1e6) )
