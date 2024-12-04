@@ -89,7 +89,7 @@ if __name__=="__main__":
     #%% Generate craft
     mc = TailSitterHover()
     # approx darkO model
-    mc.setInertia(m=0.6, I=np.diag((7e-3, 0.8e-3, 4e-3)))
+    mc.setInertia(m=0.6, I=np.diag((10e-3, 2.6e-3, 9e-3)))
     leftRotor = Rotor(r=[0, -0.13, -0.05], Tmax=14.2, dir='rh')
     rightRotor = Rotor(r=[0, +0.13, -0.05], Tmax=14.2, dir='lh')
     mc.addRotor(leftRotor)
@@ -97,7 +97,7 @@ if __name__=="__main__":
     mc.addBlownFlap(BlownFlap(leftRotor,
                               X_cp = [0., -0.13, 0.10],
                               rotation_axis = [0., 1., 0.],
-                              lam = 0.7,
+                              lam = 0.65,
                               dmax = [-45*np.pi/180., 45*np.pi/180],
                               ddot_max = 600. * np.pi/180, # guess based on 0.1sec/60deg
                               tau = 0.03, # guess
@@ -105,7 +105,7 @@ if __name__=="__main__":
     mc.addBlownFlap(BlownFlap(rightRotor,
                               X_cp = [0., +0.13, 0.10],
                               rotation_axis = [0., -1., 0.],
-                              lam = 0.7,
+                              lam = 0.65,
                               dmax = [-45*np.pi/180., 45*np.pi/180],
                               ddot_max = 600. * np.pi/180, # guess based on 0.1sec/60deg
                               tau = 0.03, # guess
@@ -173,7 +173,7 @@ if __name__=="__main__":
     atGates = False
     atRef = False
 
-    for i in tqdm(range(int(T / dt)), target_looptime=4*dt_rt):
+    for i in tqdm(range(int(T / dt)), target_looptime=2*dt_rt):
         if not home_ekf and sim.t > .5:
             home_ekf = True
             sil.mockup.lib.initEkf()
@@ -184,7 +184,7 @@ if __name__=="__main__":
         if not start_trajectory and sim.t > 5. and sil is not None:
             # start trajectory tracking at 8*0.5 = 4m/s target speed
             sil.mockup.sendKeyboard('1')
-            if sim.t > 7.:
+            if sim.t > 10.:
                 for _ in range(8):
                     sil.mockup.sendKeyboard('3')
                 start_trajectory = True
