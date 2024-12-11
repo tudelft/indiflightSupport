@@ -63,30 +63,34 @@ p = go to above nn_init
 t = takeoff
 s = set waypoint here
 i = initialize kalman filter
+
 1 = initTrajectoryTracker
+2 = decrease speed by 0.1
+3 = increase speed by 0.1
+9 = startTrajectoryTracker
+4 = stopTrajectoryTracker
 x = set init speed 70 perc
 y = set init speed 80 perc
 z = set init speed 90 perc
-a = set init speed 95 perc      (old: 100 perc)
-b = set init speed 100 perc     (old: 105 perc)
-c = set init speed 105 perc     (old: 110 perc)
-d = set init speed 110 perc     (old: 115 perc)
-e = set init speed 115 perc     (old: 120 perc)
-f = set init speed 120 perc     (old: 125 perc)
-g = set init speed 125 perc     (old: set speed 80 perc)
-h = set init speed 130 perc     (old: increment height offset 0.1)
-l = ..                          (old: increment height offset -0.1)
-n = enable autostart
-m = disable autostart
-2 = decrease speed by 0.5 m/s
-3 = increase speed by 0.5 m/s
-4 = stopTrajectoryTracker
+a = set init speed 95 perc
+b = set init speed 100 perc
+c = set init speed 105 perc
+d = set init speed 110 perc
+e = set init speed 115 perc
+f = set init speed 120 perc
+
+r = heading mode: look at ref
+n = heading mode: look at nothing
+v = heading mode: look at velocity
+g = heading mode: look at gate
+
+q = auto start true
+w = auto start false
+
 5 = land
 6 = nn_init
 7 = nn_activate
 8 = recovery_mode
-9 = kill
-
     '''
     stdscr.addstr(info)
 
