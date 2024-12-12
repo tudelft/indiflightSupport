@@ -30,6 +30,9 @@ add_executable(relay ${CMAKE_SOURCE_DIR}/src/relay.cpp
     ${PI_GEN_DIR}/pi-messages.c
 )
 
+link_libraries(relay PUBLIC)
+target_link_libraries(relay wiringPi)
+
 # when compiling for the orin, enable the parts of the code that do ROS2 things
 option(ORIN "Compile for Orin with ROS2 VIO support" OFF)
 if(ORIN)

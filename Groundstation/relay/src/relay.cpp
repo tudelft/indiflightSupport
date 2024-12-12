@@ -60,6 +60,19 @@ using std::chrono::system_clock;
 #include <signal.h>
 #include <stdlib.h>
 
+#include <wiringPi.h>
+#include <pthread.h>
+
+// Pin configuration
+#define GPIO_PIN 4 // GPIO pin to detect the pulse (BCM GPIO 18)
+
+unsigned pulse_counter = 0;
+
+// ISR for rising edge detection
+//void pulseISR(void) {
+//    pulse_counter++; // Set the flag when a pulse is detected
+//}
+
 static void catch_function(int signo) {
     switch(signo) {
         case SIGUSR1:
@@ -283,6 +296,28 @@ void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
 
 
 int main(int argc, char** argv) {
+    // Initialize wiringPi and configure the GPIO pin
+    if (wiringPiSetup() == -1) { // Use GPIO numbering
+        fprintf(stderr, "Failed to initialize wiringPi\n");
+        return 1;
+    }
+
+    //pinMode(GPIO_PIN, INPUT); // Set GPIO pin as input
+    //pullUpDnControl(GPIO_PIN, PUD_DOWN); // Enable pull-down resistor
+
+    //// Attach ISR for rising edge
+    //if (wiringPiISR(GPIO_PIN, INT_EDGE_RISING, &pulseISR) < 0) {
+    //    fprintf(stderr, "Failed to set up ISR\n");
+    //    return 1;
+    //}
+
+    //printf("Monitoring GPIO pin %d for rising edges...\n", GPIO_PIN);
+
+    pinMode(GPIO_PIN, OUTPUT); // Set GPIO pin as output
+    digitalWrite(GPIO_PIN, LOW); // Ensure pin is LOW initially
+
+    printf("Generating pulses on GPIO pin %d...\n", GPIO_PIN);
+
     // enable logging if the first argument is -l
     bool logging = (argc == 2) && !strcmp(argv[1], "-l"); 
 
@@ -366,6 +401,15 @@ int main(int argc, char** argv) {
             }
         }
 
+        //static unsigned pulse_counter_last = 0;
+        //if (pulse_counter > pulse_counter_last) {
+        //    pulse_counter_last = pulse_counter;
+        //    piMsgExternalPoseTx.ned_xd = 0.01f*((float) pulse_counter) + 0.001f; // steal this byte
+        //    piSendMsg(&piMsgExternalPoseTx, &serialWriter);
+        //    printf("sent PULSE %d \n", pulse_counter);
+        //    usleep(1000);
+        //}
+
         if ((piMsgImuRxState == PI_MSG_RX_STATE_NONE) || (!newMessage)) {
             // cannot go on, no time information to timestamp gps msgs, or setpoints
             //usleep(250); // reduce CPU load a bit
@@ -404,7 +448,8 @@ int main(int argc, char** argv) {
             piMsgExternalPoseTx.ned_x   = pose.x;
             piMsgExternalPoseTx.ned_y   = pose.y;
             piMsgExternalPoseTx.ned_z   = pose.z;
-            piMsgExternalPoseTx.ned_xd  = pose_der.x;
+            //piMsgExternalPoseTx.ned_xd  = pose_der.x;
+            piMsgExternalPoseTx.ned_xd  = 0.01f*((float) ++pulse_counter) + 0.001f; // steal this byte
             piMsgExternalPoseTx.ned_yd  = pose_der.y;
             piMsgExternalPoseTx.ned_zd  = pose_der.z;
             piMsgExternalPoseTx.body_qi = pose.qw;
@@ -413,6 +458,10 @@ int main(int argc, char** argv) {
             piMsgExternalPoseTx.body_qz = pose.qz;
             piSendMsg(&piMsgExternalPoseTx, &serialWriter);
             printf("received EXTERNAL_POSE \n");
+            digitalWrite(GPIO_PIN, 1); // Set pin HIGH
+            delayMicroseconds(100); // Wait for the pulse width
+            digitalWrite(GPIO_PIN, 0); // Set pin LOW
+            printf("sent pulse \n");
         }
 
         // ---- setpoints ----
