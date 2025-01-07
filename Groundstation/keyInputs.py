@@ -62,7 +62,6 @@ def main(stdscr, sock, host, port):
 p = go to above nn_init
 t = takeoff
 s = set waypoint here
-i = initialize kalman filter
 
 1 = initTrajectoryTracker
 2 = decrease speed by 0.1
