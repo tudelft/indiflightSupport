@@ -27,6 +27,7 @@ if __name__=="__main__":
     parser.add_argument("-i", "--id", required=False, type=int, default=1, help="If multiple logs combined in one file, select this one.")
     parser.add_argument("-n", "--name", required=False, type=str, default="fc", help="Entity name for rerun.")
     parser.add_argument("-c", "--clock-offset", required=False, type=float, default=0., help="Clock offset in seconds to add to the log time.")
+    parser.add_argument("-t", "--clock-scale", required=False, type=float, default=1.0, help="Clockscale to multiply the log time with.")
     parser.add_argument("-s", "--spawn", required=False, action='store_true', default=False, help="Spawn new recording and, if necessary, a new rerun window)"),
     parser.add_argument("-r", "--recording-id", required=False, type=str, default=None, help="Write to this recording_id")
     #parser.add_argument("-t", "--time-range", required=False, nargs=2, default=None, help="start and endtime in ms")
@@ -38,5 +39,5 @@ if __name__=="__main__":
     rr.connect()
 
     log = IndiflightLog(args.logfile, logId=args.id, timeRange=None, resetTime=False)
-    log.addToRerun(args.name, clockOffsetSeconds=args.clock_offset)
+    log.addToRerun(args.name, clockOffsetSeconds=args.clock_offset, clockScale=args.clock_scale)
 

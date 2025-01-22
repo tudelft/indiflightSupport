@@ -312,7 +312,7 @@ class IndiflightLog(object):
         print("Finished writing to ROS 2 bag file.")
         del writer
 
-    def addToRerun(self, name: str, clockOffsetSeconds=0.):
+    def addToRerun(self, name: str, clockOffsetSeconds=0., clockScale=1.):
         import rerun as rr
 
         # define elements to log
@@ -367,7 +367,7 @@ class IndiflightLog(object):
         ]
 
         # prepare arrays and lambdas
-        timeS = self.data["timeS"].to_numpy() + clockOffsetSeconds
+        timeS = self.data["timeS"].to_numpy() * clockScale + clockOffsetSeconds
         getValues = lambda s, ir: self.data[[f"{s}[{i}]" for i in ir]].to_numpy().flatten()
         getPart = lambda i: [i for _ in range(self.N)]
         getManyOf = lambda x: np.ones(self.N)*x
@@ -431,7 +431,7 @@ class IndiflightLog(object):
 
         # log flight mode changes (must be last)
         for _, row in self.flags.iterrows():
-            time = row["timeUs"] * 1e-6 + clockOffsetSeconds
+            time = row["timeUs"] * 1e-6 * clockScale + clockOffsetSeconds
             enable = IndiflightLog.modeToText(row["enable"])
             disable = IndiflightLog.modeToText(row["disable"])
 
@@ -444,7 +444,7 @@ class IndiflightLog(object):
 
         # log other events
         for event in self.events:
-            time = event['time'] * 1e-6 + clockOffsetSeconds
+            time = event['time'] * 1e-6 * clockScale + clockOffsetSeconds
             msg = event['name']
 
             rr.set_time_seconds("time", time)
