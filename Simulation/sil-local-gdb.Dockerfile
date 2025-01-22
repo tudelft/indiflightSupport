@@ -27,14 +27,14 @@ RUN apt-get update \
 COPY Simulation/requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 
-COPY LogAnalysis/indiflightLogTools/requirements.txt /requirements2.txt
-RUN pip install -r /requirements2.txt
+#COPY LogAnalysis/indiflightLogTools/requirements.txt /requirements2.txt
+#RUN pip install -r /requirements2.txt
 
 # copy sim code
 COPY Simulation/PyNDIflight /PyNDIflight
 
 # copy data analysis code
-COPY LogAnalysis/indiflightLogTools /indiflightLogTools
+#COPY LogAnalysis/indiflightLogTools /indiflightLogTools
 
 EXPOSE 5000
 EXPOSE 3333

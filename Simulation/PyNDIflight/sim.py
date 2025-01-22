@@ -31,7 +31,7 @@ class Sim():
         visData.spawn(self.uav)
 
     def tick(self, dt):
-        if not (self.i % 2):
+        if not (self.i % 8):
             self.hil.receive() if self.hil else None
 
         self.sil.receive() if self.sil else None
@@ -42,12 +42,13 @@ class Sim():
             self.sil.sendImuAndMotor()
             self.sil.tick(dt) # ticks the indiflight controller
 
-        if not (self.i % 2): # 1kHz
+        if not (self.i % 1): # 8kHz
             self.imu.update() if self.imu else None
+        if not (self.i % 8): # 1kHz
             self.hil.send() if self.hil else None
-        if not (self.i % 20): # 100 Hz
+        if not (self.i % 160): # 50 Hz
             visData.update(self.uav)
-        if not (self.i % 100): # 20 Hz
+        if not (self.i % 400): # 20 Hz
             self.mocap.update() if self.mocap else None
             self.sil.sendMocap() if self.sil else None
 

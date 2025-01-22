@@ -89,11 +89,20 @@ if __name__=="__main__":
     #%% Generate craft
     mc = MultiRotor()
     # approx model of CineRat 3inch race drone
-    mc.setInertia(m=0.41, I=0.75*np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
-    mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=4.5, dir='lh')) # RR
-    mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=4.5, dir='rh')) # FR
-    mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=4.5, dir='rh')) # RL
-    mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=4.5, dir='lh')) # FL
+    #mc.setInertia(m=0.41, I=0.75*np.diag([0.75e-3, 0.8e-3, 0.9e-3]))
+    #mc.addRotor(Rotor(r=[-0.05, +0.0635, 0.0], Tmax=4.5, dir='lh')) # RR
+    #mc.addRotor(Rotor(r=[+0.05, +0.0635, 0.0], Tmax=4.5, dir='rh')) # FR
+    #mc.addRotor(Rotor(r=[-0.05, -0.0635, 0.0], Tmax=4.5, dir='rh')) # RL
+    #mc.addRotor(Rotor(r=[+0.05, -0.0635, 0.0], Tmax=4.5, dir='lh')) # FL
+
+    mc.setInertia(m=0.923, I=np.diag([3.8e-3, 9e-3, 10e-3]))
+    widthFront = 0.22 
+    widthRear = 0.265
+    length = 0.27
+    mc.addRotor(Rotor(r=[-0.5*length, +0.5*widthRear , 0.0], Tmax=20., cm=0.025, kESC=0.4, tau=0.025, Izz=1.5e-5, dir='lh')) # RR
+    mc.addRotor(Rotor(r=[+0.5*length, +0.5*widthFront, 0.0], Tmax=20., cm=0.025, kESC=0.4, tau=0.025, Izz=1.5e-5, dir='rh')) # FR
+    mc.addRotor(Rotor(r=[-0.5*length, -0.5*widthRear , 0.0], Tmax=20., cm=0.025, kESC=0.4, tau=0.025, Izz=1.5e-5, dir='rh')) # RL
+    mc.addRotor(Rotor(r=[+0.5*length, -0.5*widthFront, 0.0], Tmax=20., cm=0.025, kESC=0.4, tau=0.025, Izz=1.5e-5, dir='lh')) # FL
     # some additional rotors
     #mc.addRotor(Rotor(r=[+0.0, -0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[0, -1., -1.]))
     #mc.addRotor(Rotor(r=[+0.0, +0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[0, 1., -1.]))
@@ -102,9 +111,9 @@ if __name__=="__main__":
 
 
     #%% craft interfaces
-    #imu = IMU(mc, r=[0., 0., 0.], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
+    imu = IMU(mc, r=[0., 0., 0.], qBody=[0., 0., 0., 1.], accStd=0.2, gyroStd=0.02)
     #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
-    imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
+    #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
 
     mocap = Mocap(mc, args.mocap_host, args.mocap_port) if args.mocap else None
     hil = IndiflightHIL(mc, imu, device=args.hil, baud=args.hil_baud) if args.hil else None
@@ -115,6 +124,7 @@ if __name__=="__main__":
     if sil is not None:
         sil.mockup.load_profile( args.sil_profile_txt ) if args.sil_profile_txt else None
         sil.mockup.setLogging( args.sil_log )
+        sil.mockup.saveConfig()
         if args.sil_log:
             os.makedirs('./logs', exist_ok=True)
 
@@ -133,7 +143,8 @@ if __name__=="__main__":
 
 
     #%% initial conditions
-    mc.setPose(x=[1.5, 2.5, -0.1], q=[0.707, 0., 0., 0.707])
+    #mc.setPose(x=[1.5, 2.5, -0.1], q=[0.707, 0., 0., -0.707])
+    mc.setPose(x=[0., 0., 0.], q=[1., 0., 0., 0.])
     mc.setTwist(v=[0., 0., 0.], w=[0., 0., 0.])
 
     sim = Sim(mc, imu, mocap, hil, sil)
@@ -152,10 +163,11 @@ if __name__=="__main__":
 
 
     #%% run loop
-    dt = 0.0005 # 2kHz
+    dt = 0.000125 # 8kHz
     T = 1000. # seconds
     dt_rt = None if args.no_real_time else dt
     takeoff = False
+    nn_init = False
     start_trajectory = False
     atNothing = False
     atVelocity = False
@@ -166,8 +178,7 @@ if __name__=="__main__":
     for i in tqdm(range(int(T / dt)), target_looptime=dt_rt):
         if not init and sim.t > 1. and sil is not None:
             # sil.mockup.sendKeyboard('i') # initialize EKF
-            # sil.mockup.sendKeyboard('s')
-            sil.mockup.sendKeyboard('n')
+            sil.mockup.sendKeyboard('s')
             
             init = True
 
@@ -175,19 +186,31 @@ if __name__=="__main__":
             sil.mockup.arm() if sil else None
             
             
-        if not takeoff and sim.t > 5:
+        if not takeoff and sim.t > 4:
             # sil.mockup.sendKeyboard('1')
-            # sil.mockup.sendKeyboard('t') # takeoff
+            sil.mockup.sendKeyboard('t') # takeoff
             # for i in range(5):
             #     sil.mockup.sendKeyboard('l')
             # sil.mockup.sendKeyboard('1') # init TT
             takeoff = True
             
 
-        # if not start_trajectory and sim.t > 10. and sil is not None:
-        #     if sim.t > 11.:
-        #         sil.mockup.sendKeyboard('x')
-        #         start_trajectory = True
+        # if not nn_init and sim.t > 6.:
+        #     sil.mockup.sendKeyboard('6')
+        #     nn_init = True
+
+        # if not start_trajectory and sim.t > 10.:
+        #     sil.mockup.lib.nn_activate()
+        #     start_trajectory = True
+
+        if not start_trajectory and sim.t > 6. and sil is not None:
+            sil.mockup.sendKeyboard('1') # init
+            #sil.mockup.sendKeyboard('x') # 70%
+            sil.mockup.sendKeyboard('b') # 100%
+            #sil.mockup.sendKeyboard('f') # 120%
+            if sim.t > 10.:
+                sil.mockup.sendKeyboard('9')
+                start_trajectory = True
 
         # if not atRef and sim.t > 7. and sil is not None:
         #     sil.mockup.sendKeyboard('r')
