@@ -99,10 +99,10 @@ if __name__=="__main__":
     widthFront = 0.22 
     widthRear = 0.265
     length = 0.27
-    mc.addRotor(Rotor(r=[-0.5*length, +0.5*widthRear , 0.0], Tmax=20., cm=0.025, kESC=0.4, tau=0.025, Izz=1.5e-5, dir='lh')) # RR
-    mc.addRotor(Rotor(r=[+0.5*length, +0.5*widthFront, 0.0], Tmax=20., cm=0.025, kESC=0.4, tau=0.025, Izz=1.5e-5, dir='rh')) # FR
-    mc.addRotor(Rotor(r=[-0.5*length, -0.5*widthRear , 0.0], Tmax=20., cm=0.025, kESC=0.4, tau=0.025, Izz=1.5e-5, dir='rh')) # RL
-    mc.addRotor(Rotor(r=[+0.5*length, -0.5*widthFront, 0.0], Tmax=20., cm=0.025, kESC=0.4, tau=0.025, Izz=1.5e-5, dir='lh')) # FL
+    mc.addRotor(Rotor(r=[-0.5*length, +0.5*widthRear , 0.0], Tmax=20., cm=0.025, wmax=3000, kESC=0.4, tau=0.025, Izz=1.5e-5, dir='lh')) # RR
+    mc.addRotor(Rotor(r=[+0.5*length, +0.5*widthFront, 0.0], Tmax=20., cm=0.025, wmax=3000, kESC=0.4, tau=0.025, Izz=1.5e-5, dir='rh')) # FR
+    mc.addRotor(Rotor(r=[-0.5*length, -0.5*widthRear , 0.0], Tmax=20., cm=0.025, wmax=3000, kESC=0.4, tau=0.025, Izz=1.5e-5, dir='rh')) # RL
+    mc.addRotor(Rotor(r=[+0.5*length, -0.5*widthFront, 0.0], Tmax=20., cm=0.025, wmax=3000, kESC=0.4, tau=0.025, Izz=1.5e-5, dir='lh')) # FL
     # some additional rotors
     #mc.addRotor(Rotor(r=[+0.0, -0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='lh', axis=[0, -1., -1.]))
     #mc.addRotor(Rotor(r=[+0.0, +0.1, 0.05], Tmax=5., kESC=0.5, tau=0.02, Izz=5e-7, dir='rh', axis=[0, 1., -1.]))
@@ -195,22 +195,22 @@ if __name__=="__main__":
             takeoff = True
             
 
-        # if not nn_init and sim.t > 6.:
-        #     sil.mockup.sendKeyboard('6')
-        #     nn_init = True
+        if not nn_init and sim.t > 6.:
+            sil.mockup.sendKeyboard('6')
+            nn_init = True
 
-        # if not start_trajectory and sim.t > 10.:
-        #     sil.mockup.lib.nn_activate()
-        #     start_trajectory = True
+        if not start_trajectory and sim.t > 10.:
+            sil.mockup.lib.nn_activate()
+            start_trajectory = True
 
-        if not start_trajectory and sim.t > 6. and sil is not None:
-            sil.mockup.sendKeyboard('1') # init
-            #sil.mockup.sendKeyboard('x') # 70%
-            sil.mockup.sendKeyboard('b') # 100%
-            #sil.mockup.sendKeyboard('f') # 120%
-            if sim.t > 10.:
-                sil.mockup.sendKeyboard('9')
-                start_trajectory = True
+        # if not start_trajectory and sim.t > 6. and sil is not None:
+        #     sil.mockup.sendKeyboard('1') # init
+        #     #sil.mockup.sendKeyboard('x') # 70%
+        #     sil.mockup.sendKeyboard('b') # 100%
+        #     #sil.mockup.sendKeyboard('f') # 120%
+        #     if sim.t > 10.:
+        #         sil.mockup.sendKeyboard('9')
+        #         start_trajectory = True
 
         # if not atRef and sim.t > 7. and sil is not None:
         #     sil.mockup.sendKeyboard('r')
