@@ -111,7 +111,7 @@ if __name__=="__main__":
 
 
     #%% craft interfaces
-    imu = IMU(mc, r=[0., 0., 0.], qBody=[0., 0., 0., 1.], accStd=0.2, gyroStd=0.02)
+    imu = IMU(mc, r=[0., 0., 0.], qBody=[0., 0., 1., 0.], accStd=0.2, gyroStd=0.02)
     #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0., gyroStd=0.)
     #imu = IMU(mc, r=[-0.01, -0.012, 0.008], qBody=[0., 0., 0., 1.], accStd=0.8, gyroStd=0.08)
 
@@ -122,8 +122,18 @@ if __name__=="__main__":
 
     #%% indiflight configuration, if software in the loop
     if sil is not None:
+        # load profile and override some stuff
         sil.mockup.load_profile( args.sil_profile_txt ) if args.sil_profile_txt else None
+
         sil.mockup.setLogging( args.sil_log )
+        for char in "set acc_calibration = 0,0,0,1\r\n":
+            # acc calib must be reset for SIL
+            sil.mockup.lib.processCharacterInteractive(bytes(char, 'utf-8'))
+
+        for char in "set motor_output_reordering = 0,1,2,3,4,5,6,7\r\n":
+            # changing this somehow messes things up with the actuator feedback
+            sil.mockup.lib.processCharacterInteractive(bytes(char, 'utf-8'))
+
         sil.mockup.saveConfig()
         if args.sil_log:
             os.makedirs('./logs', exist_ok=True)
@@ -195,22 +205,26 @@ if __name__=="__main__":
             takeoff = True
             
 
-        if not nn_init and sim.t > 6.:
-            sil.mockup.sendKeyboard('6')
-            nn_init = True
+        ######### USE NN
+        # if not nn_init and sim.t > 6.:
+        #     sil.mockup.sendKeyboard('6')
+        #     nn_init = True
 
-        if not start_trajectory and sim.t > 10.:
-            sil.mockup.lib.nn_activate()
-            start_trajectory = True
+        # if not start_trajectory and sim.t > 10.:
+        #     sil.mockup.lib.nn_activate()
+        #     start_trajectory = True
+        #########
 
-        # if not start_trajectory and sim.t > 6. and sil is not None:
-        #     sil.mockup.sendKeyboard('1') # init
-        #     #sil.mockup.sendKeyboard('x') # 70%
-        #     sil.mockup.sendKeyboard('b') # 100%
-        #     #sil.mockup.sendKeyboard('f') # 120%
-        #     if sim.t > 10.:
-        #         sil.mockup.sendKeyboard('9')
-        #         start_trajectory = True
+        ######### USE TT
+        if not start_trajectory and sim.t > 6. and sil is not None:
+            sil.mockup.sendKeyboard('1') # init
+            #sil.mockup.sendKeyboard('x') # 70%
+            sil.mockup.sendKeyboard('b') # 100%
+            #sil.mockup.sendKeyboard('f') # 120%
+            if sim.t > 10.:
+                sil.mockup.sendKeyboard('9')
+                start_trajectory = True
+        #########
 
         # if not atRef and sim.t > 7. and sil is not None:
         #     sil.mockup.sendKeyboard('r')
