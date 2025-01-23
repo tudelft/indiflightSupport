@@ -71,7 +71,6 @@ class IndiflightLog(object):
     DSHOT_MIN = 158.
     DSHOT_MAX = 2048.
     CACHE_NAME = "indiflight_logs"
-    LIBRARY_SO = os.path.join(os.path.dirname(__file__), "blackbox_decode.cpython-310-x86_64-linux-gnu.so")
 
     @staticmethod
     def modeToText(bits):
@@ -145,7 +144,16 @@ class IndiflightLog(object):
         self.logIdStr = str(logId).zfill(2)
 
         # setup libary
-        lib = ctypes.CDLL(self.LIBRARY_SO)
+        library = None
+        for file in glob.glob(os.path.join(os.path.dirname(__file__), "blackbox_decode.*.so")):
+            library = file
+            break
+
+        if library is not None:
+            lib = ctypes.CDLL(library)
+        else:
+            raise FileNotFoundError(f"Count not import blackkbox_decode library from {os.path.dirname(__file__)}")
+
         lib.main.argtypes = (ctypes.c_int, ctypes.POINTER(ctypes.c_char_p))
         lib.main.restype = ctypes.c_int
 
