@@ -438,16 +438,16 @@ int main(int argc, char** argv) {
             piSendMsg(&piMsgExternalPoseTx, &serialWriter);
             printf("forwarded EXTERNAL_POSE \n");
 
-            piMsgOffboardPoseTx.time_us = piMsgEkfInputsRx->time_us;
-            piMsgOffboardPoseTx.x = 0.;
-            piMsgOffboardPoseTx.y = 0.;
-            piMsgOffboardPoseTx.z = 0.;
-            piMsgOffboardPoseTx.qw = 1.;
-            piMsgOffboardPoseTx.qx = 0.;
-            piMsgOffboardPoseTx.qy = 0.;
-            piMsgOffboardPoseTx.qz = 0.;
-            piSendMsg(&piMsgOffboardPoseTx, &serialWriter);
-            printf("forwarded OFFBOARD_POSE \n");
+            //piMsgOffboardPoseTx.time_us = piMsgEkfInputsRx->time_us;
+            //piMsgOffboardPoseTx.x = 0.;
+            //piMsgOffboardPoseTx.y = 0.;
+            //piMsgOffboardPoseTx.z = 0.;
+            //piMsgOffboardPoseTx.qw = 1.;
+            //piMsgOffboardPoseTx.qx = 0.;
+            //piMsgOffboardPoseTx.qy = 0.;
+            //piMsgOffboardPoseTx.qz = 0.;
+            //piSendMsg(&piMsgOffboardPoseTx, &serialWriter);
+            //printf("forwarded OFFBOARD_POSE \n");
         }
 
         // ---- setpoints ----
