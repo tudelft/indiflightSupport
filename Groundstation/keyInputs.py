@@ -86,6 +86,9 @@ g = heading mode: look at gate
 q = auto start true
 w = auto start false
 
+o = state overwrite true
+u = state overwrite false
+
 5 = land
 6 = nn_init
 7 = nn_activate
