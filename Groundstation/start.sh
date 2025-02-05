@@ -54,7 +54,7 @@ if [[ $RB_ID -lt 0 ]] || [[ -z $RB_ID ]]; then
 fi
 
 # define ssh stuff
-ON_PI="/usr/bin/sshpass -p pi ssh -o StrictHostKeyChecking=no pi@10.0.0.1"
+#ON_PI="/usr/bin/sshpass -p pi ssh -o StrictHostKeyChecking=no pi@10.0.0.1"
 
 # make sure program exits properly
 trap "exit" INT TERM
@@ -71,33 +71,42 @@ tmux set mouse on
 # +-----+------+
 # | .0  |  .3  |
 # +-----|------+
-# | .1  |      |
-# +-----|  .4  |
-# | .2  |      |
+# | .1  |  .4  |
+# +-----+------+
+# | .2  |  .5  |
 # +-----+------+
 #
 tmux splitw -h -t "$session:0.0"
 tmux splitw -v -t "$session:0.0"
 tmux splitw -v -t "$session:0.2"
 tmux splitw -v -t "$session:0.1"
+tmux splitw -v -t "$session:0.4"
 
 # start uart comms. UPDATE: now assumed that relay.service is running, check README
-tmux send-keys -t $session:0.3 "$ON_PI sudo killall relay\;"
-tmux send-keys -t $session:0.3 "$ON_PI /home/pi/relay/build-aarch64-linux-gnu/relay "
+#tmux send-keys -t $session:0.3 "sudo killall relay\;"
+tmux send-keys -t $session:0.3 "relay/build/relay "
 #tmux send-keys -t $session:0.3 "$ON_PI sudo systemctl status relay.service" ENTER
 
 # start natnet2udp.py in udp mode
 #tmux send-keys -t $session:0.0 "./optitrack_forwarder/build/natnet2udp.py -ac $RB_ID 0 -f 20 -le right -an far -xs right -up z_up -udp $TEST_FLAG" ENTER
-tmux send-keys -t $session:0.0 "./UnifiedOptitrackClients/build/mocap2udp -s $RB_ID --ac 0 -f 20 -i 10.0.0.1 -p 5005 -c NED $TEST_FLAG" ENTER
+#tmux send-keys -t $session:0.0 "./UnifiedOptitrackClients/build/mocap2udp -s $RB_ID --ac 0 -f 20 -i 10.0.0.1 -p 5005 -c NED $TEST_FLAG" ENTER
+if [[ -z $TEST_FLAG ]]; then
+    tmux send-keys -t $session:0.0 "./UnifiedOptitrackClients/build/client optitrack udp -d 14 -f 20 -c NED -r far -n far -s 3 -i 127.0.0.1" ENTER
+else
+    tmux send-keys -t $session:0.0 "./UnifiedOptitrackClients/build/client test udp -d 14 -f 20 -c NED -r far -n far -s 3 -i 127.0.0.1 --test_freq 20" ENTER
+fi
 
 # setpoints
-tmux send-keys -t $session:0.1 '/usr/bin/env python3 setpointSender.py --pos 0 0 -1.0 --yaw 0'
+tmux send-keys -t $session:0.1 '/usr/bin/env python3 setpointSender.py --host 127.0.0.1 --pos 0 0 -1.0 --yaw 0'
 
 # keyboards
-tmux send-keys -t $session:0.2 '/usr/bin/env python3 keyInputs.py' ENTER
+tmux send-keys -t $session:0.2 '/usr/bin/env python3 keyInputs.py --host 127.0.0.1' ENTER
+
+# socat
+tmux send-keys -t $session:0.4 'sudo socat -d -d PTY,link=/dev/ttyDronebridge,raw,echo=0,mode=666 TCP:dronebridge.local:5760' ENTER
 
 # ping
-tmux send-keys -t $session:0.4 'ping 10.0.0.1' ENTER
+tmux send-keys -t $session:0.5 'ping 192.168.2.1' ENTER
 
 # periodically get stats by sending USER 1 signal to process
 #$ON_PI "while [[1]]; do; kill -USE2 `pidof connect`; sleep 5; done" &
