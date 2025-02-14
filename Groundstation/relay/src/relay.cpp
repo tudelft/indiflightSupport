@@ -301,10 +301,9 @@ int main(int argc, char** argv) {
 #ifdef ORIN
     const char* serialPort = "/dev/ttyTHS1";
 #else
-    //const char* serialPort = "/dev/ttyAMA0";
-    const char* serialPort = "/dev/ttyDB";
+    const char* serialPort = "/dev/ttyAMA0";
 #endif
-    int baudrate = B115200;
+    int baudrate = B921600;
 
     serialPortFd = openSerialPort(serialPort, baudrate);
     if (serialPortFd == -1) {

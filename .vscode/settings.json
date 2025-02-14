@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.ptx": "platformio-debug.asm",
+        "chrono": "cpp",
+        "algorithm": "cpp",
+        "thread": "cpp"
+    }
+}
