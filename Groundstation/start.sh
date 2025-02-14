@@ -25,44 +25,22 @@
 #   alacritty -o "window.startup_mode=Maximized" -e ./dashboard.sh 1003 
 #
 
-if ! [ -f remote.env ]; then
-  echo "Fatal: start.sh expects a remote.env file with the following contents:
-
-# NO SPACES BEFORE AND AFTER THE '='
-# NO quotation marks and no spaces in the variables
-REMOTE_NAME=CurrentUnusedCanBeEmpty
-REMOTE_IP=192.168.1.42
-REMOTE_USER=<username>
-REMOTE_PASSWORD=<ssh_password>
-    "
-fi
-
-source remote.env
-
-if [ -z $REMOTE_IP ] || [ -z $REMOTE_USER ] || [ -z $REMOTE_PASSWORD ]; then
-    echo "Fatal: Not all of REMOTE_IP, REMOTE_USER, REMOTE_PASSWORD set in remote.env"
-fi
-
 echo_help_and_exit() {
     echo "usage: $0 <rigid_body_id> [--test] [--help/-h]"
     exit 1
 }
 
 # check for arguments
-if [[ $# -gt 3 ]] || [[ $# -lt 1 ]]; then
+if [[ $# -gt 2 ]] || [[ $# -lt 1 ]]; then
     echo_help_and_exit
 fi
 
-MOCAP="optitrack"
-MOCAP_IP=
 while test $# != 0
 do
     left=$(echo "$1" | cut -d "=" -f 1)
-    right=$(echo "$1" | cut -d "=" -f 2-)
+    right=$(echo "$1" | cut -d "=" -f 2)
     case "$left" in
     --test) TEST_FLAG=--test ;;
-    --mocap) MOCAP=$right ;;
-    --mocap-ip) MOCAP_IP=$right ;;
     --help) echo_help_and_exit ;;
     -h) echo_help_and_exit ;;
     *) RB_ID=$left ;;
@@ -125,7 +103,8 @@ fi
 tmux send-keys -t $session:0.1 "/usr/bin/env python3 setpointSender.py --host $REMOTE_IP --pos 0 0 -1.0 --yaw 0"
 
 # keyboards
-tmux send-keys -t $session:0.2 "/usr/bin/env python3 keyInputs.py --host $REMOTE_IP" ENTER
+#tmux send-keys -t $session:0.2 "/usr/bin/env python3 keyInputs.py --host $REMOTE_IP" ENTER
+tmux send-keys -t $session:0.2 "/usr/bin/env python3 configMenu.py --host $REMOTE_IP" ENTER
 
 # ping
 tmux send-keys -t $session:0.4 "ping $REMOTE_IP" ENTER
