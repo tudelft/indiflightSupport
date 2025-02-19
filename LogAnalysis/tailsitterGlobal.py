@@ -37,9 +37,9 @@ class Tailsitter(nn.Module):
         self.r = nn.Parameter(torch.zeros(3, 1))  # IMU offset
         self.d0 = nn.Parameter(torch.zeros(2, 1)) # 0-force elevon angle
         coefficients = [
-            'cx0', 'cxw',         'cxd', 'cxv',
-            'cy0',                       'cyv',
-            'cz0', 'czw',         'czd2',
+            'cx0', 'cxw',         'cxd',  'cxv',
+            'cy0',                        'cyv',
+            'cz0', 'czw',         'czd2', 'czv',
             'cl0', 'clw', 
             'cm0', 'cmw',         'cmd',       'cmddd',
             'cn0', 'cnw', 'cnwd', 'cnd'
@@ -49,53 +49,46 @@ class Tailsitter(nn.Module):
 
     def forward(self, x):
         # STATE
-        # body vel   body rate   prop speeds (derivative)   elevon angles   elevon accelerations
-        vx, vy, vz,  Ox, Oy, Oz,   w1, w2, w1d, w2d,           d1, d2,            ddd1, ddd2 =  x
-        O = torch.vstack((Ox, Oy, Oz))
+        # body vel    body rate   body rate deriv    prop speeds (derivative)   elevon angles   elevon accelerations
+        vx, vy, vz,  Ox, Oy, Oz,   Odx, Ody, Odz,      w1, w2, w1d, w2d,           d1, d2,            d1dd, d2dd =  x
+        O  = torch.vstack((Ox, Oy, Oz))
+        Od = torch.vstack((Odx, Ody, Odz))
 
         # REGRESSOR primitives
         ww = torch.stack([w1*w1, w2*w2])                              # prop speeds ** 2
-        wwDd = ww * torch.tan( (torch.stack([d1, d2]) - self.d0) )    # prop speeds ** 2 * tan ( elevon angles )
-        d2abs = torch.tan( d1 ).abs() + torch.tan( d2 ).abs()         # for reduction of the prop thrust
+        wwDd = ww * torch.sin( (torch.stack([d1, d2]) - self.d0) )    # prop speeds ** 2 * sin ( elevon angles )
+        d2abs = torch.sin( d1 ).abs() + torch.sin( d2 ).abs()         # for reduction of the prop thrust
         vxavx, vyavy, vzavz = vx.abs()*vx, vy.abs()*vy, vz.abs()*vz   # for quadratic drag
 
         # FORCE / MOMENT MODEL
         #     offset      prop thrust contribution         prop rate contribution           elevon contribution          elev acc contrib                  drag
         fx = self.cx0  +  self.cxw * (ww[0] + ww[1])  +  0                        +  self.cxd * (wwDd[0] + wwDd[1])  +  0                           +  self.cxv * vxavx
         fy = self.cy0  +  0                           +  0                        +  0                               +  0                           +  self.cyv * vyavy
-        fz = self.cz0  +  self.czw * (ww[0] + ww[1])  +  0                        +  self.czd2 * d2abs               +  0                           +  0
+        fz = self.cz0  +  self.czw * (ww[0] + ww[1])  +  0                        +  self.czd2 * d2abs               +  0                           +  self.czv * vzavz
         mx = self.cl0  +  self.clw * (ww[0] - ww[1])  +  0                        +  0                               +  0                           +  0
-        my = self.cm0  +  self.cmw * (ww[0] + ww[1])  +  0                        +  self.cmd * (wwDd[0] + wwDd[1])  +  self.cmddd * (ddd1 + ddd2)  +  0
+        my = self.cm0  +  self.cmw * (ww[0] + ww[1])  +  0                        +  self.cmd * (wwDd[0] + wwDd[1])  +  self.cmddd * (d1dd + d2dd)  +  0
         mz = self.cn0  +  self.cnw * (ww[0] - ww[1])  +  self.cnwd * (w1d - w2d)  +  self.cnd * (wwDd[0] - wwDd[1])  +  0                           +  0
 
         f = torch.stack([fx, fy, fz])
         m = torch.stack([mx, my, mz])
 
         # KINETICS (todo: use measured dOdt, for IMU offset contribution to fIMU?)
-        dOdt = m # if I known: dOdt = inv(I) * (m - O.cross(self.I * O, dim=0))
-        fIMU = f  +  dOdt.cross(self.r, dim=0) + O.cross(O.cross(self.r, dim=0), dim=0)
+        a_modelled = f  +  Od.cross(self.r, dim=0)  +  O.cross(O.cross(self.r, dim=0), dim=0)
+        dO_modelled = m # if I known: dOdt = inv(I) * (m - O.cross(self.I * O, dim=0))
 
-        return torch.concat([fIMU, dOdt], dim=0)
+        return torch.concat([a_modelled, dO_modelled], dim=0)
 
-model = Tailsitter()
-model.to(device=device)
+class Motor(nn.Module):
+    def __init__(self):
+        super(Motor, self).__init__()
 
-# ablations: keep parameters at their initial value from __init__
-#exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0', 'czd2', 'cmddd', 'cyv']
-exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0', 'czd2', 'cyv']
-#exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0', 'cyv']
-for par in exclude:
-    model.get_parameter(par).requires_grad = False
+        self.tau = nn.Parameter(0.1*torch.ones(1))
+        self.idle = nn.Parameter(0*torch.ones(1))
+        self.max = nn.Parameter(1000*torch.ones(1))
+        self.k = nn.Parameter(0.0*torch.ones(1))
 
-
-#%% LOSS and OPTIMIZER
-# loss function           accelerations   gyro derivatives
-weights = torch.tensor([[0.05, 0.05, 0.05, 0.01, 0.01, 0.01]]).T.to(device=device)
-def weighted_mse_loss(pred, true, weight):
-    return torch.sum(weight * (pred - true) ** 2)
-
-optimizer = optim.LBFGS(model.parameters(), lr=1e-2); epochs = 100
-#optimizer = optim.AdamW(model.parameters(), lr=2e-1); epochs = 2000
+    def forward(self, delta, wd):
+        return self.max * (self.k * delta + (1-self.k) * delta**0.5) + self.idle - self.tau * wd
 
 
 #%% DATA loading
@@ -108,10 +101,11 @@ mean_dt = t.diff().mean()
 # convert columns to tensors
 v_true  = torch.tensor( data[[f'extVel[{i}]' for i in range(3)]].to_numpy(dtype=np.float32).T          ).to(device=device)
 q_true  = torch.tensor( data[[f'extAtt[{i}]' for i in range(4)]].to_numpy(dtype=np.float32).T / 8.128  ).to(device=device)
-a_true  = torch.tensor( data[[f'accADCafterRpm[{i}]' for i in range(3)]].to_numpy(dtype=np.float32).T  ).to(device=device)
-#a_true = torch.tensor( savgol_filter(a_true_raw.cpu(), window_length=9, polyorder=3) ).to(device=device)
+#a_true  = torch.tensor( data[[f'accADCafterRpm[{i}]' for i in range(3)]].to_numpy(dtype=np.float32).T  ).to(device=device)
+a_true_raw  = torch.tensor( data[[f'accADCafterRpm[{i}]' for i in range(3)]].to_numpy(dtype=np.float32).T  ).to(device=device)
+a_true = torch.tensor( savgol_filter(a_true_raw.cpu(), window_length=9, polyorder=3) ).to(device=device)
 O_true  = torch.tensor( data[[f'gyroADCafterRpm[{i}]' for i in range(3)]].to_numpy(dtype=np.float32).T ).to(device=device)
-Od_true = torch.tensor( savgol_filter(O_true.cpu(), window_length=9, polyorder=3, deriv=1, delta=mean_dt) ).to(device=device)
+Od_true = torch.tensor( savgol_filter(O_true.cpu(), window_length=15, polyorder=4, deriv=1, delta=mean_dt) ).to(device=device)
 w_true_raw  = torch.tensor( data[[f'omegaUnfiltered[{i}]' for i in range(2)]].to_numpy(dtype=np.float32).T ).to(device=device)
 w_true = torch.tensor( savgol_filter(w_true_raw.cpu(), window_length=25, polyorder=4) ).to(device=device)
 wd_true = torch.tensor( savgol_filter(w_true_raw.cpu(), window_length=25, polyorder=4, deriv=1, delta=mean_dt) ).to(device=device)
@@ -120,27 +114,46 @@ d_true_raw[1] *= -1
 d_true = torch.tensor( savgol_filter(d_true_raw.cpu(), window_length=50, polyorder=4) ).to(device=device)
 dd_true = torch.tensor( savgol_filter(d_true_raw.cpu(), window_length=50, polyorder=4, deriv=1, delta=mean_dt) ).to(device=device)
 ddd_true = torch.tensor( savgol_filter(d_true_raw.cpu(), window_length=50, polyorder=4, deriv=2, delta=mean_dt) ).to(device=device)
-
-# central differences
-#Od_true = 0.5/mean_dt*(O_true.roll(shifts=-1, dims=1) - O_true.roll(shifts=1, dims=1))
+del_12 = torch.tensor( data[[f'motor[{i}]' for i in range(2)]] .to_numpy(dtype=np.float32).T ).to(device=device)
 
 # get velocity in body frame for drag model
 v_body_true  = quaternion_rotate(q_true, v_true, inverse=True)
 
-# INPUTS AND TARGETS
+
+#%% MODEL optimisation
+model = Tailsitter()
+model.to(device=device)
+
+# ablations: keep parameters at their initial value from __init__
+#exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0', 'czd2', 'cmddd', 'cyv']
+#exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0', 'czd2', 'cyv']
+exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0', 'czd2'] #, 'cmddd', 'cyv']
+#exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0']
+#exclude = ['cx0', 'cy0', 'cz0']
+#exclude = []
+for par in exclude:
+    model.get_parameter(par).requires_grad = False
+
+# regressors and targets
 x = torch.vstack([
     v_body_true,
     O_true,
+    Od_true,
     w_true / 1000,  # to make regressors roughly unit
     wd_true / 20,
     d_true,
     ddd_true / 100, # servo angular acceleration
 ])[:, 1:-1]
-
 y_true = torch.concat((a_true, Od_true))[:, 1:-1]
 
+# loss function           accelerations   gyro derivatives
+weights = torch.tensor([[0.05, 0.05, 0.05, 0.01, 0.01, 0.01]]).T.to(device=device)
+def weighted_mse_loss(pred, true, weight):
+    return torch.sum(weight * (pred - true) ** 2)
 
-#%% RUN optimisation
+optimizer = optim.LBFGS(model.parameters(), lr=5e-1); epochs = 20
+#optimizer = optim.AdamW(model.parameters(), lr=1e-1); epochs = 2000
+
 for epoch in range(epochs):
     def closure():
         optimizer.zero_grad()
@@ -151,8 +164,39 @@ for epoch in range(epochs):
 
     optimizer.step(closure)
 
+    if epoch % 1 == 0:
+        print(f'Model Epoch {epoch}: Loss = {closure().item():.5f}')
+
+
+#%% MOTOR optimization for Motor 1 only for now
+motor = Motor()
+motor.to(device=device)
+
+# ablations: keep parameters at their initial value from __init__
+motor.get_parameter('idle').requires_grad = False
+
+# regressors and targets
+x1, x2 = del_12[1], wd_true[1]
+y_motor_true = w_true[1]
+
+# loss
+def mse_loss(pred, true):
+    return torch.sum((pred - true)**2)
+
+optimizer = optim.LBFGS(motor.parameters(), lr=1e-1); epochs = 100
+
+for epoch in range(epochs):
+    def closure():
+        optimizer.zero_grad()
+        y_pred = motor(x1, x2)
+        loss = mse_loss(y_pred, y_motor_true)
+        loss.backward()
+        return loss
+
+    optimizer.step(closure)
+
     if epoch % 10 == 0:
-        print(f'Epoch {epoch}: Loss = {closure().item():.5f}')
+        print(f'Motor Epoch {epoch}: Loss = {closure().item():.5f}')
 
 
 #%% PLOTS
@@ -185,7 +229,6 @@ axs[1, 1].set_ylim((-3, 3))
 for i in range(2):
     axs[2, 1].plot(t[1:-1], w_true[i, 1:-1].cpu().T, label=f"Motor {i+1}")
     axs[2, 1].set_ylabel("$\omega\ (rad/s)$")
-    # axs[3, 1].plot(t[1:-1], 180/np.pi*d_true_raw[i, 1:-1].cpu().T)
     axs[3, 1].plot(t[1:-1], 180/np.pi*d_true[i, 1:-1].cpu().T, label=f"Elevon {i+1}")
     axs[3, 1].set_ylabel("$\delta\ (deg)$")
     axs[4, 1].plot(t[1:-1], 180/np.pi*dd_true[i, 1:-1].cpu().T, label=f"Elevon {i+1}")
@@ -200,56 +243,57 @@ for i in range(2):
 [ax.set_xlabel("Time [s]") for ax in axs[-1, :]]
 fig.show()
 
+
 #%% TRIM
+# trim condition / initial guesses. False means not optimized
+v_trim   = nn.Parameter(torch.zeros(3, 1), requires_grad=False) # body speed
+O_trim   = nn.Parameter(torch.zeros(3, 1), requires_grad=False) # body rates
+Od_trim  = nn.Parameter(torch.zeros(3, 1), requires_grad=False) # body rate derivatives
+w_trim   = nn.Parameter(torch.ones (2, 1), requires_grad=True)  # motor speeds
+wd_trim  = nn.Parameter(torch.zeros(2, 1), requires_grad=False) # motor rate
+d_trim   = nn.Parameter(torch.zeros(2, 1), requires_grad=True)  # elevon angle
+ddd_trim = nn.Parameter(torch.zeros(2, 1), requires_grad=False) # elevon angle second derivative
+trim_pars = [v_trim, O_trim, Od_trim, w_trim, wd_trim, d_trim, ddd_trim]
 
-class Trimmer(nn.Module):
-    def __init__(self):
-        super(Trimmer, self).__init__()
-        self.v = nn.Parameter(torch.zeros(3, 1))    # body speed (keep zero)
-        self.O = nn.Parameter(torch.zeros(3, 1))    # body rates (keep zero)
-        self.w = nn.Parameter(torch.ones(2, 1))     # trim
-        self.wd = nn.Parameter(torch.zeros(2, 1))   # keep zero
-        self.d = nn.Parameter(torch.zeros(2, 1))    # trim
-        self.ddd = nn.Parameter(torch.zeros(2, 1))  # keep zero
+# dont allow model parameters to change, and set IMU offset to zero for the jacobians to make more sense
+from copy import deepcopy
+model_to_trim = deepcopy(model)
+model_to_trim.requires_grad_(False)
+model_to_trim.r.set_(torch.zeros((3,1)))
 
-        self.v.requires_grad = False
-        self.O.requires_grad = False
-        self.wd.requires_grad = False
-        self.ddd.requires_grad = False
-
-    def forward(self, model):
-        state = torch.concat((self.v, self.O, self.w, self.wd, self.d, self.ddd))
-        return model.forward(state)
-
+# define loss as  norm(dOdt)**2  +  (norm(f)**2 - G**2) ** 2
 def trim_loss(output):
     return torch.sum(output[3:, 0] ** 2)  +  ( torch.sum(output[:3, 0] ** 2) - 9.81**2 ) ** 2
 
-trim = Trimmer()
-optimizer = optim.LBFGS(trim.parameters(), lr=5e-1)
-
-model.requires_grad_(False)
-model.r.set_(torch.zeros((3,1)))
-print(f'Epoch {0}: Loss = {trim_loss(trim.forward(model)):.5f}')
-for epoch in range(10):
+# optimize!
+optimizer = optim.LBFGS(trim_pars, lr=5e-1)
+for epoch in range(5):
     def closure():
         optimizer.zero_grad()
-        e = trim(model)
-        loss = trim_loss(e)
+        v = model_to_trim(torch.concat(trim_pars))
+        loss = trim_loss(v)
         loss.backward()
         return loss
 
     optimizer.step(closure)
 
     if epoch % 1 == 0:
-        print(f'Epoch {epoch+1}: Loss = {closure().item():.5f}')
+        print(f'Trimming epoch {epoch+1}: Loss = {closure().item():.5f}')
+
 
 # %% Hover jacobian
 
-trim.wd.requires_grad = True
-trim.ddd.requires_grad = True
-state = torch.concat((trim.v, trim.O, trim.w, trim.wd, trim.d, trim.ddd))
-y = model(state)
+# turn on automatic gradient computation for all inputs
+#with torch.no_grad():
+    #w_trim.set_(torch.tensor([[1, 1.]]).T)
+    #d_trim.set_(torch.tensor([[0.8, 0.8]]).T)
+wd_trim.requires_grad = True
+ddd_trim.requires_grad = True
 
+# calculate 
+y = model_to_trim(torch.concat(trim_pars))
+
+# assemble jacobians 
 G1 = torch.zeros((6, 4))
 G2 = torch.zeros((6, 2))
 G3 = torch.zeros((6, 2))
@@ -257,19 +301,16 @@ for i in range(6):
     output = torch.zeros((6, 1))
     output[i, 0] = 1.
 
-    G1[i, 0:2] = 1 / (2 * trim.w.T * 1000 ** 2) * torch.autograd.grad(y, trim.w, grad_outputs=output, retain_graph=True)[0].T
-    G2[i, 0:2] = 1 / 20 * torch.autograd.grad(y, trim.wd, grad_outputs=output, retain_graph=True)[0].T
-    G1[i, 2:4] = torch.autograd.grad(y, trim.d, grad_outputs=output, retain_graph=True)[0].T
-    G3[i, 0:2] = 1 / 100 * torch.autograd.grad(y, trim.ddd, grad_outputs=output, retain_graph=True)[0].T
-
-wmax = 2800
-
-G1_indi = G1
+    G1[i, 0:2] = 1/(1000**2 * 2*w_trim.T) * torch.autograd.grad(y, w_trim, grad_outputs=output, retain_graph=True)[0].T
+    G1[i, 2:4] = torch.autograd.grad(y, d_trim, grad_outputs=output, retain_graph=True)[0].T
+    G2[i, 0:2] = 1/20 * torch.autograd.grad(y, wd_trim, grad_outputs=output, retain_graph=True)[0].T
+    G3[i, 0:2] = 1/100 * torch.autograd.grad(y, ddd_trim, grad_outputs=output, retain_graph=True)[0].T
 
 # to u-units
-G1_indi[:, :2] *= 2800*2800       # omega**2 = omega_max**2 * u
-G1_indi[:, 2:] *= 100*np.pi / 180 # u is in hectodegrees (...)
-G1_indi[:,  3] *= -1              # right servo is flipped
+G1_indi = G1
+G1_indi[:, :2] *= motor.max[0] ** 2 # omega**2 = omega_max**2 * u
+G1_indi[:, 2:] *= 100*np.pi / 180   # u is in hectodegrees (...)
+G1_indi[:,  3] *= -1                # right servo is flipped
 
 # to integers
 G1_indi[:3, :] *= 100
