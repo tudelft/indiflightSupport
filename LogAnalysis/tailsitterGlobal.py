@@ -57,6 +57,7 @@ class Tailsitter(nn.Module):
         # REGRESSOR primitives
         ww = torch.stack([w1*w1, w2*w2])                              # prop speeds ** 2
         wwDd = ww * torch.sin( (torch.stack([d1, d2]) - self.d0) )    # prop speeds ** 2 * sin ( elevon angles )
+        #wwDd = ww * ( (torch.stack([d1, d2]) - self.d0) )    # prop speeds ** 2 * sin ( elevon angles )
         d2abs = torch.sin( d1 ).abs() + torch.sin( d2 ).abs()         # for reduction of the prop thrust
         vxavx, vyavy, vzavz = vx.abs()*vx, vy.abs()*vy, vz.abs()*vz   # for quadratic drag
 
@@ -127,7 +128,8 @@ model.to(device=device)
 # ablations: keep parameters at their initial value from __init__
 #exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0', 'czd2', 'cmddd', 'cyv']
 #exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0', 'czd2', 'cyv']
-exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0', 'czd2'] #, 'cmddd', 'cyv']
+exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0', 'czd2', 'cxw']
+#exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0', 'czd2'] #, 'cmddd', 'cyv']
 #exclude = ['cx0', 'cy0', 'cz0', 'cl0', 'cm0', 'cn0']
 #exclude = ['cx0', 'cy0', 'cz0']
 #exclude = []
@@ -176,14 +178,14 @@ motor.to(device=device)
 motor.get_parameter('idle').requires_grad = False
 
 # regressors and targets
-x1, x2 = del_12[1], wd_true[1]
-y_motor_true = w_true[1]
+x1, x2 = del_12[0], wd_true[0]
+y_motor_true = w_true[0]
 
 # loss
 def mse_loss(pred, true):
     return torch.sum((pred - true)**2)
 
-optimizer = optim.LBFGS(motor.parameters(), lr=1e-1); epochs = 100
+optimizer = optim.LBFGS(motor.parameters(), lr=2e-1); epochs = 100
 
 for epoch in range(epochs):
     def closure():
@@ -306,17 +308,23 @@ for i in range(6):
     G2[i, 0:2] = 1/20 * torch.autograd.grad(y, wd_trim, grad_outputs=output, retain_graph=True)[0].T
     G3[i, 0:2] = 1/100 * torch.autograd.grad(y, ddd_trim, grad_outputs=output, retain_graph=True)[0].T
 
-# to u-units
 G1_indi = G1
+G2_indi = G2
+G3_indi = G3
+
+# to u-units
 G1_indi[:, :2] *= motor.max[0] ** 2 # omega**2 = omega_max**2 * u
 G1_indi[:, 2:] *= 100*np.pi / 180   # u is in hectodegrees (...)
 G1_indi[:,  3] *= -1                # right servo is flipped
+G1_indi[5, :2] *= -1                # I have no idea why
+G2_indi[5, :2] *= -1                # I have no idea why
+G3_indi[:,  1] *= -1                # right servo is flipped
 
 # to integers
 G1_indi[:3, :] *= 100
 G1_indi[3:, :] *= 10
-G2_indi         = G2 * 1e5
-G3_indi         = G3 * 1e3
+G2_indi        *= 1e5
+G3_indi        *= 1e3
 
 print("\n===== G1 =====")
 print(G1_indi.round().type(torch.int16))
@@ -326,3 +334,24 @@ print(G2_indi.round().type(torch.int16))
 
 print("\n===== G3 =====")
 print(G3_indi.round().type(torch.int16))
+
+print("\n===== TAILSITTER parameters =====")
+print()
+print(f"set indi_tails_use_scheduled = 1")
+print(f"set indi_tails_use_sine = 1")
+print()
+print(f"set indi_tails_d0 = {int(model.d0[0,0]*100*180/np.pi)}, {int(model.d0[1,0]*100*180/np.pi)}")
+print()
+print(f"set indi_tails_cxw = {int(model.cxw[0]*1e-6*1e9)}")
+print(f"set indi_tails_cyw = 0")
+print(f"set indi_tails_czw = {int(model.czw[0]*1e-6*1e9)}")
+print(f"set indi_tails_clw = {int(model.clw[0]*1e-6*1e8)}")
+print(f"set indi_tails_cmw = {int(model.cmw[0]*1e-6*1e8)}")
+print(f"set indi_tails_cnw = {int(model.cnw[0]*1e-6*1e8)}")
+print()
+print(f"set indi_tails_cnwd = {int(model.cnwd[0]/20*1e5)}")
+print()
+print(f"set indi_tails_cxd = {int(model.cxd[0]*1e-6*1e8)}")
+print(f"set indi_tails_cmd = {int(model.cmd[0]*1e-6*1e8)}")
+print(f"set indi_tails_cnd = {int(model.cnd[0]*1e-6*1e8)}")
+print()
