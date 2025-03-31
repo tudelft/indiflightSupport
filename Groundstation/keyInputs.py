@@ -68,23 +68,17 @@ s = set waypoint here
 3 = increase speed by 0.1
 9 = startTrajectoryTracker
 4 = stopTrajectoryTracker
-x = set init speed 70 perc
-y = set init speed 80 perc
-z = set init speed 90 perc
-a = set init speed 95 perc
-b = set init speed 100 perc
-c = set init speed 105 perc
-d = set init speed 110 perc
-e = set init speed 115 perc
-f = set init speed 120 perc
 
-r = heading mode: look at ref
-n = heading mode: look at nothing
-v = heading mode: look at velocity
-g = heading mode: look at gate
-
-q = auto start true
-w = auto start false
+a = select nn 1
+b = select nn 2
+c = select nn 3
+d = select nn 4
+e = select nn 5
+f = select nn 6
+g = select nn 7
+h = select nn 8
+i = select nn 9
+j = select nn 10
 
 5 = land
 6 = nn_init
