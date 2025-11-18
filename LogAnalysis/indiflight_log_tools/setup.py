@@ -38,11 +38,11 @@ setup(
     packages=["indiflight_log_tools"],             # Specify your package (replace with actual package name)
     ext_modules=[blackbox_decode],              # Include the C extension in the build
     install_requires=[                          # Package dependencies
-        "matplotlib >=3.9.2",
-        "numpy >=1.26.4",
-        "pandas >=2.2.2",
+        "matplotlib >=3.6.0",
+        "numpy >=1.23.5",
+        "pandas >=1.5.2",
         "platformdirs >=4.2.2",
-        "scipy >=1.14.0",
+        "scipy >=1.10.0",
     ],
     scripts=[
         "bin/bfl2csv",
