@@ -347,9 +347,6 @@ static size_t parseHeaderLine(flightLog_t *log, mmapStream_t *stream, ParserStat
 
     char *fieldName = valueBuffer;
     valueBuffer[separatorPos - lineStart] = '\0';
-    if (strstr(fieldName,"features")) { // This is the last field in the header.
-        *parserState = PARSER_STATE_TRANSITION;
-    }
     char *fieldValue = valueBuffer + (separatorPos - lineStart) + 1;
     valueBuffer[lineEnd - lineStart - 1] = '\0';
 
@@ -1359,7 +1356,12 @@ bool flightLogParse(flightLog_t *log, int logIndex, FlightLogMetadataReady onMet
             } else if (command == EOF) {
                 fprintf(stderr, "Data file contained no events\n");
                 break;
-            } 
+            } else if (parserState == PARSER_STATE_HEADER) {
+                // First non-header byte reached: the header is finished and this
+                // is the first data frame. (Replaces the wrong assumption that the
+                // "features" line is always the last header line.)
+                parserState = PARSER_STATE_TRANSITION;
+            }
             if (parserState == PARSER_STATE_TRANSITION) {
                 frameType = getFrameType(command);
 
