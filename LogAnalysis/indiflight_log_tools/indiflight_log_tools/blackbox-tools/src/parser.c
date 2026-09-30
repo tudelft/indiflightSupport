@@ -384,6 +384,10 @@ static size_t parseHeaderLine(flightLog_t *log, mmapStream_t *stream, ParserStat
         if (slashPos) {
             log->frameIntervalPNum = atoi(fieldValue);
             log->frameIntervalPDenom = atoi(slashPos + 1);
+        } else if (atoi(fieldValue) > 0) {
+            // BF4-style "P interval:N" = log every Nth iteration (blackbox.c blackboxPInterval)
+            log->frameIntervalPNum = 1;
+            log->frameIntervalPDenom = atoi(fieldValue);
         }
     } else if (strcmp(fieldName, "Data version") == 0) {
         log->private->dataVersion = atoi(fieldValue);
@@ -797,6 +801,14 @@ static void parseEventFrame(flightLog_t *log, mmapStream_t *stream, bool raw)
         case FLIGHT_LOG_EVENT_LOGGING_RESUME:
             data->loggingResume.logIteration = streamReadUnsignedVB(stream);
             data->loggingResume.currentTime = streamReadUnsignedVB(stream) + log->private->timeRolloverAccumulator;
+        break;
+        // Must be parsed: an unknown event desyncs the stream and silently drops the rest of the log
+        case FLIGHT_LOG_EVENT_FLIGHTMODE:
+            data->flightMode.flags = streamReadUnsignedVB(stream);
+            data->flightMode.lastFlags = streamReadUnsignedVB(stream);
+        break;
+        case FLIGHT_LOG_EVENT_DISARM:
+            data->disarm.reason = streamReadUnsignedVB(stream);
         break;
         case FLIGHT_LOG_EVENT_LOG_END:
             streamRead(stream, endMessage, END_OF_LOG_MESSAGE_LEN);
